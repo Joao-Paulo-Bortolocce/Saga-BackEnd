@@ -4,6 +4,7 @@ import  sistema.saga.sagabackend.model.Endereco;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import sistema.saga.sagabackend.repository.PessoaDAO;
+import sistema.saga.sagabackend.service.PessoaService;
 
 import java.time.LocalDate;
 
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @Table( name="pessoa")
 public class Pessoa {
     @Autowired
-    private PessoaDAO pessoaDAO;
+    private PessoaService pessoaService;
 
     @Id  // indica que é chave primaria
     @Column(name = "pessoa_cpf") // Como o atributo tem um nome diferente da tabela preciso colocar essa linha para que o JPA consiga gerar corretamente.
@@ -23,23 +24,23 @@ public class Pessoa {
     @Column(name = "pessoa_nome")
     private String nome;
 
-    @Temporal(value = LocalDate)
-    @Column(name = "pessoa_dataNascimento")
+    @Column(name = "pessoa_datanascimento")
     private LocalDate dataNascimento;
 
     @Column(name = "pessoa_sexo")
     private String sexo;
 
-    @Column(name = "pessoa_locNascimento")
+    @Column(name = "pessoa_locnascimento")
     private String locNascimento;
     
-    @Column(name = "pessoa_estadoNascimento")
+    @Column(name = "pessoa_estadonascimento")
     private String estadoNascimento;
 
-    @Column(name = "pessoa_enderecoId")
+    @ManyToOne
+    @JoinColumn(name = "pessoa_enderecoid", referencedColumnName = "endereco_id")
     private Endereco endereco;
 
-    @Column(name = "pessoa_estadoCivil")
+    @Column(name = "pessoa_estadocivil")
     private String estadoCivil;
 
     public Pessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, Endereco endereco, String estadoCivil) {
@@ -131,6 +132,6 @@ public class Pessoa {
     }
 
     public void gravarPessoa(){
-        pessoaDAO.save(this);
+        pessoaService.salvarPessoa(this);
     }
 }

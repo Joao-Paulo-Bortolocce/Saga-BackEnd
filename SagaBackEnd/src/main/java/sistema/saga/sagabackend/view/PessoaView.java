@@ -1,11 +1,12 @@
 package sistema.saga.sagabackend.view;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sistema.saga.sagabackend.controller.PessoaCtrl;
 import sistema.saga.sagabackend.dto.PessoaDTO;
-import sistema.saga.sagabackend.model.Endereco;
+import sistema.saga.sagabackend.service.PessoaService;
 
 import java.util.Date;
 
@@ -13,8 +14,11 @@ import java.util.Date;
 @RestController
 @RequestMapping(value = "pessoa")
 public class PessoaView {
-    @Autowired //não preciso instanciar nenhuma vez?
-    private PessoaCtrl pessoaCtrl;
+    //não preciso instanciar nenhuma vez?
+    private static PessoaCtrl pessoaCtrl= new PessoaCtrl();
+
+//    @Autowired
+//    private PessoaService pessoaService;
 
     ResponseEntity<Object> getPerson(String term){
         return null;
@@ -27,5 +31,12 @@ public class PessoaView {
        pessoaCtrl.gravarPessoa(pessoaDTO);
         return null;
     }
+
+//    @GetMapping("/test-pessoa")
+//    public Pessoa testPessoaService(@RequestParam String cpf) {
+//        // Testando o método do serviço
+//        Pessoa teste= pessoaService.buscarPessoaPorCpf(cpf);
+//        return null;
+//    }
 
 }
