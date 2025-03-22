@@ -11,9 +11,6 @@ import java.time.LocalDate;
 @Entity
 @Table( name="pessoa")
 public class Pessoa {
-    @Autowired
-    private PessoaService pessoaService;
-
     @Id  // indica que é chave primaria
     @Column(name = "pessoa_cpf") // Como o atributo tem um nome diferente da tabela preciso colocar essa linha para que o JPA consiga gerar corretamente.
     private String cpf;
@@ -53,6 +50,10 @@ public class Pessoa {
         this.estadoNascimento = estadoNascimento;
         this.endereco = endereco;
         this.estadoCivil = estadoCivil;
+    }
+
+    public Pessoa(String cpf) {
+        this(cpf,"","",null,"","","",null,"");
     }
 
     public Pessoa() {
@@ -131,7 +132,4 @@ public class Pessoa {
         this.estadoCivil = estadoCivil;
     }
 
-    public void gravarPessoa(){
-        pessoaService.salvarPessoa(this);
-    }
 }
