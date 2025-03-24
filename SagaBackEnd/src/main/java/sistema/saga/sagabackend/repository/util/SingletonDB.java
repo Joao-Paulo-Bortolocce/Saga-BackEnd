@@ -18,7 +18,7 @@ public class SingletonDB {
     {
         conexao=new Conexao();
 //        return conexao.conectar("jdbc:postgresql://localhost/", "postgres","postgres","postgres123");
-        return conexao.conectar("jdbc:postgresql://localhost/", "botecodb","postgres","postgres123");
+        return conexao.conectar("jdbc:postgresql://localhost/", "backendsaga","postgres","postgres123");
     }
     public static Conexao getConexao() {
         return conexao;
@@ -27,7 +27,7 @@ public class SingletonDB {
     public static boolean criarBD(String BD)
     { try{
         String url = "jdbc:postgresql://localhost/";
-        Connection con = DriverManager.getConnection(url,"postgres","postgres123");
+        Connection con = DriverManager.getConnection(url,"postgresql","postgres123");
 
         Statement statement = con.createStatement();
         statement.execute("CREATE DATABASE "+BD+" WITH OWNER = postgres ENCODING = 'UTF8'  "
