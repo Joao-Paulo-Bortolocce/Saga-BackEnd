@@ -1,3 +1,4 @@
+import Endereco from "../model/endereco.js";
 import Pessoa from "../model/pessoa.js";
 
 export default class PessoaCtrl {
@@ -14,42 +15,46 @@ export default class PessoaCtrl {
             const sexo = requisicao.body.sexo;
             const locNascimento = requisicao.body.locNascimento;
             const estadoNascimento = requisicao.body.estadoNascimento;
-            const endereco = requisicao.body.endereco;
+            const enderecoId = requisicao.body.enderecoId;
             const estadoCivil = requisicao.body.estadoCivil;
 
-            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && endereco && estadoCivil) {
-                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
-
-                pessoa.getPessoa(cpf)  
-                    .then((pessoaExistente) => {
-                        if (!pessoaExistente) {
-                            pessoa.gravar()  // Gravar a nova pessoa
-                                .then(() => {
-                                    resposta.status(200).json({
-                                        "status": true,
-                                        "mensagem": "Pessoa cadastrada com sucesso!"
+            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
+                let endereco = new Endereco(enderecoId);
+                endereco.buscaEndereco(enderecoId).then((endereco) => {
+                    // if(endereco==null)
+                    const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
+                    pessoa.consultar(cpf)
+                        .then((pessoaExistente) => {
+                            if (!pessoaExistente) {
+                                pessoa.gravar()  // Gravar a nova pessoa
+                                    .then(() => {
+                                        resposta.status(200).json({
+                                            "status": true,
+                                            "mensagem": "Pessoa cadastrada com sucesso!"
+                                        });
+                                    })
+                                    .catch((erro) => {
+                                        resposta.status(500).json({
+                                            "status": false,
+                                            "mensagem": "Erro ao cadastrar a pessoa: " + erro.message
+                                        });
                                     });
-                                })
-                                .catch((erro) => {
-                                    resposta.status(500).json({
-                                        "status": false,
-                                        "mensagem": "Erro ao cadastrar a pessoa: " + erro.message
-                                    });
+                            } else {
+                                resposta.status(400).json({
+                                    "status": false,
+                                    "mensagem": "Já existe uma pessoa cadastrada com este CPF."
                                 });
-                        } else {
-                            resposta.status(400).json({
+                            }
+                        })
+                        .catch((erro) => {
+                            resposta.status(500).json({
                                 "status": false,
-                                "mensagem": "Já existe uma pessoa cadastrada com este CPF."
+                                "mensagem": "Erro ao verificar CPF: " + erro.message
                             });
-                        }
-                    })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao verificar CPF: " + erro.message
                         });
-                    });
-            } else {
+                });
+            }
+            else {
                 resposta.status(400).json({
                     "status": false,
                     "mensagem": "Preencha todos os campos corretamente conforme documentação da API."
@@ -74,25 +79,28 @@ export default class PessoaCtrl {
             const sexo = requisicao.body.sexo;
             const locNascimento = requisicao.body.locNascimento;
             const estadoNascimento = requisicao.body.estadoNascimento;
-            const endereco = requisicao.body.endereco;
+            const enderecoId = requisicao.body.enderecoId;
             const estadoCivil = requisicao.body.estadoCivil;
 
-            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && endereco && estadoCivil) {
-                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
+            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
+                let endereco = new Endereco(enderecoId);
+                endereco.buscaEndereco(enderecoId).then((endereco) => {
+                    const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
 
-                pessoa.alterar()  // Alterar os dados da pessoa
-                    .then(() => {
-                        resposta.status(200).json({
-                            "status": true,
-                            "mensagem": "Pessoa atualizada com sucesso!"
+                    pessoa.alterar()  // Alterar os dados da pessoa
+                        .then(() => {
+                            resposta.status(200).json({
+                                "status": true,
+                                "mensagem": "Pessoa atualizada com sucesso!"
+                            });
+                        })
+                        .catch((erro) => {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": "Erro ao atualizar a pessoa: " + erro.message
+                            });
                         });
-                    })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao atualizar a pessoa: " + erro.message
-                        });
-                    });
+                })
             } else {
                 resposta.status(400).json({
                     "status": false,
@@ -116,7 +124,7 @@ export default class PessoaCtrl {
             if (cpf) {
                 const pessoa = new Pessoa(cpf);
 
-                pessoa.apagar()  
+                pessoa.apagar()
                     .then(() => {
                         resposta.status(200).json({
                             "status": true,
@@ -149,26 +157,18 @@ export default class PessoaCtrl {
 
         if (requisicao.method === "GET") {
             const termo = requisicao.params.termo;
-
-            if (termo) {
-                const pessoa = new Pessoa();
-
-                pessoa.consultar(cpf) 
-                    .then((listaPessoas) =>
-                       {resposta.status(200).json(listaPessoas);
-                    })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao consultar a pessoa(s): " + erro.message
-                        });
+            const pessoa = new Pessoa();
+            pessoa.consultar(termo)
+                .then((listaPessoas) => {
+                    resposta.status(200).json(listaPessoas);
+                })
+                .catch((erro) => {
+                    resposta.status(500).json({
+                        "status": false,
+                        "mensagem": "Erro ao consultar a pessoa(s): " + erro.message
                     });
-            } else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": "Informe um filtro válido para consultar a pessoa."
                 });
-            }
+
         } else {
             resposta.status(400).json({
                 "status": false,

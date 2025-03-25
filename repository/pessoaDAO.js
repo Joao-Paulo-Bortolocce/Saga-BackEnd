@@ -36,6 +36,9 @@ export default class PessoaDAO {
             const conexao = await conectar();
             const sql = `INSERT INTO pessoa (pessoa_cpf, pessoa_rg, pessoa_nome, pessoa_datanascimento, pessoa_sexo, pessoa_locnascimento, pessoa_estadonascimento, pessoa_enderecoid, pessoa_estadocivil) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                let enderecoId = pessoa.enderecoId;
+
+
             const parametros = [
                 pessoa.cpf,
                 pessoa.rg,
@@ -44,7 +47,7 @@ export default class PessoaDAO {
                 pessoa.sexo,
                 pessoa.locNascimento,
                 pessoa.estadoNascimento,
-                pessoa.enderecoId,
+                enderecoId,
                 pessoa.estadoCivil
             ];
             await conexao.execute(sql, parametros);
@@ -83,15 +86,19 @@ export default class PessoaDAO {
     
     async get(filtro) {
         const conexao = await conectar();
-        const unico= false;
+        let unico= false;
         let parametros;
-        if(filtro!==undefined && filtro!="" && !isNaN(filtro[0])){
-            const sql = `SELECT * FROM pessoa WHERE pessoa_cpf = ?`;
+        let sql;
+        if(filtro===undefined)
+            filtro="";
+        if(filtro!="" && !isNaN(filtro[0])){
+             sql= `SELECT * FROM pessoa WHERE pessoa_cpf = ?`;
             unico=true;
             parametros = [filtro];
         }
         else{
-            const sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE ?`;
+                
+             sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE ?`;
             parametros=[`%${filtro}%`]
         }
         const [linhas, campos] = await conexao.execute(sql, parametros);

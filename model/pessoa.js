@@ -77,6 +77,10 @@ export default class Pessoa {
         this.#endereco = novoEndereco;
     }
 
+    get enderecoId(){
+        return this.#endereco.id;
+    }
+
     get estadoCivil() {
         return this.#estadoCivil;
     }
@@ -123,7 +127,7 @@ export default class Pessoa {
 
     async apagar() {
         const pessoaDAO = new PessoaDAO();
-        return await pessoaDAO.apagar(this);
+        return await pessoaDAO.apagar(this.#cpf);
     }
 
     async consultar(filtro) {

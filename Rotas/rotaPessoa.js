@@ -8,7 +8,7 @@ const pessoaCtrl = new PessoaCtrl();
 const rotaPessoa = Router();
 
 rotaPessoa.post("/", pessoaCtrl.gravar);
-rotaPessoa.put("/:cpf", pessoaCtrl.editar);
+rotaPessoa.put("/", pessoaCtrl.editar);
 rotaPessoa.patch("/:cpf", pessoaCtrl.editar);
 rotaPessoa.delete("/:cpf", pessoaCtrl.excluir);
 rotaPessoa.get("/:termo", pessoaCtrl.consultar);

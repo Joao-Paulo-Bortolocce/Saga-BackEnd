@@ -12,13 +12,14 @@ export default class EnderecoDAO {
             const conexao = await conectar();
             const sql = `
             CREATE TABLE IF NOT EXISTS endereco (
-                endereco_id INT AUTO_INCREMENT PRIMARY KEY,
+                endereco_id INT AUTO_INCREMENT ,
                 endereco_rua VARCHAR(255) NOT NULL,
                 endereco_numero INT NOT NULL,
                 endereco_complemento VARCHAR(255),
                 endereco_cep VARCHAR(20) NOT NULL,
                 endereco_uf VARCHAR(2) NOT NULL,
-                endereco_cidade VARCHAR(100) NOT NULL
+                endereco_cidade VARCHAR(100) NOT NULL,
+                CONSTRAINT pk_endereco primary key (endereco_id)
             );
             `;
             await conexao.execute(sql);
@@ -75,13 +76,15 @@ export default class EnderecoDAO {
 
     async get(filtro) {
         const conexao = await conectar();
-        const unico = false;
         let parametros;
-        if (filtro !== undefined && filtro !== "" && !isNaN(filtro[0])) {
-            const sql = `SELECT * FROM endereco WHERE endereco_id = ?`;
+        let sql;
+        if(filtro===undefined)
+            filtro="";
+        if (filtro !== undefined && filtro !== "" && !isNaN(filtro)) {
+             sql= `SELECT * FROM endereco WHERE endereco_id = ?`;
             parametros = [filtro];
         } else {
-            const sql = `SELECT * FROM endereco WHERE endereco_rua LIKE ? OR endereco_cidade LIKE ?`;
+            sql = `SELECT * FROM endereco WHERE endereco_rua LIKE ? OR endereco_cidade LIKE ?`;
             parametros = [`%${filtro}%`, `%${filtro}%`];
         }
         const [linhas, campos] = await conexao.execute(sql, parametros);
@@ -100,7 +103,7 @@ export default class EnderecoDAO {
                 );
                 listaEnderecos.push(endereco);
             }
-            if (unico) return listaEnderecos[0];
+            if (listaEnderecos.length<=1) return listaEnderecos[0];
             return listaEnderecos;
         }
         return null;

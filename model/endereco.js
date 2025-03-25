@@ -11,7 +11,6 @@ export default class Endereco {
         this.cidade = cidade;
     }
 
-    // Getters e Setters
     getId() {
         return this.id;
     }
@@ -71,7 +70,7 @@ export default class Endereco {
     async buscaEndereco(idEndereco) {
         try {
             const enderecoDAO = new EnderecoDAO();
-            return await enderecoDAO.getEndereco(idEndereco); 
+            return await enderecoDAO.get(idEndereco); 
         } catch (erro) {
             throw new Error("Erro ao buscar endereço: " + erro.message);
         }
