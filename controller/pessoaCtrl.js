@@ -20,39 +20,36 @@ export default class PessoaCtrl {
 
             if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
                 let endereco = new Endereco(enderecoId);
-                endereco.buscaEndereco(enderecoId).then((endereco) => {
-                    // if(endereco==null)
-                    const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
-                    pessoa.consultar(cpf)
-                        .then((pessoaExistente) => {
-                            if (!pessoaExistente) {
-                                pessoa.gravar()  // Gravar a nova pessoa
-                                    .then(() => {
-                                        resposta.status(200).json({
-                                            "status": true,
-                                            "mensagem": "Pessoa cadastrada com sucesso!"
-                                        });
-                                    })
-                                    .catch((erro) => {
-                                        resposta.status(500).json({
-                                            "status": false,
-                                            "mensagem": "Erro ao cadastrar a pessoa: " + erro.message
-                                        });
+                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
+                pessoa.consultar(cpf)
+                    .then((pessoaExistente) => {
+                        if (!pessoaExistente) {
+                            pessoa.gravar()  // Gravar a nova pessoa
+                                .then(() => {
+                                    resposta.status(200).json({
+                                        "status": true,
+                                        "mensagem": "Pessoa cadastrada com sucesso!"
                                     });
-                            } else {
-                                resposta.status(400).json({
-                                    "status": false,
-                                    "mensagem": "Já existe uma pessoa cadastrada com este CPF."
+                                })
+                                .catch((erro) => {
+                                    resposta.status(500).json({
+                                        "status": false,
+                                        "mensagem": "Erro ao cadastrar a pessoa: " + erro.message
+                                    });
                                 });
-                            }
-                        })
-                        .catch((erro) => {
-                            resposta.status(500).json({
+                        } else {
+                            resposta.status(400).json({
                                 "status": false,
-                                "mensagem": "Erro ao verificar CPF: " + erro.message
+                                "mensagem": "Já existe uma pessoa cadastrada com este CPF."
                             });
+                        }
+                    })
+                    .catch((erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": "Erro ao verificar CPF: " + erro.message
                         });
-                });
+                    });
             }
             else {
                 resposta.status(400).json({
@@ -84,23 +81,23 @@ export default class PessoaCtrl {
 
             if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
                 let endereco = new Endereco(enderecoId);
-                endereco.buscaEndereco(enderecoId).then((endereco) => {
-                    const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
 
-                    pessoa.alterar()  // Alterar os dados da pessoa
-                        .then(() => {
-                            resposta.status(200).json({
-                                "status": true,
-                                "mensagem": "Pessoa atualizada com sucesso!"
-                            });
-                        })
-                        .catch((erro) => {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": "Erro ao atualizar a pessoa: " + erro.message
-                            });
+                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
+
+                pessoa.alterar()  // Alterar os dados da pessoa
+                    .then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": "Pessoa atualizada com sucesso!"
                         });
-                })
+                    })
+                    .catch((erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": "Erro ao atualizar a pessoa: " + erro.message
+                        });
+                    });
+
             } else {
                 resposta.status(400).json({
                     "status": false,
@@ -160,6 +157,10 @@ export default class PessoaCtrl {
             const pessoa = new Pessoa();
             pessoa.consultar(termo)
                 .then((listaPessoas) => {
+                    let listaAux = [];
+                    for(let pessoa of listaPessoas){
+                        pessoa.endereco= new Endereco().buscaEndereco(pessoa.enderecoId)
+                    }
                     resposta.status(200).json(listaPessoas);
                 })
                 .catch((erro) => {

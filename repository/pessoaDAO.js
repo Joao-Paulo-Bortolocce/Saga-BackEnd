@@ -1,5 +1,6 @@
 import conectar from "./Conexao.js";
 import Pessoa from "../model/pessoa.js";
+import Endereco from "../model/endereco.js";
 
 export default class PessoaDAO {
     constructor() {
@@ -8,7 +9,7 @@ export default class PessoaDAO {
 
     async init() {
         try {
-            const conexao = await conectar();
+            const conexao = await conectar.connect();
             const sql = `
             CREATE TABLE IF NOT EXISTS pessoa (
                 pessoa_cpf VARCHAR(15) NOT NULL,
@@ -24,7 +25,7 @@ export default class PessoaDAO {
                 CONSTRAINT fk_enderecoPessoa FOREIGN KEY (pessoa_enderecoid) references endereco (endereco_id)
             );
             `;
-            await conexao.execute(sql);
+            await conexao.query(sql);
             await conexao.release();
         } catch (erro) {
             console.log("Erro ao iniciar tabela pessoa: " + erro.message);
@@ -33,9 +34,9 @@ export default class PessoaDAO {
 
     async gravar(pessoa) {
         if (pessoa instanceof Pessoa) {
-            const conexao = await conectar();
+            const conexao = await conectar.connect();
             const sql = `INSERT INTO pessoa (pessoa_cpf, pessoa_rg, pessoa_nome, pessoa_datanascimento, pessoa_sexo, pessoa_locnascimento, pessoa_estadonascimento, pessoa_enderecoid, pessoa_estadocivil) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
                 let enderecoId = pessoa.enderecoId;
 
 
@@ -50,16 +51,16 @@ export default class PessoaDAO {
                 enderecoId,
                 pessoa.estadoCivil
             ];
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             await conexao.release();
         }
     }
 
     async alterar(pessoa) {
         if (pessoa instanceof Pessoa) {
-            const conexao = await conectar();
-            const sql = `UPDATE pessoa SET pessoa_rg = ?, pessoa_nome = ?, pessoa_datanascimento = ?, pessoa_sexo = ?, pessoa_locnascimento = ?, pessoa_estadonascimento = ?, pessoa_enderecoid = ?, pessoa_estadocivil = ? 
-                WHERE pessoa_cpf = ?`;
+            const conexao = await conectar.connect();
+            const sql = `UPDATE pessoa SET pessoa_rg = $1, pessoa_nome = $2, pessoa_datanascimento = $3, pessoa_sexo = $4, pessoa_locnascimento = $5, pessoa_estadonascimento = $6, pessoa_enderecoid = $7, pessoa_estadocivil = $8 
+            WHERE pessoa_cpf = $9`;
             const parametros = [
                 pessoa.rg,
                 pessoa.nome,
@@ -71,42 +72,43 @@ export default class PessoaDAO {
                 pessoa.estadoCivil,
                 pessoa.cpf
             ];
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             await conexao.release();
         }
     }
 
     async apagar(cpf) {
-        const conexao = await conectar();
-        const sql = `DELETE FROM pessoa WHERE pessoa_cpf = ?`;
+        const conexao = await conectar.connect();
+        const sql = `DELETE FROM pessoa WHERE pessoa_cpf = $1`;
         let parametros=[cpf]
-        await conexao.execute(sql, parametros);
+        await conexao.query(sql, parametros);
         await conexao.release();
     }
     
     async get(filtro) {
-        const conexao = await conectar();
+        const conexao = await conectar.connect();
         let unico= false;
         let parametros;
         let sql;
         if(filtro===undefined)
             filtro="";
         if(filtro!="" && !isNaN(filtro[0])){
-             sql= `SELECT * FROM pessoa WHERE pessoa_cpf = ?`;
+             sql= `SELECT * FROM pessoa WHERE pessoa_cpf = $1`;
             unico=true;
             parametros = [filtro];
         }
         else{
                 
-             sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE ?`;
+             sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE $1`;
             parametros=[`%${filtro}%`]
         }
-        const [linhas, campos] = await conexao.execute(sql, parametros);
-        await conexao.release();
+        const resultado = await conexao.query(sql, parametros);
+        const linhas = resultado.rows || []; // Garante que seja um array
         if(linhas.length>0){
             let listaPessoas=[];
             for(const linha of linhas){
-                const pessoa= new Pessoa(
+                let endereco = new Endereco(linha.pessoa_enderecoid)
+                    const pessoa= new Pessoa(
                     linha.pessoa_cpf,
                     linha.pessoa_rg,
                     linha.pessoa_nome,
@@ -114,14 +116,14 @@ export default class PessoaDAO {
                     linha.pessoa_sexo,
                     linha.pessoa_locnascimento,
                     linha.pessoa_estadonascimento,
-                    linha.pessoa_enderecoid,
+                    endereco,
                     linha.pessoa_estadocivil
-                );
-                listaPessoas.push(pessoa);
-            }
-            if(unico)
-                return listaPessoas[0];
-            return listaPessoas;
+                    );
+                    listaPessoas.push(pessoa);    
+                }
+                if(unico)
+                    return listaPessoas[0];
+                return listaPessoas;
         }
         return null;
 
