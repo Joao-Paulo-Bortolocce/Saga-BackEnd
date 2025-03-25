@@ -6,14 +6,14 @@
 //vamos utilizar o padrão modular para importar os módulos
 //não esqueça de atualizar o arquivo package.json adicionando a chave "type":"module"
 import express from 'express';
-import rotaPessoa from "./Rotas/rotaPessoa.js"
-import dotenv from 'dotenv';
+import rotaSerie from './Rotas/rotaSerie.js';
+//import dotenv from 'dotenv';
 import cors from 'cors';
 
 
 //CARREGAR AS VARIAVEIS DE AMBIENTE LOCALIZADAS NA RAIZ DO PROJETO
 // A PARTIR DO ARQUIVO .ENV LOCALIZADO NA RAIZ DO PROJETO
-dotenv.config()
+//dotenv.config()
 
 
 const host = "0.0.0.0"; //todas as placas de rede do computador que está executando a aplicação
@@ -33,8 +33,8 @@ app.use(cors({
 app.use(express.static('./publico'));
 
 
-app.use('/pessoa', rotaPessoa);
+app.use('/serie', rotaSerie);
 
 app.listen(porta, host, () => {
-    console.log(`Servidor escutando em http://${host}:${porta}`)
+    console.log(`Servidor Executando: http://${host}:${porta}`)
 });
