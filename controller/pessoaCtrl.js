@@ -3,65 +3,44 @@ import Pessoa from "../model/pessoa.js";
 
 export default class PessoaCtrl {
 
-    // Criar uma nova pessoa
     gravar(requisicao, resposta) {
         resposta.type("application/json");
 
         if (requisicao.method === 'POST' && requisicao.is("application/json")) {
-            const cpf = requisicao. body.cpf;
+            const cpf = requisicao.body.cpf;
             const rg = requisicao.body.rg;
             const nome = requisicao.body.nome;
             const dataNascimento = requisicao.body.dataNascimento;
             const sexo = requisicao.body.sexo;
             const locNascimento = requisicao.body.locNascimento;
             const estadoNascimento = requisicao.body.estadoNascimento;
-            const enderecoId = requisicao.body.enderecoId;
             const estadoCivil = requisicao.body.estadoCivil;
+            const endereco = new Endereco(requisicao.body.endereco.rua, requisicao.body.endereco.numero, requisicao.body.endereco.complemento, requisicao.body.endereco.cep, requisicao.body.endereco.uf, requisicao.body.endereco.cidade);
 
-            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
-                let endereco = new Endereco(enderecoId);
-                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
+            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && estadoCivil && endereco) {
+                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, estadoCivil, endereco);
                 pessoa.consultar(cpf)
-                    .then((pessoaExistente) => {
+                    .then(pessoaExistente => {
                         if (!pessoaExistente) {
-                            pessoa.gravar()  // Gravar a nova pessoa
+                            pessoa.gravar()
                                 .then(() => {
-                                    resposta.status(200).json({
-                                        "status": true,
-                                        "mensagem": "Pessoa cadastrada com sucesso!"
-                                    });
+                                    resposta.status(200).json({ "status": true, "mensagem": "Pessoa cadastrada com sucesso!" });
                                 })
-                                .catch((erro) => {
-                                    resposta.status(500).json({
-                                        "status": false,
-                                        "mensagem": "Erro ao cadastrar a pessoa: " + erro.message
-                                    });
+                                .catch(erro => {
+                                    resposta.status(500).json({ "status": false, "mensagem": "Erro ao cadastrar a pessoa: " + erro.message });
                                 });
                         } else {
-                            resposta.status(400).json({
-                                "status": false,
-                                "mensagem": "Já existe uma pessoa cadastrada com este CPF."
-                            });
+                            resposta.status(400).json({ "status": false, "mensagem": "Já existe uma pessoa cadastrada com este CPF." });
                         }
                     })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao verificar CPF: " + erro.message
-                        });
+                    .catch(erro => {
+                        resposta.status(500).json({ "status": false, "mensagem": "Erro ao consultar a pessoa: " + erro.message });
                     });
-            }
-            else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": "Preencha todos os campos corretamente conforme documentação da API."
-                });
+            } else {
+                resposta.status(400).json({ "status": false, "mensagem": "Preencha todos os campos corretamente conforme documentação da API." });
             }
         } else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": "Requisição inválida! Consulte a documentação da API."
-            });
+            resposta.status(400).json({ "status": false, "mensagem": "Requisição inválida! Consulte a documentação da API." });
         }
     }
 
@@ -76,39 +55,23 @@ export default class PessoaCtrl {
             const sexo = requisicao.body.sexo;
             const locNascimento = requisicao.body.locNascimento;
             const estadoNascimento = requisicao.body.estadoNascimento;
-            const enderecoId = requisicao.body.enderecoId;
             const estadoCivil = requisicao.body.estadoCivil;
+            const endereco = new Endereco(requisicao.body.endereco.rua, requisicao.body.endereco.numero, requisicao.body.endereco.complemento, requisicao.body.endereco.cep, requisicao.body.endereco.uf, requisicao.body.endereco.cidade);
 
-            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && enderecoId && estadoCivil) {
-                let endereco = new Endereco(enderecoId);
-
-                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
-
-                pessoa.alterar()  // Alterar os dados da pessoa
+            if (cpf && rg && nome && dataNascimento && sexo && locNascimento && estadoNascimento && estadoCivil && endereco) {
+                const pessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, estadoCivil, endereco);
+                pessoa.alterar()
                     .then(() => {
-                        resposta.status(200).json({
-                            "status": true,
-                            "mensagem": "Pessoa atualizada com sucesso!"
-                        });
+                        resposta.status(200).json({ "status": true, "mensagem": "Pessoa atualizada com sucesso!" });
                     })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao atualizar a pessoa: " + erro.message
-                        });
+                    .catch(erro => {
+                        resposta.status(500).json({ "status": false, "mensagem": "Erro ao atualizar a pessoa: " + erro.message });
                     });
-
             } else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": "Preencha todos os campos corretamente conforme documentação da API."
-                });
+                resposta.status(400).json({ "status": false, "mensagem": "Preencha todos os campos corretamente conforme documentação da API." });
             }
         } else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": "Requisição inválida! Consulte a documentação da API."
-            });
+            resposta.status(400).json({ "status": false, "mensagem": "Requisição inválida! Consulte a documentação da API." });
         }
     }
 
@@ -120,34 +83,20 @@ export default class PessoaCtrl {
 
             if (cpf) {
                 const pessoa = new Pessoa(cpf);
-
                 pessoa.apagar()
                     .then(() => {
-                        resposta.status(200).json({
-                            "status": true,
-                            "mensagem": "Pessoa excluída com sucesso!"
-                        });
+                        resposta.status(200).json({ "status": true, "mensagem": "Pessoa excluída com sucesso!" });
                     })
-                    .catch((erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": "Erro ao excluir a pessoa: " + erro.message
-                        });
+                    .catch(erro => {
+                        resposta.status(500).json({ "status": false, "mensagem": "Erro ao excluir a pessoa: " + erro.message });
                     });
             } else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": "Informe um CPF válido para excluir a pessoa."
-                });
+                resposta.status(400).json({ "status": false, "mensagem": "Informe um CPF válido para excluir a pessoa." });
             }
         } else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": "Requisição inválida! Consulte a documentação da API."
-            });
+            resposta.status(400).json({ "status": false, "mensagem": "Requisição inválida! Consulte a documentação da API." });
         }
     }
-
 
     consultar(requisicao, resposta) {
         resposta.type("application/json");
@@ -156,25 +105,14 @@ export default class PessoaCtrl {
             const termo = requisicao.params.termo;
             const pessoa = new Pessoa();
             pessoa.consultar(termo)
-                .then((listaPessoas) => {
-                    let listaAux = [];
-                    for(let pessoa of listaPessoas){
-                        pessoa.endereco= new Endereco().buscaEndereco(pessoa.enderecoId)
-                    }
+                .then(listaPessoas => {
                     resposta.status(200).json(listaPessoas);
                 })
-                .catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": "Erro ao consultar a pessoa(s): " + erro.message
-                    });
+                .catch(erro => {
+                    resposta.status(500).json({ "status": false, "mensagem": "Erro ao consultar a pessoa(s): " + erro.message });
                 });
-
         } else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": "Requisição inválida! Consulte a documentação da API."
-            });
+            resposta.status(400).json({ "status": false, "mensagem": "Requisição inválida! Consulte a documentação da API." });
         }
     }
 }

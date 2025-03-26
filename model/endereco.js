@@ -1,78 +1,76 @@
-import EnderecoDAO from '../repository/enderecoDAO.js'; // Importação do DAO
-
 export default class Endereco {
-    constructor(id = 0, rua = "", numero = 0, complemento = "", cep = "", uf = "", cidade = "") {
-        this.id = id;
-        this.rua = rua;
-        this.numero = numero;
-        this.complemento = complemento;
-        this.cep = cep;
-        this.uf = uf;
-        this.cidade = cidade;
+    #rua;
+    #numero;
+    #complemento;
+    #cep;
+    #uf;
+    #cidade;
+
+    constructor(rua = "", numero = 0, complemento = "", cep = "", uf = "", cidade = "") {
+        this.#rua = rua;
+        this.#numero = numero;
+        this.#complemento = complemento;
+        this.#cep = cep;
+        this.#uf = uf;
+        this.#cidade = cidade;
     }
 
-    getId() {
-        return this.id;
+    get rua() {
+        return this.#rua;
     }
 
-    setId(id) {
-        this.id = id;
+    set rua(novaRua) {
+        this.#rua = novaRua;
     }
 
-    getRua() {
-        return this.rua;
+    get numero() {
+        return this.#numero;
     }
 
-    setRua(rua) {
-        this.rua = rua;
+    set numero(novoNumero) {
+        this.#numero = novoNumero;
     }
 
-    getNumero() {
-        return this.numero;
+    get complemento() {
+        return this.#complemento;
     }
 
-    setNumero(numero) {
-        this.numero = numero;
+    set complemento(novoComplemento) {
+        this.#complemento = novoComplemento;
     }
 
-    getComplemento() {
-        return this.complemento;
+    get cep() {
+        return this.#cep;
     }
 
-    setComplemento(complemento) {
-        this.complemento = complemento;
+    set cep(novoCep) {
+        this.#cep = novoCep;
     }
 
-    getCep() {
-        return this.cep;
+    get uf() {
+        return this.#uf;
     }
 
-    setCep(cep) {
-        this.cep = cep;
+    set uf(novoUf) {
+        this.#uf = novoUf;
     }
 
-    getUf() {
-        return this.uf;
+    get cidade() {
+        return this.#cidade;
     }
 
-    setUf(uf) {
-        this.uf = uf;
+    set cidade(novaCidade) {
+        this.#cidade = novaCidade;
     }
 
-    getCidade() {
-        return this.cidade;
-    }
-
-    setCidade(cidade) {
-        this.cidade = cidade;
-    }
-
-    async buscaEndereco(idEndereco) {
-        try {
-            const enderecoDAO = new EnderecoDAO();
-            return await enderecoDAO.get(idEndereco); 
-        } catch (erro) {
-            throw new Error("Erro ao buscar endereço: " + erro.message);
-        }
+    toJSON() {
+        return {
+            rua: this.#rua,
+            numero: this.#numero,
+            complemento: this.#complemento,
+            cep: this.#cep,
+            uf: this.#uf,
+            cidade: this.#cidade
+        };
     }
 }

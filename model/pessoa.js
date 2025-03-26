@@ -10,8 +10,8 @@ export default class Pessoa {
     #sexo;
     #locNascimento;
     #estadoNascimento;
-    #endereco;
     #estadoCivil;
+    #endereco;
 
     get cpf() {
         return this.#cpf;
@@ -69,18 +69,6 @@ export default class Pessoa {
         this.#estadoNascimento = novoEstadoNascimento;
     }
 
-    get endereco() {
-        return this.#endereco;
-    }
-
-    set endereco(novoEndereco) {
-        this.#endereco = novoEndereco;
-    }
-
-    get enderecoId(){
-        return this.#endereco.id;
-    }
-
     get estadoCivil() {
         return this.#estadoCivil;
     }
@@ -89,7 +77,19 @@ export default class Pessoa {
         this.#estadoCivil = novoEstadoCivil;
     }
 
-    constructor(cpf = "", rg = "", nome = "", dataNascimento = "", sexo = "", locNascimento = "", estadoNascimento = "", endereco = new Endereco(), estadoCivil = "") {
+    get endereco() {
+        return this.#endereco;
+    }
+
+    set endereco(novoEndereco) {
+        if (novoEndereco instanceof Endereco) {
+            this.#endereco = novoEndereco;
+        } else {
+            throw new Error("O endereço deve ser uma instância de Endereco.");
+        }
+    }
+
+    constructor(cpf = "", rg = "", nome = "", dataNascimento = "", sexo = "", locNascimento = "", estadoNascimento = "", estadoCivil = "", endereco = new Endereco()) {
         this.#cpf = cpf;
         this.#rg = rg;
         this.#nome = nome;
@@ -97,8 +97,8 @@ export default class Pessoa {
         this.#sexo = sexo;
         this.#locNascimento = locNascimento;
         this.#estadoNascimento = estadoNascimento;
-        this.#endereco = endereco;
         this.#estadoCivil = estadoCivil;
+        this.#endereco = endereco;
     }
 
     toJSON() {
@@ -110,8 +110,8 @@ export default class Pessoa {
             "sexo": this.#sexo,
             "locNascimento": this.#locNascimento,
             "estadoNascimento": this.#estadoNascimento,
-            "endereco": this.#endereco,  
-            "estadoCivil": this.#estadoCivil
+            "estadoCivil": this.#estadoCivil,
+            "endereco": this.#endereco.toJSON()  
         };
     }
 
