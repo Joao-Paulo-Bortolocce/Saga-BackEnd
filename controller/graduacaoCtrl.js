@@ -1,26 +1,26 @@
-import Salas from "../model/salas";
+import Graduacao from "../model/graduacao.js";
 
-export default class SalasCtrl {
+export default class GraduacaoCrtl {
 
     gravar(requisicao, resposta) {
         resposta.type("application/json");
 
         if (requisicao.method === 'POST' && requisicao.is("application/json")) {
-            const ncarteiras = requisicao.body.ncarteiras;
+            const descricao = requisicao.body.descricao;
 
-            if (ncarteiras) {
-                const salas = new Salas(0, ncarteiras);
-                salas.gravar()
+            if (descricao) {
+                const graduacao = new Graduacao(0, descricao);
+                graduacao.gravar()
                 .then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "mensagem": "Sala cadastrada com sucesso!"
+                        "mensagem": "Graduação cadastrada com sucesso!"
                     });
                 })
                 .catch((erro) => {
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": "Erro ao cadastrar a sala: " + erro.message
+                        "mensagem": "Erro ao cadastrar a graduação: " + erro.message
                     });
                 });
             }
@@ -43,22 +43,21 @@ export default class SalasCtrl {
 
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is("application/json")) {
             const id = requisicao.body.id;
-            const ncarteiras = requisicao.body.ncarteiras;
+            const descricao = requisicao.body.descricao;
 
-            if (id > 0 && ncarteiras) {
-                const salas = new Salas(id, ncarteiras);
-
-                salas.alterar()
+            if (id > 0 && descricao) {
+                const graduacao = new graduacao(id, descricao);
+                graduacao.alterar()
                     .then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "mensagem": "Sala atualizada com sucesso!"
+                            "mensagem": "Graduação atualizada com sucesso!"
                         });
                     })
                     .catch((erro) => {
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": "Erro ao atualizar a sala: " + erro.message
+                            "mensagem": "Erro ao atualizar a graduação: " + erro.message
                         });
                     });
 
@@ -83,19 +82,19 @@ export default class SalasCtrl {
             const id = requisicao.params.id;
 
             if (id>0) {
-                const salas = new Salas(id);
+                const graduacao = new Graduacao(id);
 
-                salas.apagar()
+                graduacao.apagar()
                     .then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "mensagem": "Sala excluída com sucesso!"
+                            "mensagem": "Graduação excluída com sucesso!"
                         });
                     })
                     .catch((erro) => {
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": "Erro ao excluir a sala: " + erro.message
+                            "mensagem": "Erro ao excluir a graduação: " + erro.message
                         });
                     });
             } else {
@@ -121,18 +120,18 @@ export default class SalasCtrl {
                 id = "";
             }
             
-            const sala = new Salas();
+            const graduacao = new Graduacao();
             
-            sala.consultar(id)
-                .then((listaSalas) => {
+            graduacao.consultar(id)
+                .then((listaGraducao) => {
                     let listaAux = [];
-                    for(let sala of listaSalas)
-                    resposta.status(200).json(listaSalas);
+                    for(let graduacao of listaGraducao)
+                    resposta.status(200).json(listaGraducao);
                 })
                 .catch((erro) => {
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": "Erro ao consultar a sala(s): " + erro.message
+                        "mensagem": "Erro ao consultar a(s) gradução(ões): " + erro.message
                     });
                 });
 

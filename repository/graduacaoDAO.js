@@ -1,7 +1,7 @@
 import conectar from "./Conexao.js";
-import Salas from "../model/salas.js";
+import Graduacao from "../model/graduacao.js";
 
-export default class SalasDAO {
+export default class GraduacaoDAO {
     constructor() {
         this.init();
     }
@@ -10,39 +10,39 @@ export default class SalasDAO {
         try {
             const conexao = await conectar.connect();
             const sql = `
-            CREATE TABLE IF NOT EXISTS salas (
-                salas_id SERIAL PRIMARY KEY,
-                salas_ncarteiras INT NOT NULL
+            CREATE TABLE IF NOT EXISTS graduacao (
+                graduacao_id SERIAL PRIMARY KEY,
+                graduacao_descricao VARCHAR(50) NOT NULL
             );
             `;
             await conexao.query(sql);
             await conexao.release();
         } catch (erro) {
-            console.log("Erro ao iniciar tabela salas: " + erro.message);
+            console.log("Erro ao iniciar tabela graduacao: " + erro.message);
         }
     }
 
-    async gravar(salas) {
-        if (salas instanceof Salas) {
+    async gravar(graduacao) {
+        if (graduacao instanceof Graduacao) {
             const conexao = await conectar.connect();
-            const sql = `INSERT INTO salas(salas_id, salas_ncarteiras)
+            const sql = `INSERT INTO graduacao(graduacao_id, graduacao_descricao)
 	            'VALUES ($1, $2)`;
             const parametros = [
-                salas.id,
-                salas.ncarteiras
+                graduacao.id,
+                graduacao.descricao
             ];
             await conexao.query(sql, parametros);
             await conexao.release();
         }
     }
 
-    async alterar(salas) {
+    async alterar(graduacao) {
         if (salas instanceof Salas) {
             const conexao = await conectar.connect();
-            const sql = `UPDATE salas SET salas_ncarteiras=$1 WHERE salas_id=$2`;
+            const sql = `UPDATE graduacao SET graduacao_descricao=$1 WHERE graduacao_id=$2`;
             const parametros = [
-                salas.ncarteiras,
-                salas.id
+                graduacao.descricao,
+                graduacao.id
             ];
             await conexao.query(sql, parametros);
             await conexao.release();
@@ -51,7 +51,7 @@ export default class SalasDAO {
 
     async apagar(id) {
         const conexao = await conectar.connect();
-        const sql = `DELETE FROM salas WHERE salas_id = $1`;
+        const sql = `DELETE FROM graduacao WHERE graduacao_id = $1`;
         let parametros=[id]
         await conexao.query(sql, parametros);
         await conexao.release();
@@ -65,28 +65,28 @@ export default class SalasDAO {
         if(filtro===undefined)
             filtro="";
         if(filtro!="" && !isNaN(filtro[0])){
-            sql= `SELECT * FROM salas WHERE salas_id = $1`;
+            sql= `SELECT * FROM graduacao WHERE graduacao_id = $1`;
             unico=true;
             parametros = [filtro];
         }
         else{
-            sql = `SELECT * FROM salas WHERE salas_ncarteiras LIKE $1`;
+            sql = `SELECT * FROM graduacao WHERE graduacao_descricao LIKE $1`;
             parametros=[`%${filtro}%`]
         }
         const resultado = await conexao.query(sql, parametros);
         const linhas = resultado.rows || [];
         if(linhas.length>0){
-            let listaSalas=[];
+            let listaGraduacao=[];
             for(const linha of linhas){
-                const salas= new Salas(
-                linha.salas_id,
-                linha.salas_ncarteiras
+                const graduacao= new Graduacao(
+                linha.graduacao_id,
+                linha.graduacao_descricao
                 );
-                    listaSalas.push(salas);
+                listaGraduacao.push(graduacao);
                 }
                 if(unico)
-                    return listaSalas[0];
-                return listaSalas;
+                    return listaGraduacao[0];
+                return listaGraduacao;
         }
         return null;
     }

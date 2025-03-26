@@ -11,6 +11,6 @@ rotaSala.delete("/:id", salasCtrl.excluir);
 rotaSala.get("/:id", salasCtrl.consultar);
 rotaSala.get("/",salasCtrl.consultar);
 
-export default rotaPessoa;
+export default rotaSala;
 
 
