@@ -8,7 +8,7 @@ export default class PessoaCtrl {
         resposta.type("application/json");
 
         if (requisicao.method === 'POST' && requisicao.is("application/json")) {
-            const cpf = requisicao.body.cpf;
+            const cpf = requisicao. body.cpf;
             const rg = requisicao.body.rg;
             const nome = requisicao.body.nome;
             const dataNascimento = requisicao.body.dataNascimento;
