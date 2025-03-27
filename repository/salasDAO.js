@@ -63,12 +63,14 @@ export default class SalasDAO {
             parametros = [];
         } 
         else if (!isNaN(filtro)) {
-            sql = `SELECT * FROM salas WHERE salas_id = $1`;
+            sql = `
+              SELECT * FROM salas WHERE salas_id = $1 OR salas_ncarteiras = $1
+            `;
             parametros = [filtro];
-            unico = true;
-        } 
+            unico = false;
+        }
         else {
-            sql = `SELECT * FROM salas WHERE salas_ncarteiras LIKE $1`;
+            sql = `SELECT * FROM salas WHERE salas_id = $1 OR salas_ncarteiras = $1`;
             parametros = [`%${filtro}%`];
         }
 
