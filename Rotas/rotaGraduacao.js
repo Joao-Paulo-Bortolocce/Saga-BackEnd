@@ -1,5 +1,5 @@
 import { Router } from "express"; //micro-aplicação HTTP
-import GraduacaoCtrl from "../controller/graduacaoCtrl";
+import GraduacaoCtrl from "../controller/graduacaoCtrl.js";
 
 const graduacaoCtrl = new GraduacaoCtrl();
 const rotaGraduacao = Router();

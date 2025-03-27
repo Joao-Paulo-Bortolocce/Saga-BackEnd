@@ -5,12 +5,10 @@ const salasCtrl = new SalasCtrl();
 const rotaSala = Router();
 
 rotaSala.post("/", salasCtrl.gravar);
-rotaSala.put("/", salasCtrl.editar);
+rotaSala.put("/:id", salasCtrl.editar);
 rotaSala.patch("/:id", salasCtrl.editar);
 rotaSala.delete("/:id", salasCtrl.excluir);
-rotaSala.get("/:id", salasCtrl.consultar);
+rotaSala.get("/:termo", salasCtrl.consultar);
 rotaSala.get("/",salasCtrl.consultar);
 
 export default rotaSala;
-
-

@@ -1,4 +1,4 @@
-import Salas from "../model/salas";
+import Salas from "../model/salas.js";
 
 export default class SalasCtrl {
 
@@ -42,10 +42,10 @@ export default class SalasCtrl {
         resposta.type("application/json");
 
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is("application/json")) {
-            const id = requisicao.body.id;
+            const id = requisicao.params.id;
             const ncarteiras = requisicao.body.ncarteiras;
 
-            if (id > 0 && ncarteiras) {
+            if (id && ncarteiras) {
                 const salas = new Salas(id, ncarteiras);
 
                 salas.alterar()
@@ -116,17 +116,13 @@ export default class SalasCtrl {
         resposta.type("application/json");
 
         if (requisicao.method === "GET") {
-            const id = requisicao.params.id;
-            if (isNaN(id)){
-                id = "";
-            }
+            
+            const termo = requisicao.params.termo;
             
             const sala = new Salas();
             
-            sala.consultar(id)
+            sala.consultar(termo)
                 .then((listaSalas) => {
-                    let listaAux = [];
-                    for(let sala of listaSalas)
                     resposta.status(200).json(listaSalas);
                 })
                 .catch((erro) => {

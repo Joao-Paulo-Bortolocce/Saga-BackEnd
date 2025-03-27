@@ -6,7 +6,8 @@
 //vamos utilizar o padrão modular para importar os módulos
 //não esqueça de atualizar o arquivo package.json adicionando a chave "type":"module"
 import express from 'express';
-import rotaPessoa from "./Rotas/rotaPessoa.js"
+import rotaSala from "./Rotas/rotaSalas.js"
+import rotaGraduacao from './Rotas/rotaGraduacao.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -32,8 +33,8 @@ app.use(cors({
 //app utilize a pasta 'publico' para disponibilizar o conteúdo ali armazenado
 app.use(express.static('./publico'));
 
-
-app.use('/pessoa', rotaPessoa);
+app.use('/graduacao', rotaGraduacao);
+app.use('/salas', rotaSala);
 
 app.listen(porta, host, () => {
     console.log(`Servidor escutando em http://${host}:${porta}`)

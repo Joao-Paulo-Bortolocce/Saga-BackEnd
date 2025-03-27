@@ -1,4 +1,4 @@
-import GraduacaoDAO from "../repository/GraduacaoDAO";
+import GraduacaoDAO from "../repository/graduacaoDAO.js";
 
 export default class Graduacao {
 

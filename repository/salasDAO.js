@@ -25,14 +25,10 @@ export default class SalasDAO {
     async gravar(salas) {
         if (salas instanceof Salas) {
             const conexao = await conectar.connect();
-            const sql = `INSERT INTO salas(salas_id, salas_ncarteiras)
-	            'VALUES ($1, $2)`;
-            const parametros = [
-                salas.id,
-                salas.ncarteiras
-            ];
-            await conexao.query(sql, parametros);
-            await conexao.release();
+            const sql = `INSERT INTO salas (salas_ncarteiras) VALUES ($1)`;
+            const parametros = [salas.getNcarteira()];
+            await conexao.query(sql,parametros);
+            conexao.release();
         }
     }
 
@@ -41,11 +37,10 @@ export default class SalasDAO {
             const conexao = await conectar.connect();
             const sql = `UPDATE salas SET salas_ncarteiras=$1 WHERE salas_id=$2`;
             const parametros = [
-                salas.ncarteiras,
-                salas.id
+                salas.getNcarteira(), salas.getId()
             ];
             await conexao.query(sql, parametros);
-            await conexao.release();
+            conexao.release();
         }
     }
 
@@ -59,34 +54,32 @@ export default class SalasDAO {
     
     async get(filtro) {
         const conexao = await conectar.connect();
-        let unico= false;
-        let parametros;
         let sql;
-        if(filtro===undefined)
-            filtro="";
-        if(filtro!="" && !isNaN(filtro[0])){
-            sql= `SELECT * FROM salas WHERE salas_id = $1`;
-            unico=true;
+        let parametros;
+        let unico = false;
+
+        if (!filtro) {
+            sql = `SELECT * FROM salas`;
+            parametros = [];
+        } 
+        else if (!isNaN(filtro)) {
+            sql = `SELECT * FROM salas WHERE salas_id = $1`;
             parametros = [filtro];
-        }
-        else{
+            unico = true;
+        } 
+        else {
             sql = `SELECT * FROM salas WHERE salas_ncarteiras LIKE $1`;
-            parametros=[`%${filtro}%`]
+            parametros = [`%${filtro}%`];
         }
-        const resultado = await conexao.query(sql, parametros);
-        const linhas = resultado.rows || [];
-        if(linhas.length>0){
-            let listaSalas=[];
-            for(const linha of linhas){
-                const salas= new Salas(
-                linha.salas_id,
-                linha.salas_ncarteiras
-                );
-                    listaSalas.push(salas);
-                }
-                if(unico)
-                    return listaSalas[0];
-                return listaSalas;
+
+        const result = await conexao.query(sql, parametros);
+        conexao.release();
+
+        if (result.rows.length > 0) {
+            const listaSalas = result.rows.map(row =>
+                new Salas(row.salas_id, row.salas_ncarteiras)
+            );
+            return unico ? listaSalas[0] : listaSalas;
         }
         return null;
     }
