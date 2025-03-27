@@ -126,7 +126,7 @@ export default class PessoaDAO {
                 unico = true;
                 parametros = [filtro];
             } else {
-                sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE $1`;
+                sql = `SELECT * FROM pessoa WHERE pessoa_nome LIKE $1 ORDER BY pessoa_nome`;
                 parametros = [`%${filtro}%`];
             }
 
