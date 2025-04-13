@@ -46,11 +46,13 @@ public class PessoaCtrl {
                 if(pessoa.gravar(gerenciaConexao.getConexao())){
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa alterada com sucesso");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 }
                 else{
                     resposta.put("status", false);
                     resposta.put("mensagem", "Pessoa não foi inserida!");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
 
@@ -97,11 +99,13 @@ public class PessoaCtrl {
                 if(pessoa.alterar(gerenciaConexao.getConexao())){
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa alterada com sucesso");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 }
                 else{
                     resposta.put("status", false);
                     resposta.put("mensagem", "Pessoa não foi alterada!");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
             } else {
@@ -122,6 +126,7 @@ public class PessoaCtrl {
             Pessoa pessoa = new Pessoa();
             GerenciaConexao gerenciaConexao= new GerenciaConexao();
             List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao());
+            gerenciaConexao.Desconectar();
             if (pessoaList != null && pessoaList.size() > 0) {
                 resposta.put("status", true);
                 resposta.put("listaDePessoas", pessoaList);
@@ -147,11 +152,13 @@ public class PessoaCtrl {
                 if(pessoa.apagar(gerenciaConexao.getConexao())){
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa excluída com sucesso!");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 }
                 else{
                     resposta.put("status", false);
                     resposta.put("mensagem", "Exclusão não foi realizada!");
+                    gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
             } else {

@@ -24,8 +24,7 @@ public class Conexao {
     public boolean conectar(String local, String banco, String usuario, String senha) {
         boolean conectado = false;
         try {
-            //Class.forName(driver); "org.postgresql.Driver");
-            String url = local + banco; //"jdbc:postgresql://localhost/"+banco;
+            String url = local + banco; // "jdbc:postgresql://localhost/"+banco;
             connect = DriverManager.getConnection(url, usuario, senha);
             conectado = true;
         } catch (SQLException sqlex) {
@@ -44,7 +43,7 @@ public class Conexao {
         return (connect != null);
     }
 
-    public boolean manipular(String sql) {// inserir, alterar,excluir
+    public boolean manipular(String sql) {
         boolean executou = false;
         try {
             Statement statement = connect.createStatement();
@@ -62,10 +61,7 @@ public class Conexao {
         ResultSet rs = null;
         try {
             Statement statement = connect.createStatement();
-            //ResultSet.TYPE_SCROLL_INSENSITIVE,
-            //ResultSet.CONCUR_READ_ONLY);
             rs = statement.executeQuery(sql);
-            //statement.close();
         } catch (SQLException sqlex) {
             erro = "Erro: " + sqlex.toString();
             rs = null;
@@ -78,7 +74,7 @@ public class Conexao {
         int max = 0;
         ResultSet rs = consultar(sql);
         try {
-            if (rs.next())
+            if (rs != null && rs.next())
                 max = rs.getInt(1);
         } catch (SQLException sqlex) {
             erro = "Erro: " + sqlex.toString();
@@ -87,7 +83,20 @@ public class Conexao {
         return max;
     }
 
+    public boolean desconectar() {
+        boolean desconectado = false;
+        try {
+            if (connect != null && !connect.isClosed()) {
+                connect.close();
+                desconectado = true;
+            }
+        } catch (SQLException e) {
+            erro = "Erro ao desconectar: " + e.toString();
+        }
+        return desconectado;
+    }
 }
+
 
 
 //    @Bean

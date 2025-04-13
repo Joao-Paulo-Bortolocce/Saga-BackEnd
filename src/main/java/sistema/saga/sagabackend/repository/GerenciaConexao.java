@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class GerenciaConexao {
-    private static Conexao conexao;
+    private  Conexao conexao;
     private static final String URL = "jdbc:postgresql://localhost/";
     private static final String BASE_NAME = "saga";
     private static final String USER = "postgres";
@@ -22,6 +22,10 @@ public class GerenciaConexao {
     public boolean Conectar() {
         conexao = new Conexao();
         return conexao.conectar(URL, BASE_NAME, USER, SENHA);
+    }
+
+    public boolean Desconectar() {
+        return conexao.desconectar();
     }
 
     public Conexao getConexao() {
