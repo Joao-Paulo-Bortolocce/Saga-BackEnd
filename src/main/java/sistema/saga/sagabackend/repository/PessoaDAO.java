@@ -71,10 +71,10 @@ public class PessoaDAO {
                 String pessoaSexo = resultSet.getString("pessoa_sexo");
                 String pessoaLocNascimento = resultSet.getString("pessoa_locnascimento");
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
-//                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
+                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
-                Endereco endereco = null;
-//                endereco = endereco.buscaEndereco(pessoaEnderecoId);
+                Endereco endereco = new Endereco(pessoaEnderecoId);
+                endereco=endereco.buscaEndereco(pessoaEnderecoId,conexao);
                 Pessoa pessoa =new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
                         pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, endereco, pessoaEstadoCivil);
                 return pessoa;
@@ -102,10 +102,10 @@ public class PessoaDAO {
                 String pessoaSexo = resultSet.getString("pessoa_sexo");
                 String pessoaLocNascimento = resultSet.getString("pessoa_locnascimento");
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
-//                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
+                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
-                Endereco endereco = null;
-//                endereco = endereco.buscaEndereco(pessoaEnderecoId);
+                Endereco endereco = new Endereco(pessoaEnderecoId);
+                endereco=endereco.buscaEndereco(pessoaEnderecoId,conexao);
                 pessoas.add(new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
                         pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, endereco, pessoaEstadoCivil));
             }

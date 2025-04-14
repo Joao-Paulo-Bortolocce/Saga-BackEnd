@@ -2,6 +2,7 @@ package sistema.saga.sagabackend.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.EnderecoDAO;
 
 import java.sql.SQLException;
@@ -17,17 +18,18 @@ public class Endereco {
     private String uf;
     private String cidade;
 
-    @Autowired
-    private EnderecoDAO enderecoDAO;
-
     public Endereco(long id, String rua, int numero, String complemento, String cep, String cidade, String uf) {
         this.id = id;
-        this.rua = rua;
+        this.rua = rua.toUpperCase();
         this.numero = numero;
-        this.complemento = complemento;
-        this.cep = cep;
-        this.uf = uf;
-        this.cidade = cidade;
+        this.complemento = complemento.toUpperCase();
+        this.cep = cep.toUpperCase();
+        this.uf = uf.toUpperCase();
+        this.cidade = cidade.toUpperCase();
+    }
+
+    public Endereco(String rua, int numero, String complemento, String cep, String cidade, String uf) {
+        this(0,rua,numero,complemento,cep,cidade,uf);
     }
 
     public Endereco() {
@@ -94,7 +96,33 @@ public class Endereco {
         this.cidade = cidade;
     }
 
-    public Endereco buscaEndereco(int pessoaEnderecoId) throws SQLException {
-        return enderecoDAO.getEndereco(pessoaEnderecoId);
+    public Endereco buscaEndereco(Conexao conexao)  {
+        EnderecoDAO enderecoDAO= new EnderecoDAO();
+        return enderecoDAO.getEndereco(this,conexao);
+    }
+
+    public Endereco buscaEndereco(int id,Conexao conexao)  {
+        EnderecoDAO enderecoDAO= new EnderecoDAO();
+        return enderecoDAO.getEndereco(id,conexao);
+    }
+
+    public boolean gravar(Conexao conexao) {
+        Endereco aux= buscaEndereco(conexao);
+        if(aux!=null){
+            setId(aux.getId());
+            setNumero(aux.getNumero());
+            setCep(aux.getCep());
+            setCidade(aux.getCidade());
+            setRua(aux.getRua());
+            setUf(aux.getUf());
+            setComplemento(aux.getComplemento());
+            return true;
+        }
+        EnderecoDAO enderecoDAO= new EnderecoDAO();
+         if(enderecoDAO.gravar(this,conexao)){
+             setId(conexao.getMaxPK("endereco","endereco_id"));
+             return true;
+         }
+         return false;
     }
 }

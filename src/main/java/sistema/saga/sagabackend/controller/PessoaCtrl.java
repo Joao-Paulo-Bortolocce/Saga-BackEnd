@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Service
 public class PessoaCtrl {
-    public ResponseEntity<Object> gravarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, int idEndereco, String estadoCivil) {
+    public ResponseEntity<Object> gravarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, String estadoCivil, String rua, int numero, String complemento, String cep, String uf, String cidade ) {
         Map<String, Object> resposta = new HashMap<>();
         try {
             if (verificaIntegridade(cpf) &&
@@ -26,10 +26,20 @@ public class PessoaCtrl {
                     verificaIntegridade(locNascimento) &&
                     verificaIntegridade(estadoNascimento) &&
                     verificaIntegridade(estadoCivil) &&
-                    verificaIntegridade(idEndereco) &&
+                    verificaIntegridade(rua) &&
+                    verificaIntegridade(numero) &&
+                    verificaIntegridade(cep) &&
+                    verificaIntegridade(uf) &&
+                    verificaIntegridade(cidade) &&
                     verificaIntegridade(dataNascimento)) {
-                Endereco endereco = new Endereco(idEndereco);
-                endereco = endereco.buscaEndereco(idEndereco); // supondo que o método buscarEndereco existe
+                GerenciaConexao gerenciaConexao= new GerenciaConexao();
+                Endereco endereco = new Endereco(rua,numero,complemento,cep,cidade,uf);
+                if(!endereco.gravar(gerenciaConexao.getConexao())){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Erro ao cadastrar endereco");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
 
                 Pessoa pessoa = new Pessoa(
                         cpf,
@@ -42,10 +52,10 @@ public class PessoaCtrl {
                         endereco,
                         estadoCivil
                 );
-                GerenciaConexao gerenciaConexao= new GerenciaConexao();
+
                 if(pessoa.gravar(gerenciaConexao.getConexao())){
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Pessoa alterada com sucesso");
+                    resposta.put("mensagem", "Pessoa Inserida com sucesso");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 }
@@ -68,7 +78,7 @@ public class PessoaCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, int idEndereco, String estadoCivil) {
+    public ResponseEntity<Object> alterarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, String estadoCivil, String rua, int numero, String complemento, String cep, String uf, String cidade ) {
         Map<String, Object> resposta = new HashMap<>();
         try {
             if (verificaIntegridade(cpf) &&
@@ -78,11 +88,21 @@ public class PessoaCtrl {
                     verificaIntegridade(locNascimento) &&
                     verificaIntegridade(estadoNascimento) &&
                     verificaIntegridade(estadoCivil) &&
-                    verificaIntegridade(idEndereco) &&
+                    verificaIntegridade(rua) &&
+                    verificaIntegridade(numero) &&
+                    verificaIntegridade(cep) &&
+                    verificaIntegridade(uf) &&
+                    verificaIntegridade(cidade) &&
                     verificaIntegridade(dataNascimento)) {
 
-                Endereco endereco = new Endereco(idEndereco);
-                endereco = endereco.buscaEndereco(idEndereco);
+                GerenciaConexao gerenciaConexao= new GerenciaConexao();
+                Endereco endereco = new Endereco(rua,numero,complemento,cep,cidade,uf);
+                if(!endereco.gravar(gerenciaConexao.getConexao())){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Erro ao cadastrar endereco");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
 
                 Pessoa pessoa = new Pessoa(
                         cpf,
@@ -95,7 +115,6 @@ public class PessoaCtrl {
                         endereco,
                         estadoCivil
                 );
-                GerenciaConexao gerenciaConexao= new GerenciaConexao();
                 if(pessoa.alterar(gerenciaConexao.getConexao())){
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa alterada com sucesso");
