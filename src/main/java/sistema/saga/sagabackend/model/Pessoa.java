@@ -121,7 +121,7 @@ public class Pessoa {
 
     public int buscaPessoa(Conexao conexao,Pessoa pessoa){
         PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.get(pessoa,conexao);
+        return pessoaDAO.getPessoa(pessoa,conexao);
     }
 
     public List<Pessoa> buscarTodos(Conexao conexao,List<Integer> idsEndereco) {

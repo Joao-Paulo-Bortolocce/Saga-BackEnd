@@ -83,11 +83,12 @@ public class EnderecoDAO {
         try {
             ResultSet resultSet= conexao.consultar(sql);
             if (resultSet.next()) {
+                String complemento= resultSet.getString("endereco_complemento");
                 return new Endereco(
                         resultSet.getLong("endereco_id"),
                         resultSet.getString("endereco_rua"),
                         resultSet.getInt("endereco_numero"),
-                        resultSet.getString("endereco_complemento"),
+                        complemento,
                         resultSet.getString("endereco_cep"),
                         resultSet.getString("endereco_cidade"),
                         resultSet.getString("endereco_uf")

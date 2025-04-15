@@ -6,6 +6,7 @@ import sistema.saga.sagabackend.model.Pessoa;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class PessoaDAO {
         return conexao.manipular(sql);
     }
 
-    public Pessoa getPessoa(Pessoa pessoa,Conexao conexao) {
+    public int getPessoa(Pessoa pessoa,Conexao conexao) {
         String sql = "SELECT * FROM pessoa WHERE pessoa_cpf = '#1'";
         sql = sql.replace("#1", pessoa.getCpf());
 
@@ -73,18 +74,22 @@ public class PessoaDAO {
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
                 int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
-                Endereco endereco = new Endereco(pessoaEnderecoId);
-                endereco=endereco.buscaEndereco(pessoaEnderecoId,conexao);
-                Pessoa pessoa =new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
-                        pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, endereco, pessoaEstadoCivil);
-                return pessoa;
+                pessoa.setCpf(pessoaCpf);
+                pessoa.setRg(pessoaRg);
+                pessoa.setNome(pessoaNome);
+                pessoa.setDataNascimento(pessoaDataNascimento.toLocalDate());
+                pessoa.setSexo(pessoaSexo);
+                pessoa.setLocNascimento(pessoaLocNascimento);
+                pessoa.setEstadoNascimento(pessoaEstadoNascimento);
+                pessoa.setEstadoCivil(pessoaEstadoCivil);
+                return pessoaEnderecoId;
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return null;
+        pessoa=null;
+        return 0;
     }
 
     public List<Pessoa> get(String filtro,Conexao conexao,List<Integer>idsEndereco) {

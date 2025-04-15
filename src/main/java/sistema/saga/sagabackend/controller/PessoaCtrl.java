@@ -211,12 +211,11 @@ public class PessoaCtrl {
 
     public ResponseEntity<Object> buscarTodos() {
         Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Pessoa pessoa = new Pessoa();
             List<Integer> idsEndereco = new ArrayList<>();
-            GerenciaConexao gerenciaConexao = new GerenciaConexao();
             List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao(), idsEndereco);
-            gerenciaConexao.Desconectar();
             if (pessoaList != null && pessoaList.size() > 0) {
                 Endereco endereco = new Endereco();
                 for (int i = 0; i < idsEndereco.size(); i++) {
@@ -224,43 +223,46 @@ public class PessoaCtrl {
                 }
                 resposta.put("status", true);
                 resposta.put("listaDePessoas", pessoaList);
+                gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
                 resposta.put("mensagem", "Não existem pessoas cadastradas");
+                gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
         } catch (Exception e) {
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
     public ResponseEntity<Object> buscarPessoa(String cpf) {
         Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            List<Pessoa> pessoaList = new ArrayList<>();
             Pessoa pessoa = new Pessoa(cpf);
             int idEndereco;
-            GerenciaConexao gerenciaConexao = new GerenciaConexao();
             idEndereco = pessoa.buscaPessoa(gerenciaConexao.getConexao(), pessoa);
-            gerenciaConexao.Desconectar();
             if (pessoa != null) {
                 Endereco endereco = new Endereco();
                 pessoa.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
-                pessoaList.add(pessoa);
                 resposta.put("status", true);
-                resposta.put("listaDePessoas", pessoaList);
+                resposta.put("Pessoa", pessoa);
+                gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
                 resposta.put("mensagem", "Não existem pessoas cadastradas");
+                gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
         } catch (Exception e) {
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
     }

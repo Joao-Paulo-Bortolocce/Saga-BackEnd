@@ -28,6 +28,11 @@ public class PessoaView {
         return pessoaCtrl.buscarTodos();
     }
 
+    @GetMapping(value = "/{cpf}")
+    ResponseEntity<Object> buscar(@PathVariable(name="cpf")String cpf){
+        return pessoaCtrl.buscarPessoa(cpf);
+    }
+
     @DeleteMapping(value = "/apagar/{cpf}")
     ResponseEntity<Object> apagar(@PathVariable(name = "cpf") String cpf){
         return pessoaCtrl.apagarPessoa(cpf);

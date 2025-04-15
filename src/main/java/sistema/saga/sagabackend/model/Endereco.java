@@ -22,7 +22,7 @@ public class Endereco {
         this.id = id;
         this.rua = rua.toUpperCase();
         this.numero = numero;
-        this.complemento = complemento.toUpperCase();
+        setComplemento(complemento);
         this.cep = cep.toUpperCase();
         this.uf = uf.toUpperCase();
         this.cidade = cidade.toUpperCase();
@@ -69,7 +69,9 @@ public class Endereco {
     }
 
     public void setComplemento(String complemento) {
-        this.complemento = complemento;
+        if (complemento!=null)
+            this.complemento = complemento.toUpperCase();
+        this.complemento=null;
     }
 
     public String getCep() {
