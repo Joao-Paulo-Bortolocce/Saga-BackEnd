@@ -95,6 +95,54 @@ public class Conexao {
         }
         return desconectado;
     }
+
+    public boolean iniciarTransacao() {
+        try {
+            if (connect != null && !connect.isClosed()) {
+                connect.setAutoCommit(false);
+                return true;
+            }
+        } catch (SQLException e) {
+            erro = "Erro ao iniciar transação: " + e.toString();
+        }
+        return false;
+    }
+
+    public boolean commit() {
+        try {
+            if (connect != null && !connect.isClosed()) {
+                connect.commit();
+                return true;
+            }
+        } catch (SQLException e) {
+            erro = "Erro ao fazer commit: " + e.toString();
+        }
+        return false;
+    }
+
+    public boolean rollback() {
+        try {
+            if (connect != null && !connect.isClosed()) {
+                connect.rollback();
+                return true;
+            }
+        } catch (SQLException e) {
+            erro = "Erro ao fazer rollback: " + e.toString();
+        }
+        return false;
+    }
+
+    public boolean fimTransacao() {
+        try {
+            if (connect != null && !connect.isClosed()) {
+                connect.setAutoCommit(true);
+                return true;
+            }
+        } catch (SQLException e) {
+            erro = "Erro ao finalizar transação: " + e.toString();
+        }
+        return false;
+    }
 }
 
 

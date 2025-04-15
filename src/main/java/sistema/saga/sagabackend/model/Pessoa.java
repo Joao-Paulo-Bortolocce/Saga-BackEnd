@@ -119,9 +119,14 @@ public class Pessoa {
         return pessoaDAO.apagar(this,conexao);
     }
 
-    public List<Pessoa> buscarTodos(Conexao conexao) {
+    public int buscaPessoa(Conexao conexao,Pessoa pessoa){
         PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.get("",conexao);
+        return pessoaDAO.get(pessoa,conexao);
+    }
+
+    public List<Pessoa> buscarTodos(Conexao conexao,List<Integer> idsEndereco) {
+        PessoaDAO pessoaDAO = new PessoaDAO();
+        return pessoaDAO.get("",conexao,idsEndereco);
     }
 
     public boolean alterar(Conexao conexao) {

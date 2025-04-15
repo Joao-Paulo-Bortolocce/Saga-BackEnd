@@ -1,152 +1,255 @@
 package sistema.saga.sagabackend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.Endereco;
 import sistema.saga.sagabackend.model.Pessoa;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class PessoaCtrl {
-    public ResponseEntity<Object> gravarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, String estadoCivil, String rua, int numero, String complemento, String cep, String uf, String cidade ) {
+    public ResponseEntity<Object> gravarPessoa(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        try {
-            if (verificaIntegridade(cpf) &&
-                    verificaIntegridade(rg) &&
-                    verificaIntegridade(nome) &&
-                    verificaIntegridade(sexo) &&
-                    verificaIntegridade(locNascimento) &&
-                    verificaIntegridade(estadoNascimento) &&
-                    verificaIntegridade(estadoCivil) &&
-                    verificaIntegridade(rua) &&
-                    verificaIntegridade(numero) &&
-                    verificaIntegridade(cep) &&
-                    verificaIntegridade(uf) &&
-                    verificaIntegridade(cidade) &&
-                    verificaIntegridade(dataNascimento)) {
-                GerenciaConexao gerenciaConexao= new GerenciaConexao();
-                Endereco endereco = new Endereco(rua,numero,complemento,cep,cidade,uf);
-                if(!endereco.gravar(gerenciaConexao.getConexao())){
+        String cpf = (String) dados.get("cpf");
+        String rg = (String) dados.get("rg");
+        String nome = (String) dados.get("nome");
+        String dataNascimentoStr = (String) dados.get("dataNascimento");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
+        String sexo = (String) dados.get("sexo");
+        String locNascimento = (String) dados.get("locNascimento");
+        String estadoNascimento = (String) dados.get("estadoNascimento");
+        String estadoCivil = (String) dados.get("estadoCivil");
+        Map<String, Object> end = (Map<String, Object>) dados.get("endereco");
+        String rua = (String) end.get("rua");
+        int numero = Integer.parseInt(end.get("numero").toString());
+        String complemento = (String) end.get("complemento");
+        String cep = (String) end.get("cep");
+        String uf = (String) end.get("uf");
+        String cidade = (String) end.get("cidade");
+        if (verificaIntegridade(cpf) &&
+                verificaIntegridade(rg) &&
+                verificaIntegridade(nome) &&
+                verificaIntegridade(sexo) &&
+                verificaIntegridade(locNascimento) &&
+                verificaIntegridade(estadoNascimento) &&
+                verificaIntegridade(estadoCivil) &&
+                verificaIntegridade(rua) &&
+                verificaIntegridade(numero) &&
+                verificaIntegridade(cep) &&
+                verificaIntegridade(uf) &&
+                verificaIntegridade(cidade) &&
+                verificaIntegridade(dataNascimento)) {
+            GerenciaConexao gerenciaConexao;
+            try {
+                gerenciaConexao = new GerenciaConexao();
+                try {
+                    gerenciaConexao.getConexao().iniciarTransacao();
+                    //begin transaction
+                    Endereco endereco = new Endereco(rua, numero, complemento, cep, cidade, uf);
+                    if (!endereco.gravar(gerenciaConexao.getConexao())) {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Erro ao cadastrar endereco");
+                        //roolback; end trasaction;
+                        gerenciaConexao.getConexao().rollback();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+
+                    Pessoa pessoa = new Pessoa(
+                            cpf,
+                            rg,
+                            nome,
+                            dataNascimento,
+                            sexo,
+                            locNascimento,
+                            estadoNascimento,
+                            endereco,
+                            estadoCivil
+                    );
+
+                    if (pessoa.gravar(gerenciaConexao.getConexao())) {
+                        resposta.put("status", true);
+                        resposta.put("mensagem", "Pessoa Inserida com sucesso");
+                        //commit; end transaction;
+                        gerenciaConexao.getConexao().commit();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.ok(resposta);
+                    } else {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Pessoa não foi inserida!");
+                        //rollback end transaction;
+                        gerenciaConexao.getConexao().rollback();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+                } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao cadastrar endereco");
+                    resposta.put("mensagem", "Ocorreu um erro na durante a insercao");
+                    gerenciaConexao.getConexao().rollback();
+                    gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
-
-                Pessoa pessoa = new Pessoa(
-                        cpf,
-                        rg,
-                        nome,
-                        dataNascimento,
-                        sexo,
-                        locNascimento,
-                        estadoNascimento,
-                        endereco,
-                        estadoCivil
-                );
-
-                if(pessoa.gravar(gerenciaConexao.getConexao())){
-                    resposta.put("status", true);
-                    resposta.put("mensagem", "Pessoa Inserida com sucesso");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.ok(resposta);
-                }
-                else{
-                    resposta.put("status", false);
-                    resposta.put("mensagem", "Pessoa não foi inserida!");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.badRequest().body(resposta);
-                }
-
-            } else {
+            } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Dados inválidos");
+                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } catch (Exception e) {
+        } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
+
     }
 
-    public ResponseEntity<Object> alterarPessoa(String cpf, String rg, String nome, LocalDate dataNascimento, String sexo, String locNascimento, String estadoNascimento, String estadoCivil, String rua, int numero, String complemento, String cep, String uf, String cidade ) {
+    public ResponseEntity<Object> alterarPessoa(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        try {
-            if (verificaIntegridade(cpf) &&
-                    verificaIntegridade(rg) &&
-                    verificaIntegridade(nome) &&
-                    verificaIntegridade(sexo) &&
-                    verificaIntegridade(locNascimento) &&
-                    verificaIntegridade(estadoNascimento) &&
-                    verificaIntegridade(estadoCivil) &&
-                    verificaIntegridade(rua) &&
-                    verificaIntegridade(numero) &&
-                    verificaIntegridade(cep) &&
-                    verificaIntegridade(uf) &&
-                    verificaIntegridade(cidade) &&
-                    verificaIntegridade(dataNascimento)) {
+        String cpf = (String) dados.get("cpf");
+        String rg = (String) dados.get("rg");
+        String nome = (String) dados.get("nome");
+        String dataNascimentoStr = (String) dados.get("dataNascimento");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
+        String sexo = (String) dados.get("sexo");
+        String locNascimento = (String) dados.get("locNascimento");
+        String estadoNascimento = (String) dados.get("estadoNascimento");
+        String estadoCivil = (String) dados.get("estadoCivil");
+        Map<String, Object> end = (Map<String, Object>) dados.get("endereco");
+        String rua = (String) end.get("rua");
+        int numero = Integer.parseInt(end.get("numero").toString());
+        String complemento = (String) end.get("complemento");
+        String cep = (String) end.get("cep");
+        String uf = (String) end.get("uf");
+        String cidade = (String) end.get("cidade");
 
-                GerenciaConexao gerenciaConexao= new GerenciaConexao();
-                Endereco endereco = new Endereco(rua,numero,complemento,cep,cidade,uf);
-                if(!endereco.gravar(gerenciaConexao.getConexao())){
+        if (verificaIntegridade(cpf) &&
+                verificaIntegridade(rg) &&
+                verificaIntegridade(nome) &&
+                verificaIntegridade(sexo) &&
+                verificaIntegridade(locNascimento) &&
+                verificaIntegridade(estadoNascimento) &&
+                verificaIntegridade(estadoCivil) &&
+                verificaIntegridade(rua) &&
+                verificaIntegridade(numero) &&
+                verificaIntegridade(cep) &&
+                verificaIntegridade(uf) &&
+                verificaIntegridade(cidade) &&
+                verificaIntegridade(dataNascimento)) {
+            GerenciaConexao gerenciaConexao;
+            try {
+                gerenciaConexao = new GerenciaConexao();
+                try {
+                    gerenciaConexao.getConexao().iniciarTransacao();
+
+                    Endereco endereco = new Endereco(rua, numero, complemento, cep, cidade, uf);
+                    if (!endereco.gravar(gerenciaConexao.getConexao())) {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Erro ao cadastrar endereco");
+                        gerenciaConexao.getConexao().rollback();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+                    Pessoa pessoa = new Pessoa(
+                            cpf,
+                            rg,
+                            nome,
+                            dataNascimento,
+                            sexo,
+                            locNascimento,
+                            estadoNascimento,
+                            endereco,
+                            estadoCivil
+                    );
+                    if (pessoa.alterar(gerenciaConexao.getConexao())) {
+                        resposta.put("status", true);
+                        resposta.put("mensagem", "Pessoa alterada com sucesso");
+                        gerenciaConexao.getConexao().commit();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.ok(resposta);
+                    } else {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Pessoa não foi alterada!");
+                        gerenciaConexao.getConexao().rollback();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+                } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao cadastrar endereco");
+                    resposta.put("mensagem", "Ocorreu um erro de conexão");
+                    gerenciaConexao.getConexao().rollback();
+                    gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
-
-                Pessoa pessoa = new Pessoa(
-                        cpf,
-                        rg,
-                        nome,
-                        dataNascimento,
-                        sexo,
-                        locNascimento,
-                        estadoNascimento,
-                        endereco,
-                        estadoCivil
-                );
-                if(pessoa.alterar(gerenciaConexao.getConexao())){
-                    resposta.put("status", true);
-                    resposta.put("mensagem", "Pessoa alterada com sucesso");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.ok(resposta);
-                }
-                else{
-                    resposta.put("status", false);
-                    resposta.put("mensagem", "Pessoa não foi alterada!");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.badRequest().body(resposta);
-                }
-            } else {
+            } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Dados inválidos");
+                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } catch (Exception e) {
+        } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
+
     }
 
     public ResponseEntity<Object> buscarTodos() {
         Map<String, Object> resposta = new HashMap<>();
         try {
             Pessoa pessoa = new Pessoa();
-            GerenciaConexao gerenciaConexao= new GerenciaConexao();
-            List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao());
+            List<Integer> idsEndereco = new ArrayList<>();
+            GerenciaConexao gerenciaConexao = new GerenciaConexao();
+            List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao(), idsEndereco);
             gerenciaConexao.Desconectar();
             if (pessoaList != null && pessoaList.size() > 0) {
+                Endereco endereco = new Endereco();
+                for (int i = 0; i < idsEndereco.size(); i++) {
+                    pessoaList.get(i).setEndereco(endereco.buscaEndereco(idsEndereco.get(i), gerenciaConexao.getConexao()));
+                }
+                resposta.put("status", true);
+                resposta.put("listaDePessoas", pessoaList);
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem pessoas cadastradas");
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+    public ResponseEntity<Object> buscarPessoa(String cpf) {
+        Map<String, Object> resposta = new HashMap<>();
+        try {
+            List<Pessoa> pessoaList = new ArrayList<>();
+            Pessoa pessoa = new Pessoa(cpf);
+            int idEndereco;
+            GerenciaConexao gerenciaConexao = new GerenciaConexao();
+            idEndereco = pessoa.buscaPessoa(gerenciaConexao.getConexao(), pessoa);
+            gerenciaConexao.Desconectar();
+            if (pessoa != null) {
+                Endereco endereco = new Endereco();
+                pessoa.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
+                pessoaList.add(pessoa);
                 resposta.put("status", true);
                 resposta.put("listaDePessoas", pessoaList);
                 return ResponseEntity.ok(resposta);
@@ -164,32 +267,33 @@ public class PessoaCtrl {
 
     public ResponseEntity<Object> apagarPessoa(String cpf) {
         Map<String, Object> resposta = new HashMap<>();
-        try {
-            if (verificaIntegridade(cpf)) {
+
+        if (verificaIntegridade(cpf)) {
+            try {
                 Pessoa pessoa = new Pessoa(cpf);
-                GerenciaConexao gerenciaConexao= new GerenciaConexao();
-                if(pessoa.apagar(gerenciaConexao.getConexao())){
+                GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                if (pessoa.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
-                }
-                else{
+                } else {
                     resposta.put("status", false);
                     resposta.put("mensagem", "Exclusão não foi realizada!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
-            } else {
+            } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Dados inválidos para exclusão!");
+                resposta.put("mensagem", "Ocorreu um erro de conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } catch (Exception e) {
+        } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            resposta.put("mensagem", "Dados inválidos para exclusão!");
             return ResponseEntity.badRequest().body(resposta);
         }
+
     }
 
     private boolean verificaIntegridade(String elemento) {

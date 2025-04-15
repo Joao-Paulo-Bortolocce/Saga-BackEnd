@@ -57,9 +57,9 @@ public class PessoaDAO {
         return conexao.manipular(sql);
     }
 
-    public Pessoa getPessoa(String cpf,Conexao conexao) {
+    public Pessoa getPessoa(Pessoa pessoa,Conexao conexao) {
         String sql = "SELECT * FROM pessoa WHERE pessoa_cpf = '#1'";
-        sql = sql.replace("#1", cpf);
+        sql = sql.replace("#1", pessoa.getCpf());
 
         try{
             ResultSet resultSet = conexao.consultar(sql);
@@ -87,7 +87,7 @@ public class PessoaDAO {
         return null;
     }
 
-    public List<Pessoa> get(String filtro,Conexao conexao) {
+    public List<Pessoa> get(String filtro,Conexao conexao,List<Integer>idsEndereco) {
         String sql = "SELECT * FROM pessoa WHERE pessoa_nome LIKE '%#1%'";
         sql = sql.replace("#1", filtro);
 
@@ -104,10 +104,9 @@ public class PessoaDAO {
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
                 int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
-                Endereco endereco = new Endereco(pessoaEnderecoId);
-                endereco=endereco.buscaEndereco(pessoaEnderecoId,conexao);
+                idsEndereco.add(pessoaEnderecoId);
                 pessoas.add(new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
-                        pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, endereco, pessoaEstadoCivil));
+                        pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, null, pessoaEstadoCivil));
             }
 
         } catch (Exception e) {
