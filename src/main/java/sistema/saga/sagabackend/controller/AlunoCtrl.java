@@ -3,6 +3,7 @@ package sistema.saga.sagabackend.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.Endereco;
+import sistema.saga.sagabackend.model.Aluno;
 import sistema.saga.sagabackend.model.Pessoa;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
@@ -14,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class PessoaCtrl {
-    public ResponseEntity<Object> gravarPessoa(Map<String, Object> dados) {
+public class AlunoCtrl {
+   /* public ResponseEntity<Object> gravarAluno(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String cpf = (String) dados.get("cpf");
+        String ra = (String) dados.get("ra");
         String rg = (String) dados.get("rg");
         String nome = (String) dados.get("nome");
         String dataNascimentoStr = (String) dados.get("dataNascimento");
@@ -34,7 +35,7 @@ public class PessoaCtrl {
         String cep = (String) end.get("cep");
         String uf = (String) end.get("uf");
         String cidade = (String) end.get("cidade");
-        if (verificaIntegridade(cpf) &&
+        if (verificaIntegridade(ra) &&
                 verificaIntegridade(rg) &&
                 verificaIntegridade(nome) &&
                 verificaIntegridade(sexo) &&
@@ -64,8 +65,8 @@ public class PessoaCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Pessoa pessoa = new Pessoa(
-                            cpf,
+                    Aluno aluno = new Aluno(
+                            ra,
                             rg,
                             nome,
                             dataNascimento,
@@ -76,9 +77,9 @@ public class PessoaCtrl {
                             estadoCivil
                     );
 
-                    if (pessoa.gravar(gerenciaConexao.getConexao())) {
+                    if (aluno.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Pessoa Inserida com sucesso");
+                        resposta.put("mensagem", "Aluno Inserida com sucesso");
                         //commit; end transaction;
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
@@ -86,7 +87,7 @@ public class PessoaCtrl {
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Pessoa não foi inserida!");
+                        resposta.put("mensagem", "Aluno não foi inserida!");
                         //rollback end transaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
@@ -114,9 +115,9 @@ public class PessoaCtrl {
 
     }
 
-    public ResponseEntity<Object> alterarPessoa(Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarAluno(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String cpf = (String) dados.get("cpf");
+        String ra = (String) dados.get("ra");
         String rg = (String) dados.get("rg");
         String nome = (String) dados.get("nome");
         String dataNascimentoStr = (String) dados.get("dataNascimento");
@@ -134,7 +135,7 @@ public class PessoaCtrl {
         String uf = (String) end.get("uf");
         String cidade = (String) end.get("cidade");
 
-        if (verificaIntegridade(cpf) &&
+        if (verificaIntegridade(ra) &&
                 verificaIntegridade(rg) &&
                 verificaIntegridade(nome) &&
                 verificaIntegridade(sexo) &&
@@ -162,8 +163,8 @@ public class PessoaCtrl {
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
-                    Pessoa pessoa = new Pessoa(
-                            cpf,
+                    Aluno aluno = new Aluno(
+                            ra,
                             rg,
                             nome,
                             dataNascimento,
@@ -173,16 +174,16 @@ public class PessoaCtrl {
                             endereco,
                             estadoCivil
                     );
-                    if (pessoa.alterar(gerenciaConexao.getConexao())) {
+                    if (aluno.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Pessoa alterada com sucesso");
+                        resposta.put("mensagem", "Aluno alterada com sucesso");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Pessoa não foi alterada!");
+                        resposta.put("mensagem", "Aluno não foi alterada!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -208,75 +209,16 @@ public class PessoaCtrl {
         }
 
     }
-
-    public ResponseEntity<Object> buscarTodos() {
-        Map<String, Object> resposta = new HashMap<>();
-        GerenciaConexao gerenciaConexao = new GerenciaConexao();
-        try {
-            Pessoa pessoa = new Pessoa();
-            List<Integer> idsEndereco = new ArrayList<>();
-            List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao(), idsEndereco);
-            if (pessoaList != null ) {
-                Endereco endereco = new Endereco();
-                for (int i = 0; i < idsEndereco.size(); i++) {
-                    pessoaList.get(i).setEndereco(endereco.buscaEndereco(idsEndereco.get(i), gerenciaConexao.getConexao()));
-                }
-                resposta.put("status", true);
-                resposta.put("listaDePessoas", pessoaList);
-                gerenciaConexao.Desconectar();
-                return ResponseEntity.ok(resposta);
-            } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Não existem pessoas cadastradas");
-                gerenciaConexao.Desconectar();
-                return ResponseEntity.badRequest().body(resposta);
-            }
-        } catch (Exception e) {
-            resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
-            gerenciaConexao.Desconectar();
-            return ResponseEntity.badRequest().body(resposta);
-        }
-    }
-
-    public ResponseEntity<Object> buscarPessoa(String cpf) {
-        Map<String, Object> resposta = new HashMap<>();
-        GerenciaConexao gerenciaConexao = new GerenciaConexao();
-        try {
-            Pessoa pessoa = new Pessoa(cpf);
-            int idEndereco;
-            idEndereco = pessoa.buscaPessoa(gerenciaConexao.getConexao(), pessoa);
-            if (pessoa != null) {
-                Endereco endereco = new Endereco();
-                pessoa.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
-                resposta.put("status", true);
-                resposta.put("Pessoa", pessoa);
-                gerenciaConexao.Desconectar();
-                return ResponseEntity.ok(resposta);
-            } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Não existem pessoas cadastradas");
-                gerenciaConexao.Desconectar();
-                return ResponseEntity.badRequest().body(resposta);
-            }
-        } catch (Exception e) {
-            resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
-            gerenciaConexao.Desconectar();
-            return ResponseEntity.badRequest().body(resposta);
-        }
-    }
-
-    public ResponseEntity<Object> apagarPessoa(String cpf) {
+    public ResponseEntity<Object> apagarAluno(String ra) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(cpf)) {
+        if (verificaIntegridade(ra)) {
             try {
-                Pessoa pessoa = new Pessoa(cpf);
+                Aluno aluno = new Aluno(ra);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (pessoa.apagar(gerenciaConexao.getConexao())) {
+                if (aluno.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Pessoa excluída com sucesso!");
+                    resposta.put("mensagem", "Aluno excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
@@ -297,6 +239,69 @@ public class PessoaCtrl {
         }
 
     }
+    */
+
+    public ResponseEntity<Object> buscarTodos() {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Aluno aluno = new Aluno();
+            List<String> cpfsPessoa = new ArrayList<>();
+            List<Aluno> alunoList = aluno.buscarTodos(gerenciaConexao.getConexao(), cpfsPessoa);
+            if (alunoList != null ) {
+                for (int i = 0; i < cpfsPessoa.size(); i++) {
+                    Pessoa pessoa= new Pessoa(cpfsPessoa.get(i));
+                    int id=pessoa.buscaPessoa(gerenciaConexao.getConexao(),pessoa);
+                    pessoa.setEndereco(new Endereco().buscaEndereco(id,gerenciaConexao.getConexao()));
+                    alunoList.get(i).setPessoa(pessoa);
+                }
+                resposta.put("status", true);
+                resposta.put("listaDeAlunos", alunoList);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem alunos cadastradas");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+   /* public ResponseEntity<Object> buscarAluno(String ra) {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Aluno aluno = new Aluno(ra);
+            int idEndereco;
+            idEndereco = aluno.buscaAluno(gerenciaConexao.getConexao(), aluno);
+            if (aluno != null) {
+                Endereco endereco = new Endereco();
+                aluno.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
+                resposta.put("status", true);
+                resposta.put("Aluno", aluno);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem alunos cadastradas");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }*/
+
+
 
     private boolean verificaIntegridade(String elemento) {
         return elemento != null && !elemento.trim().isEmpty();

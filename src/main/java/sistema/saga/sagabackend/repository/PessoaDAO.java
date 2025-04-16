@@ -93,7 +93,7 @@ public class PessoaDAO {
     }
 
     public List<Pessoa> get(String filtro,Conexao conexao,List<Integer>idsEndereco) {
-        String sql = "SELECT * FROM pessoa WHERE pessoa_nome LIKE '%#1%'";
+        String sql = "SELECT * FROM pessoa WHERE pessoa_nome LIKE '%#1%' order by(pessoa_nome)";
         sql = sql.replace("#1", filtro);
 
         List<Pessoa> pessoas = new ArrayList<>();

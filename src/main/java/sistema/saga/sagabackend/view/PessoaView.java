@@ -18,8 +18,6 @@ public class PessoaView {
 
     @PostMapping(value = "/gravar")
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
-
-
         return pessoaCtrl.gravarPessoa(dados);
     }
 
