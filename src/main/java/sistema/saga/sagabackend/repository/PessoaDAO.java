@@ -8,7 +8,9 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class PessoaDAO {
@@ -58,8 +60,8 @@ public class PessoaDAO {
         return conexao.manipular(sql);
     }
 
-    public int getPessoa(Pessoa pessoa,Conexao conexao) {
-        String sql = "SELECT * FROM pessoa WHERE pessoa_cpf = '#1'";
+    public Pessoa getPessoa(Pessoa pessoa,Conexao conexao,Map<String, Object> end) {
+        String sql = "SELECT * FROM pessoa join endereco on pessoa_enderecoid=endereco_id WHERE pessoa_cpf = '#1'";
         sql = sql.replace("#1", pessoa.getCpf());
 
         try{
@@ -72,7 +74,6 @@ public class PessoaDAO {
                 String pessoaSexo = resultSet.getString("pessoa_sexo");
                 String pessoaLocNascimento = resultSet.getString("pessoa_locnascimento");
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
-                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
                 pessoa.setCpf(pessoaCpf);
                 pessoa.setRg(pessoaRg);
@@ -82,18 +83,24 @@ public class PessoaDAO {
                 pessoa.setLocNascimento(pessoaLocNascimento);
                 pessoa.setEstadoNascimento(pessoaEstadoNascimento);
                 pessoa.setEstadoCivil(pessoaEstadoCivil);
-                return pessoaEnderecoId;
+                end.put("endereco_rua", resultSet.getString("endereco_rua"));
+                end.put("endereco_num", resultSet.getInt("endereco_numero"));
+                end.put("endereco_complemento", resultSet.getString("endereco_complemento"));
+                end.put("endereco_cep", resultSet.getString("endereco_cep"));
+                end.put("endereco_id", resultSet.getInt("endereco_id"));
+                end.put("endereco_cidade", resultSet.getString("endereco_cidade"));
+                end.put("endereco_uf", resultSet.getString("endereco_uf"));
+                return pessoa;
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        pessoa=null;
-        return 0;
+        return null;
     }
 
-    public List<Pessoa> get(String filtro,Conexao conexao,List<Integer>idsEndereco) {
-        String sql = "SELECT * FROM pessoa WHERE pessoa_nome LIKE '%#1%' order by(pessoa_nome)";
+    public List<Pessoa> get(String filtro,Conexao conexao,List<Map<String,Object>> enderecos) {
+        String sql = "SELECT * FROM pessoa join endereco on pessoa_enderecoid=endereco_id WHERE pessoa_nome LIKE '%#1%' order by(pessoa_nome)";
         sql = sql.replace("#1", filtro);
 
         List<Pessoa> pessoas = new ArrayList<>();
@@ -107,9 +114,16 @@ public class PessoaDAO {
                 String pessoaSexo = resultSet.getString("pessoa_sexo");
                 String pessoaLocNascimento = resultSet.getString("pessoa_locnascimento");
                 String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
-                int pessoaEnderecoId = resultSet.getInt("pessoa_enderecoid");
                 String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
-                idsEndereco.add(pessoaEnderecoId);
+                Map<String, Object> end= new HashMap<>();
+               end.put("endereco_rua", resultSet.getString("endereco_rua"));
+                end.put("endereco_num", resultSet.getInt("endereco_numero"));
+                end.put("endereco_complemento", resultSet.getString("endereco_complemento"));
+                end.put("endereco_cep", resultSet.getString("endereco_cep"));
+                end.put("endereco_id", resultSet.getInt("endereco_id"));
+                end.put("endereco_cidade", resultSet.getString("endereco_cidade"));
+                end.put("endereco_uf", resultSet.getString("endereco_uf"));
+                enderecos.add(end);
                 pessoas.add(new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
                         pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, null, pessoaEstadoCivil));
             }

@@ -6,6 +6,7 @@ import sistema.saga.sagabackend.repository.AlunoDAO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Aluno {
@@ -66,9 +67,9 @@ public class Aluno {
         return alunoDAO.getAluno(aluno,conexao);
     }
 
-    public List<Aluno> buscarTodos(Conexao conexao, List<String> cpfsPessoa) {
+    public List<Aluno> buscarTodos(Conexao conexao,List<Map<String, Object>>  pessoas) {
         AlunoDAO alunoDAO = new AlunoDAO();
-        return alunoDAO.get(conexao,cpfsPessoa);
+        return alunoDAO.get(conexao,pessoas);
     }
 
     public boolean alterar(Conexao conexao) {

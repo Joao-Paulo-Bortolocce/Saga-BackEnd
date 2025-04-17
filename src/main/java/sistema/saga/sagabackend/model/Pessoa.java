@@ -7,6 +7,7 @@ import sistema.saga.sagabackend.repository.PessoaDAO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Pessoa {
@@ -119,14 +120,14 @@ public class Pessoa {
         return pessoaDAO.apagar(this,conexao);
     }
 
-    public int buscaPessoa(Conexao conexao,Pessoa pessoa){
+    public Pessoa buscaPessoa(Conexao conexao,Map<String,Object> end){
         PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.getPessoa(pessoa,conexao);
+        return pessoaDAO.getPessoa(this,conexao,end);
     }
 
-    public List<Pessoa> buscarTodos(Conexao conexao,List<Integer> idsEndereco) {
+    public List<Pessoa> buscarTodos(Conexao conexao,List<Map<String,Object>> enderecos) {
         PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.get("",conexao,idsEndereco);
+        return pessoaDAO.get("",conexao,enderecos);
     }
 
     public boolean alterar(Conexao conexao) {

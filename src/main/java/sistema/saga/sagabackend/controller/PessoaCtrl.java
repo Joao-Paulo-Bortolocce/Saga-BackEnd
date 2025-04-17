@@ -214,12 +214,21 @@ public class PessoaCtrl {
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Pessoa pessoa = new Pessoa();
-            List<Integer> idsEndereco = new ArrayList<>();
-            List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao(), idsEndereco);
+            List<Map<String,Object>> enderecos = new ArrayList<>();
+            List<Pessoa> pessoaList = pessoa.buscarTodos(gerenciaConexao.getConexao(), enderecos);
             if (pessoaList != null ) {
-                Endereco endereco = new Endereco();
-                for (int i = 0; i < idsEndereco.size(); i++) {
-                    pessoaList.get(i).setEndereco(endereco.buscaEndereco(idsEndereco.get(i), gerenciaConexao.getConexao()));
+                for (int i = 0; i < enderecos.size(); i++) {
+                    Map<String, Object>  end= enderecos.get(i);
+                    Endereco endereco = new Endereco(
+                            ((Number) end.get("endereco_id")).longValue(),
+                            (String) end.get("endereco_rua"),
+                            (int) end.get("endereco_num"),
+                            (String) end.get("endereco_complemento"),
+                            (String) end.get("endereco_cep"),
+                            (String) end.get("endereco_cidade"),
+                            (String) end.get("endereco_uf")
+                    );
+                    pessoaList.get(i).setEndereco(endereco);
                 }
                 resposta.put("status", true);
                 resposta.put("listaDePessoas", pessoaList);
@@ -244,11 +253,19 @@ public class PessoaCtrl {
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Pessoa pessoa = new Pessoa(cpf);
-            int idEndereco;
-            idEndereco = pessoa.buscaPessoa(gerenciaConexao.getConexao(), pessoa);
+            Map<String, Object> end= new HashMap<>();
+            pessoa = pessoa.buscaPessoa(gerenciaConexao.getConexao(), end);
             if (pessoa != null) {
-                Endereco endereco = new Endereco();
-                pessoa.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
+                Endereco endereco = new Endereco(
+                        ((Number) end.get("endereco_id")).longValue(),
+                        (String) end.get("endereco_rua"),
+                        (int) end.get("endereco_num"),
+                        (String) end.get("endereco_complemento"),
+                        (String) end.get("endereco_cep"),
+                        (String) end.get("endereco_cidade"),
+                        (String) end.get("endereco_uf")
+                );
+                pessoa.setEndereco(endereco);
                 resposta.put("status", true);
                 resposta.put("Pessoa", pessoa);
                 gerenciaConexao.Desconectar();
