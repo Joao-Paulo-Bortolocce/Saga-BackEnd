@@ -255,6 +255,7 @@ public class AlunoCtrl {
                     pessoa.setEndereco(new Endereco().buscaEndereco(id,gerenciaConexao.getConexao()));
                     alunoList.get(i).setPessoa(pessoa);
                 }
+                ordenarPorNome(alunoList);
                 resposta.put("status", true);
                 resposta.put("listaDeAlunos", alunoList);
                 gerenciaConexao.Desconectar();
@@ -271,6 +272,31 @@ public class AlunoCtrl {
             gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
+    }
+
+    private void ordenarPorNome(List<Aluno> alunoList) {
+        quick(0,alunoList.size()-1,alunoList);
+    }
+
+    private void quick(int ini, int fim, List<Aluno> alunoList) {
+        int i=ini,j=fim;
+        Aluno aluno;
+        while (i<j){
+            while (i<j && alunoList.get(i).getPessoa().getNome().compareToIgnoreCase(alunoList.get(j).getPessoa().getNome())<=0)
+                i++;
+            aluno=alunoList.get(i);
+            alunoList.set(i,alunoList.get(j));
+            alunoList.set(j,aluno);
+            while (i<j && alunoList.get(i).getPessoa().getNome().compareToIgnoreCase(alunoList.get(j).getPessoa().getNome())<=0)
+                j--;
+            aluno=alunoList.get(i);
+            alunoList.set(i,alunoList.get(j));
+            alunoList.set(j,aluno);
+        }
+        if(ini<i-1)
+            quick(ini,i-1,alunoList);
+        if(j+1<fim)
+            quick(j+1,fim,alunoList);
     }
 
    /* public ResponseEntity<Object> buscarAluno(String ra) {
