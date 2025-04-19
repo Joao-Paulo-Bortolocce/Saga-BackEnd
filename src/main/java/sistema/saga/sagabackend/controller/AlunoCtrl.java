@@ -123,25 +123,29 @@ public class AlunoCtrl {
 
     public ResponseEntity<Object> alterarAluno(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String ra = (String) dados.get("ra");
-        String rg = (String) dados.get("rg");
-        String nome = (String) dados.get("nome");
-        String dataNascimentoStr = (String) dados.get("dataNascimento");
+        int ra = (int) dados.get("ra");
+        String restricaoMedica = (String) dados.get("restricaoMedica");
+        Map<String, Object> pessoa = (Map<String, Object>) dados.get("pessoa");
+        String cpf = (String) pessoa.get("cpf");
+        String rg = (String) pessoa.get("rg");
+        String nome = (String) pessoa.get("nome");
+        String dataNascimentoStr = (String) pessoa.get("dataNascimento");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
-        String sexo = (String) dados.get("sexo");
-        String locNascimento = (String) dados.get("locNascimento");
-        String estadoNascimento = (String) dados.get("estadoNascimento");
-        String estadoCivil = (String) dados.get("estadoCivil");
-        Map<String, Object> end = (Map<String, Object>) dados.get("endereco");
+        String sexo = (String) pessoa.get("sexo");
+        String locNascimento = (String) pessoa.get("locNascimento");
+        String estadoNascimento = (String) pessoa.get("estadoNascimento");
+        String estadoCivil = (String) pessoa.get("estadoCivil");
+        Map<String, Object> end = (Map<String, Object>) pessoa.get("endereco");
         String rua = (String) end.get("rua");
         int numero = Integer.parseInt(end.get("numero").toString());
         String complemento = (String) end.get("complemento");
         String cep = (String) end.get("cep");
         String uf = (String) end.get("uf");
         String cidade = (String) end.get("cidade");
-
         if (Regras.verificaIntegridade(ra) &&
+                Regras.verificaIntegridade(restricaoMedica) &&
+                Regras.verificaIntegridade(cpf) &&
                 Regras.verificaIntegridade(rg) &&
                 Regras.verificaIntegridade(nome) &&
                 Regras.verificaIntegridade(sexo) &&
@@ -159,37 +163,45 @@ public class AlunoCtrl {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
+                    //begin transaction
 
-                    Endereco endereco = new Endereco(rua, numero, complemento, cep, cidade, uf);
-                    if (!endereco.gravar(gerenciaConexao.getConexao())) {
-                        resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao cadastrar endereco");
-                        gerenciaConexao.getConexao().rollback();
-                        gerenciaConexao.getConexao().fimTransacao();
-                        gerenciaConexao.Desconectar();
-                        return ResponseEntity.badRequest().body(resposta);
-                    }
-                    Aluno aluno = new Aluno(
-                            ra,
+
+                    Pessoa pessoaAux = new Pessoa(
+                            cpf,
                             rg,
                             nome,
                             dataNascimento,
                             sexo,
                             locNascimento,
                             estadoNascimento,
-                            endereco,
+                            null,
                             estadoCivil
                     );
+                    end= new HashMap<>();
+                    pessoaAux=pessoaAux.buscaPessoa(gerenciaConexao.getConexao(),end);
+                    if (pessoaAux==null) {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "As informações pessoais do aluno não estão cadastradas");
+                        //roolback; end trasaction;
+                        gerenciaConexao.getConexao().rollback();
+                        gerenciaConexao.getConexao().fimTransacao();
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+                    pessoaAux.setEndereco(Regras.HashToEndereco(end));
+                    Aluno aluno= new Aluno(ra,restricaoMedica,pessoaAux);
                     if (aluno.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Aluno alterada com sucesso");
+                        resposta.put("mensagem", "Aluno alterado com sucesso");
+                        //commit; end transaction;
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Aluno não foi alterada!");
+                        resposta.put("mensagem", "Aluno não foi alterado!");
+                        //rollback end transaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -197,7 +209,7 @@ public class AlunoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro de conexão");
+                    resposta.put("mensagem", "Ocorreu um erro na durante a alteração");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
