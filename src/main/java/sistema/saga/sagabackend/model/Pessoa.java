@@ -1,6 +1,5 @@
 package sistema.saga.sagabackend.model;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.PessoaDAO;

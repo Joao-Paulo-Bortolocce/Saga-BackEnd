@@ -24,6 +24,11 @@ public class AlunoView {
         return alunoCtrl.buscarTodos();
     }
 
+    @GetMapping(value = "/buscarTodosSemMatricula")
+    ResponseEntity<Object> buscarTodosSemMatricula(){
+        return alunoCtrl.buscarTodosSemMatricula();
+    }
+
     @GetMapping(value = "/{ra}")
     ResponseEntity<Object> buscar(@PathVariable(name="ra")int ra){
         return alunoCtrl.buscarAluno(ra);

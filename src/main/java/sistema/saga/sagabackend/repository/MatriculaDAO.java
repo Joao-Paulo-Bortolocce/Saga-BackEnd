@@ -139,12 +139,13 @@ public class MatriculaDAO {
 
     public List<Matricula> get(Conexao conexao, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         String sql = """
-                   SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
+                 SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
                  JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf
                  JOIN endereco ON pessoa_enderecoid = endereco_id
                  JOIN anoLetivo ON anoletivo_id = matricula_anoletivo_id
                  JOIN serie ON serie_id = matricula_serie_id
-                 LEFT JOIN turma ON turmaanoletivo_id = matricula_anoletivo_id AND serieturma_id = matricula_serie_id AND (matricula_turma_letra IS NULL OR turma_letra = matricula_turma_letra)                
+                 LEFT JOIN turma ON turmaanoletivo_id = matricula_anoletivo_id AND serieturma_id = matricula_serie_id
+                 AND (matricula_turma_letra IS NULL OR turma_letra = matricula_turma_letra)                
                  ORDER BY pessoa_nome;
                 """;
         List<Matricula> lista = new ArrayList<>();

@@ -216,6 +216,38 @@ public class AlunoCtrl {
         }
     }
 
+
+    public ResponseEntity<Object> buscarTodosSemMatricula() {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Aluno aluno = new Aluno();
+            List<Map<String, Object>> pessoas = new ArrayList<>();
+            List<Aluno> alunoList = aluno.buscarTodosSemMatricula(gerenciaConexao.getConexao(), pessoas);
+            if (alunoList != null) {
+                for (int i = 0; i < pessoas.size(); i++) {
+                    Map<String, Object> pessoa = pessoas.get(i);
+                    alunoList.get(i).setPessoa(Regras.HashToPessoa(pessoa));
+
+                }
+                resposta.put("status", true);
+                resposta.put("listaDeAlunos", alunoList);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem alunos cadastradas");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
     public ResponseEntity<Object> buscarAluno(int ra) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
