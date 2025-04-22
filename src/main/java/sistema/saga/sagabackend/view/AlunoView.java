@@ -14,29 +14,28 @@ public class AlunoView {
     @Autowired
     private AlunoCtrl alunoCtrl;
 
-   /* @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return alunoCtrl.gravarAluno(dados);
-    }*/
+    }
 
     @GetMapping(value = "/buscarTodos")
     ResponseEntity<Object> buscarTodos(){
         return alunoCtrl.buscarTodos();
     }
 
-   /* @GetMapping(value = "/{ra}")
-    ResponseEntity<Object> buscar(@PathVariable(name="ra")String ra){
+    @GetMapping(value = "/{ra}")
+    ResponseEntity<Object> buscar(@PathVariable(name="ra")int ra){
         return alunoCtrl.buscarAluno(ra);
     }
 
-    @DeleteMapping(value = "/apagar/{ra}")
-    ResponseEntity<Object> apagar(@PathVariable(name = "ra") String ra){
+    @DeleteMapping(value = "/{ra}")
+    ResponseEntity<Object> apagar(@PathVariable(name = "ra") int ra){
         return alunoCtrl.apagarAluno(ra);
     }
 
-    @PutMapping(value = "/alterar")
+    @PutMapping
     ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
-
         return alunoCtrl.alterarAluno(dados);
-    }*/
+    }
 }

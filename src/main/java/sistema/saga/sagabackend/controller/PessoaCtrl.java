@@ -152,7 +152,8 @@ public class PessoaCtrl {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-
+                    if(complemento==null)
+                        complemento="";
                     Endereco endereco = new Endereco(rua, numero, complemento, cep, cidade, uf);
                     if (!endereco.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", false);
@@ -204,6 +205,37 @@ public class PessoaCtrl {
         } else {
             resposta.put("status", false);
             resposta.put("mensagem", "Dados inválidos");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+
+    }
+
+    public ResponseEntity<Object> apagarPessoa(String cpf) {
+        Map<String, Object> resposta = new HashMap<>();
+
+        if (verificaIntegridade(cpf)) {
+            try {
+                Pessoa pessoa = new Pessoa(cpf);
+                GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                if (pessoa.apagar(gerenciaConexao.getConexao())) {
+                    resposta.put("status", true);
+                    resposta.put("mensagem", "Pessoa excluída com sucesso!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.ok(resposta);
+                } else {
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Exclusão não foi realizada!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+            } catch (Exception e) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Ocorreu um erro de conexão");
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } else {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Dados inválidos para exclusão!");
             return ResponseEntity.badRequest().body(resposta);
         }
 
@@ -267,7 +299,7 @@ public class PessoaCtrl {
                 );
                 pessoa.setEndereco(endereco);
                 resposta.put("status", true);
-                resposta.put("Pessoa", pessoa);
+                resposta.put("pessoa", pessoa);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
@@ -284,35 +316,43 @@ public class PessoaCtrl {
         }
     }
 
-    public ResponseEntity<Object> apagarPessoa(String cpf) {
+    public ResponseEntity<Object> buscarTodosSemAlunos() {
         Map<String, Object> resposta = new HashMap<>();
-
-        if (verificaIntegridade(cpf)) {
-            try {
-                Pessoa pessoa = new Pessoa(cpf);
-                GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (pessoa.apagar(gerenciaConexao.getConexao())) {
-                    resposta.put("status", true);
-                    resposta.put("mensagem", "Pessoa excluída com sucesso!");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.ok(resposta);
-                } else {
-                    resposta.put("status", false);
-                    resposta.put("mensagem", "Exclusão não foi realizada!");
-                    gerenciaConexao.Desconectar();
-                    return ResponseEntity.badRequest().body(resposta);
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Pessoa pessoa = new Pessoa();
+            List<Map<String,Object>> enderecos = new ArrayList<>();
+            List<Pessoa> pessoaList = pessoa.buscarTodosSemAlunos(gerenciaConexao.getConexao(), enderecos);
+            if (pessoaList != null ) {
+                for (int i = 0; i < enderecos.size(); i++) {
+                    Map<String, Object>  end= enderecos.get(i);
+                    Endereco endereco = new Endereco(
+                            ((Number) end.get("endereco_id")).longValue(),
+                            (String) end.get("endereco_rua"),
+                            (int) end.get("endereco_num"),
+                            (String) end.get("endereco_complemento"),
+                            (String) end.get("endereco_cep"),
+                            (String) end.get("endereco_cidade"),
+                            (String) end.get("endereco_uf")
+                    );
+                    pessoaList.get(i).setEndereco(endereco);
                 }
-            } catch (Exception e) {
+                resposta.put("status", true);
+                resposta.put("listaDePessoas", pessoaList);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro de conexão");
+                resposta.put("mensagem", "Não existem pessoas cadastradas");
+                gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } else {
+        } catch (Exception e) {
             resposta.put("status", false);
-            resposta.put("mensagem", "Dados inválidos para exclusão!");
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
-
     }
 
     private boolean verificaIntegridade(String elemento) {

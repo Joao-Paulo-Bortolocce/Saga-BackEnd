@@ -43,17 +43,33 @@ public class AlunoDAO {
         return conexao.manipular(sql);
     }
 
-    public String getAluno(Aluno aluno, Conexao conexao) {
-        String sql = "SELECT * FROM aluno WHERE aluno_ra = " + aluno.getRa();
+    public Aluno getAluno(Aluno alu, Conexao conexao, Map<String, Object> pessoa) {
+        String sql = "SELECT * FROM aluno JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf JOIN endereco ON pessoa_enderecoid = endereco_id WHERE aluno_ra = " + alu.getRa()+" ORDER BY pessoa_nome";
         try {
             ResultSet rs = conexao.consultar(sql);
             if (rs.next()) {
-
+                Aluno aluno= new Aluno();
                 aluno.setRa(rs.getInt("aluno_ra"));
                 aluno.setRestricaoMedica(rs.getString("aluno_restricaomedica"));
                 aluno.setPessoa(null);
-                String cpf=rs.getString("aluno_pessoa_cpf");
-                return cpf;
+                pessoa.put("pessoa_cpf", rs.getString("pessoa_cpf"));
+                pessoa.put("pessoa_nome", rs.getString("pessoa_nome"));
+                pessoa.put("pessoa_rg", rs.getString("pessoa_rg"));
+                pessoa.put("pessoa_datanascimento", rs.getDate("pessoa_datanascimento"));
+                pessoa.put("pessoa_sexo", rs.getString("pessoa_sexo"));
+                pessoa.put("pessoa_locNascimento", rs.getString("pessoa_locnascimento"));
+                pessoa.put("pessoa_estadoNascimento", rs.getString("pessoa_estadonascimento"));
+                pessoa.put("pessoa_estadoCivil", rs.getString("pessoa_estadocivil"));
+                Map<String, Object> end= new HashMap<>();
+                end.put("endereco_rua", rs.getString("endereco_rua"));
+                end.put("endereco_num", rs.getInt("endereco_numero"));
+                end.put("endereco_complemento", rs.getString("endereco_complemento"));
+                end.put("endereco_cep", rs.getString("endereco_cep"));
+                end.put("endereco_id", rs.getInt("endereco_id"));
+                end.put("endereco_cidade", rs.getString("endereco_cidade"));
+                end.put("endereco_uf", rs.getString("endereco_uf"));
+                pessoa.put("endereco",end);
+                return aluno;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -74,14 +90,14 @@ public class AlunoDAO {
                 aluno.setPessoa(null);
                 Map<String,Object> pessoa= new HashMap<>();
 
-                pessoa.put("cpf", rs.getString("pessoa_cpf"));
-                pessoa.put("nome", rs.getString("pessoa_nome"));
-                pessoa.put("rg", rs.getString("pessoa_rg"));
-                pessoa.put("dataNascimento", rs.getDate("pessoa_datanascimento"));
-                pessoa.put("sexo", rs.getString("pessoa_sexo"));
-                pessoa.put("locNascimento", rs.getString("pessoa_locnascimento"));
-                pessoa.put("estadoNascimento", rs.getString("pessoa_estadonascimento"));
-                pessoa.put("estadoCivil", rs.getString("pessoa_estadocivil"));
+                pessoa.put("pessoa_cpf", rs.getString("pessoa_cpf"));
+                pessoa.put("pessoa_nome", rs.getString("pessoa_nome"));
+                pessoa.put("pessoa_rg", rs.getString("pessoa_rg"));
+                pessoa.put("pessoa_datanascimento", rs.getDate("pessoa_datanascimento"));
+                pessoa.put("pessoa_sexo", rs.getString("pessoa_sexo"));
+                pessoa.put("pessoa_locNascimento", rs.getString("pessoa_locnascimento"));
+                pessoa.put("pessoa_estadoNascimento", rs.getString("pessoa_estadonascimento"));
+                pessoa.put("pessoa_estadoCivil", rs.getString("pessoa_estadocivil"));
                 Map<String, Object> end= new HashMap<>();
                 end.put("endereco_rua", rs.getString("endereco_rua"));
                 end.put("endereco_num", rs.getInt("endereco_numero"));

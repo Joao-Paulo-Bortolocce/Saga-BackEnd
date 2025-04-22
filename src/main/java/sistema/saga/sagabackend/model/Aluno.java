@@ -62,9 +62,9 @@ public class Aluno {
         return alunoDAO.apagar(this.getRa(),conexao);
     }
 
-    public String buscaAluno(Conexao conexao, Aluno aluno){
+    public Aluno buscaAluno(Conexao conexao, Aluno aluno, Map<String, Object> pessoa){
         AlunoDAO alunoDAO = new AlunoDAO();
-        return alunoDAO.getAluno(aluno,conexao);
+        return alunoDAO.getAluno(aluno,conexao,pessoa);
     }
 
     public List<Aluno> buscarTodos(Conexao conexao,List<Map<String, Object>>  pessoas) {

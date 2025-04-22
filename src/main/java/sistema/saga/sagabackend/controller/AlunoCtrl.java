@@ -16,41 +16,14 @@ import java.util.*;
 public class AlunoCtrl {
     public ResponseEntity<Object> gravarAluno(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int ra = (int) dados.get("ra");
+        int ra = Integer.parseInt((String) dados.get("ra"));
         String restricaoMedica = (String) dados.get("restricaoMedica");
         Map<String, Object> pessoa = (Map<String, Object>) dados.get("pessoa");
         String cpf = (String) pessoa.get("cpf");
-        String rg = (String) pessoa.get("rg");
-        String nome = (String) pessoa.get("nome");
-        String dataNascimentoStr = (String) pessoa.get("dataNascimento");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
-        String sexo = (String) pessoa.get("sexo");
-        String locNascimento = (String) pessoa.get("locNascimento");
-        String estadoNascimento = (String) pessoa.get("estadoNascimento");
-        String estadoCivil = (String) pessoa.get("estadoCivil");
-        Map<String, Object> end = (Map<String, Object>) pessoa.get("endereco");
-        String rua = (String) end.get("rua");
-        int numero = Integer.parseInt(end.get("numero").toString());
-        String complemento = (String) end.get("complemento");
-        String cep = (String) end.get("cep");
-        String uf = (String) end.get("uf");
-        String cidade = (String) end.get("cidade");
+
         if (Regras.verificaIntegridade(ra) &&
                 Regras.verificaIntegridade(restricaoMedica) &&
-                Regras.verificaIntegridade(cpf) &&
-                Regras.verificaIntegridade(rg) &&
-                Regras.verificaIntegridade(nome) &&
-                Regras.verificaIntegridade(sexo) &&
-                Regras.verificaIntegridade(locNascimento) &&
-                Regras.verificaIntegridade(estadoNascimento) &&
-                Regras.verificaIntegridade(estadoCivil) &&
-                Regras.verificaIntegridade(rua) &&
-                Regras.verificaIntegridade(numero) &&
-                Regras.verificaIntegridade(cep) &&
-                Regras.verificaIntegridade(uf) &&
-                Regras.verificaIntegridade(cidade) &&
-                Regras.verificaIntegridade(dataNascimento)) {
+                Regras.verificaIntegridade(cpf)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -59,18 +32,8 @@ public class AlunoCtrl {
                     //begin transaction
 
 
-                    Pessoa pessoaAux = new Pessoa(
-                            cpf,
-                            rg,
-                            nome,
-                            dataNascimento,
-                            sexo,
-                            locNascimento,
-                            estadoNascimento,
-                            null,
-                            estadoCivil
-                    );
-                    end= new HashMap<>();
+                    Pessoa pessoaAux = new Pessoa(cpf);
+                    Map<String,Object> end= new HashMap<>();
                     pessoaAux=pessoaAux.buscaPessoa(gerenciaConexao.getConexao(),end);
                     if (pessoaAux==null) {
                         resposta.put("status", false);
@@ -127,37 +90,10 @@ public class AlunoCtrl {
         String restricaoMedica = (String) dados.get("restricaoMedica");
         Map<String, Object> pessoa = (Map<String, Object>) dados.get("pessoa");
         String cpf = (String) pessoa.get("cpf");
-        String rg = (String) pessoa.get("rg");
-        String nome = (String) pessoa.get("nome");
-        String dataNascimentoStr = (String) pessoa.get("dataNascimento");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
-        String sexo = (String) pessoa.get("sexo");
-        String locNascimento = (String) pessoa.get("locNascimento");
-        String estadoNascimento = (String) pessoa.get("estadoNascimento");
-        String estadoCivil = (String) pessoa.get("estadoCivil");
-        Map<String, Object> end = (Map<String, Object>) pessoa.get("endereco");
-        String rua = (String) end.get("rua");
-        int numero = Integer.parseInt(end.get("numero").toString());
-        String complemento = (String) end.get("complemento");
-        String cep = (String) end.get("cep");
-        String uf = (String) end.get("uf");
-        String cidade = (String) end.get("cidade");
+
         if (Regras.verificaIntegridade(ra) &&
                 Regras.verificaIntegridade(restricaoMedica) &&
-                Regras.verificaIntegridade(cpf) &&
-                Regras.verificaIntegridade(rg) &&
-                Regras.verificaIntegridade(nome) &&
-                Regras.verificaIntegridade(sexo) &&
-                Regras.verificaIntegridade(locNascimento) &&
-                Regras.verificaIntegridade(estadoNascimento) &&
-                Regras.verificaIntegridade(estadoCivil) &&
-                Regras.verificaIntegridade(rua) &&
-                Regras.verificaIntegridade(numero) &&
-                Regras.verificaIntegridade(cep) &&
-                Regras.verificaIntegridade(uf) &&
-                Regras.verificaIntegridade(cidade) &&
-                Regras.verificaIntegridade(dataNascimento)) {
+                Regras.verificaIntegridade(cpf)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -166,18 +102,8 @@ public class AlunoCtrl {
                     //begin transaction
 
 
-                    Pessoa pessoaAux = new Pessoa(
-                            cpf,
-                            rg,
-                            nome,
-                            dataNascimento,
-                            sexo,
-                            locNascimento,
-                            estadoNascimento,
-                            null,
-                            estadoCivil
-                    );
-                    end= new HashMap<>();
+                    Pessoa pessoaAux = new Pessoa(cpf);
+                    Map<String,Object> end= new HashMap<>();
                     pessoaAux=pessoaAux.buscaPessoa(gerenciaConexao.getConexao(),end);
                     if (pessoaAux==null) {
                         resposta.put("status", false);
@@ -222,12 +148,12 @@ public class AlunoCtrl {
             }
         } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Dados inválidos");
+            resposta.put("mensagem", "Dados inválidos, preencha todas as informações corretamente");
             return ResponseEntity.badRequest().body(resposta);
         }
 
     }
-    public ResponseEntity<Object> apagarAluno(String ra) {
+    public ResponseEntity<Object> apagarAluno(int  ra) {
         Map<String, Object> resposta = new HashMap<>();
 
         if (Regras.verificaIntegridade(ra)) {
@@ -236,7 +162,7 @@ public class AlunoCtrl {
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
                 if (aluno.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Aluno excluída com sucesso!");
+                    resposta.put("mensagem", "Aluno excluído com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
@@ -269,29 +195,7 @@ public class AlunoCtrl {
             if (alunoList != null) {
                 for (int i = 0; i < pessoas.size(); i++) {
                     Map<String, Object> pessoa = pessoas.get(i);
-                    String cpf = (String) pessoa.get("cpf");
-                    String rg = (String) pessoa.get("rg");
-                    String nome = (String) pessoa.get("nome");
-                    java.sql.Date data = (java.sql.Date) pessoa.get("dataNascimento");
-                    LocalDate dataNascimento = data.toLocalDate();
-                    String sexo = (String) pessoa.get("sexo");
-                    String locNascimento = (String) pessoa.get("locNascimento");
-                    String estadoNascimento = (String) pessoa.get("estadoNascimento");
-                    String estadoCivil = (String) pessoa.get("estadoCivil");
-                    Map<String, Object>  end= (Map<String, Object>) pessoa.get("endereco");
-
-                    Endereco endereco = new Endereco(
-                            ((Number) end.get("endereco_id")).longValue(),
-                            (String) end.get("endereco_rua"),
-                            (int) end.get("endereco_num"),
-                            (String) end.get("endereco_complemento"),
-                            (String) end.get("endereco_cep"),
-                            (String) end.get("endereco_cidade"),
-                            (String) end.get("endereco_uf")
-                    );
-
-                    Pessoa novaPessoa = new Pessoa(cpf, rg, nome, dataNascimento, sexo, locNascimento, estadoNascimento, endereco, estadoCivil);
-                    alunoList.get(i).setPessoa(novaPessoa);
+                    alunoList.get(i).setPessoa(Regras.HashToPessoa(pessoa));
 
                 }
                 resposta.put("status", true);
@@ -312,23 +216,22 @@ public class AlunoCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarAluno(String ra) {
+    public ResponseEntity<Object> buscarAluno(int ra) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Aluno aluno = new Aluno(ra);
-            int idEndereco;
-            idEndereco = aluno.buscaAluno(gerenciaConexao.getConexao(), aluno);
+            Map<String, Object> pessoa= new HashMap<>();
+            aluno = aluno.buscaAluno(gerenciaConexao.getConexao(), aluno,pessoa);
             if (aluno != null) {
-                Endereco endereco = new Endereco();
-                aluno.setEndereco(endereco.buscaEndereco(idEndereco, gerenciaConexao.getConexao()));
+               aluno.setPessoa(Regras.HashToPessoa(pessoa));
                 resposta.put("status", true);
-                resposta.put("Aluno", aluno);
+                resposta.put("aluno", aluno);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existem alunos cadastradas");
+                resposta.put("mensagem", "Não existe aluno cadastrado com o RA: "+ra);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
