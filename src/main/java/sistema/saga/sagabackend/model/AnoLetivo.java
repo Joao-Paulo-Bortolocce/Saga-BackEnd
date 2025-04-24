@@ -1,6 +1,10 @@
 package sistema.saga.sagabackend.model;
 
+import sistema.saga.sagabackend.repository.Conexao;
+import sistema.saga.sagabackend.repository.AnoLetivoDAO;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public class AnoLetivo {
     private int id;
@@ -46,5 +50,30 @@ public class AnoLetivo {
 
     public void setFim(LocalDate fim) {
         this.fim = fim;
+    }
+
+    public boolean apagar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.apagar(this,conexao);
+    }
+
+    public int buscaAnos(Conexao conexao){
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.getAno(this,conexao);
+    }
+
+    public List<AnoLetivo> buscarTodos(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.get("",conexao);
+    }
+
+    public boolean alterar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.alterar(this,conexao);
+    }
+
+    public boolean gravar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.gravar(this,conexao);
     }
 }
