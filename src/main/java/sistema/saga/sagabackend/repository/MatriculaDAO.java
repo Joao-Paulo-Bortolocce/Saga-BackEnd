@@ -17,14 +17,15 @@ public class MatriculaDAO {
 
     public boolean gravar(Matricula matricula, Conexao conexao) {
         String sql = """
-                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_aprovado, matricula_data) 
-                    VALUES (#1, #2, #3, #5, '#6')
+                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_aprovado, matricula_data, matricula_valido) 
+                    VALUES (#1, #2, #3, #5, '#6',#7)
                 """;
         sql = sql.replace("#1", "" + matricula.getAluno().getRa());
         sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
         sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
         sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
         sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
+        sql = sql.replace("#7", matricula.isValido() ? "true" : "false");
         return conexao.manipular(sql);
     }
 
@@ -36,8 +37,9 @@ public class MatriculaDAO {
                         matricula_serie_id = #3,
                         matricula_turma_letra = '#4',
                         matricula_aprovado = #5,
-                        matricula_data = '#6'
-                    WHERE matricula_id = #7
+                        matricula_data = '#6',
+                        matricula_valido = #7
+                    WHERE matricula_id = #8
                 """;
         sql = sql.replace("#1", "" + matricula.getAluno().getRa());
         sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
@@ -45,7 +47,8 @@ public class MatriculaDAO {
         sql = sql.replace("#4", "" + matricula.getTurma().getLetra());
         sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
         sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
-        sql = sql.replace("#7", "" + matricula.getId());
+        sql = sql.replace("#7", matricula.isValido() ? "true" : "false");
+        sql = sql.replace("#8", "" + matricula.getId());
         return conexao.manipular(sql);
     }
 
@@ -83,6 +86,7 @@ public class MatriculaDAO {
                 matricula = new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();
@@ -156,6 +160,7 @@ public class MatriculaDAO {
                 Matricula matricula = new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();
@@ -246,6 +251,7 @@ public class MatriculaDAO {
                 Matricula matricula = new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();

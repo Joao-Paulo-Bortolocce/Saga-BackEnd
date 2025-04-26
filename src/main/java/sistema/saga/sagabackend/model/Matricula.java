@@ -18,8 +18,10 @@ public class Matricula {
     private Turma turma;
     private boolean aprovado;
     private LocalDate data;
+    private boolean valido;
 
-    public Matricula(int id, Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data) {
+
+    public Matricula(int id, Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data, Boolean valido) {
         this.id = id;
         this.aluno = aluno;
         this.anoLetivo = anoLetivo;
@@ -27,18 +29,19 @@ public class Matricula {
         this.turma = turma;
         this.aprovado = aprovado;
         this.data = data;
+        this.valido=valido;
     }
 
-    public Matricula(Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data) {
-        this(0,  aluno,  anoLetivo,  serie,  turma,  aprovado,  data);
+    public Matricula(Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data, Boolean valido) {
+        this(0,  aluno,  anoLetivo,  serie,  turma,  aprovado,  data,valido);
     }
 
     public Matricula(int id) {
-        this(id,null,null,null,null,false,null);
+        this(id,null,null,null,null,false,null,false);
     }
 
     public Matricula() {
-        this(0,null,null,null,null,false,null);
+        this(0,null,null,null,null,false,null,false);
     }
 
     public int getId() {
@@ -95,6 +98,14 @@ public class Matricula {
 
     public void setData(LocalDate data) {
         this.data = data;
+    }
+
+    public boolean isValido() {
+        return valido;
+    }
+
+    public void setValido(boolean valido) {
+        this.valido = valido;
     }
 
     public boolean apagar(Conexao conexao) {

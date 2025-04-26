@@ -75,7 +75,7 @@ public class MatriculaCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                   Matricula matricula= new Matricula(aluno,anoLetivo,serie,null,false,data);
+                   Matricula matricula= new Matricula(aluno,anoLetivo,serie,null,false,data,true);
                     Map<String, Object> alunoMap= new HashMap<>();
                     Map<String, Object> anoMap= new HashMap<>();
                     Map<String, Object> serieMap= new HashMap<>();
@@ -188,7 +188,7 @@ public class MatriculaCtrl {
                     }*/
 
                     aluno.setPessoa(Regras.HashToPessoa(pessoa));
-                    Matricula matricula= new Matricula(aluno,anoLetivo,serie,null,false,data);
+                    Matricula matricula= new Matricula(aluno,anoLetivo,serie,null,false,data,true);
                     if (matricula.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Matricula alterada com sucesso");
