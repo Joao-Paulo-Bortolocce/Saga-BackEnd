@@ -117,16 +117,17 @@ public class AlunoDAO {
         return lista;
     }
 
-    public List<Aluno> buscaAlunosSemMatricula( Conexao conexao,List<Map<String, Object>> pessoas) {
-        String sql = "SELECT *\n" +
-                "FROM aluno\n" +
-                "JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf\n" +
-                "JOIN endereco ON pessoa_enderecoid = endereco_id\n" +
-                "WHERE aluno_ra NOT IN (\n" +
-                "    SELECT matricula_aluno_ra\n" +
-                "    FROM matricula\n" +
-                ")\n" +
-                "ORDER BY pessoa_nome;";
+    public List<Aluno> buscaAlunosSemMatricula( Conexao conexao,int anoLetivo,List<Map<String, Object>> pessoas) {
+       String condicao="SELECT matricula_aluno_ra FROM matricula";
+       if(anoLetivo>0){
+           condicao="SELECT matricula_aluno_ra FROM matricula join anoletivo on matricula_anoletivo_id = anoletivo_id where anoletivo_id ="+anoLetivo;
+       }
+        String sql = """
+                SELECT * FROM aluno
+                JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf
+                 JOIN endereco ON pessoa_enderecoid = endereco_id WHERE aluno_ra NOT IN (#1)ORDER BY pessoa_nome;
+                 """;
+        sql=sql.replace("#1",condicao);
         List<Aluno> lista = new ArrayList<>();
         Map<String, Object> resposta = new HashMap<>();
         try {

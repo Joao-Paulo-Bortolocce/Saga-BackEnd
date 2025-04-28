@@ -28,12 +28,12 @@ public class PessoaView {
 
     @GetMapping(value = "/buscarTodosSemAlunos")
     ResponseEntity<Object> buscarTodosSemAlunos(){
-        return pessoaCtrl.buscarTodosSemAlunos();
+        return pessoaCtrl.buscarTodosSemAlunos(true);
     }
 
     @GetMapping(value = "/buscarSemAlunos/{cpf}")
     ResponseEntity<Object> buscarSemAlunos(){
-        return pessoaCtrl.buscarTodosSemAlunos();
+        return pessoaCtrl.buscarTodosSemAlunos(true);
     }
 
     @GetMapping(value = "/{cpf}")

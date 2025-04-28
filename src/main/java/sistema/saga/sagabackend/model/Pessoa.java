@@ -129,9 +129,9 @@ public class Pessoa {
         return pessoaDAO.get("",conexao,enderecos);
     }
 
-    public List<Pessoa> buscarTodosSemAlunos(Conexao conexao,List<Map<String,Object>> enderecos) {
+    public List<Pessoa> buscarTodosSemAlunos(Conexao conexao,List<Map<String,Object>> enderecos,boolean aluno) {
         PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.buscarTodosSemAlunos("",conexao,enderecos);
+        return pessoaDAO.buscarTodosSemAlunos("",conexao,enderecos,aluno);
     }
 
     public boolean alterar(Conexao conexao) {

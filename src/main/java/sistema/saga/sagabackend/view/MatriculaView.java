@@ -25,8 +25,8 @@ public class MatriculaView {
     }
 
      @GetMapping(value = "/buscarTodasFiltradas")
-    ResponseEntity<Object> buscarTodasFiltradas(@RequestParam(name = "serie") int serie,@RequestParam(name = "anoLetivo") int anoLetivo ){
-        return matriculaCtrl.buscarTodasFiltradas(serie,anoLetivo);
+    ResponseEntity<Object> buscarTodasFiltradas(@RequestParam(name = "serie") int serie,@RequestParam(name = "anoLetivo") int anoLetivo,@RequestParam(name = "valido") int valido ){
+        return matriculaCtrl.buscarTodasFiltradas(serie,anoLetivo,valido);
     }
 
    @GetMapping(value = "/{ra}")

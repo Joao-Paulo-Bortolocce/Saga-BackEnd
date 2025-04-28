@@ -160,6 +160,17 @@ public class AlunoCtrl {
             try {
                 Aluno aluno = new Aluno(ra);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                List<Map<String, Object>> pessoas = new ArrayList<>();
+                List<Aluno> alunoList= aluno.buscarTodosSemMatricula(gerenciaConexao.getConexao(),0,pessoas);
+                int i;
+                for (i = 0; i < alunoList.size() && ra!=alunoList.get(i).getRa(); i++) ;
+                if(i==alunoList.size()){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Exclusão não pode ser realizada, pois existem matriculas cadastradas para esse aluno!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+
                 if (aluno.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Aluno excluído com sucesso!");
@@ -217,13 +228,13 @@ public class AlunoCtrl {
     }
 
 
-    public ResponseEntity<Object> buscarTodosSemMatricula() {
+    public ResponseEntity<Object> buscarTodosSemMatricula(int anoLetivo) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Aluno aluno = new Aluno();
             List<Map<String, Object>> pessoas = new ArrayList<>();
-            List<Aluno> alunoList = aluno.buscarTodosSemMatricula(gerenciaConexao.getConexao(), pessoas);
+            List<Aluno> alunoList = aluno.buscarTodosSemMatricula(gerenciaConexao.getConexao(),anoLetivo, pessoas);
             if (alunoList != null) {
                 for (int i = 0; i < pessoas.size(); i++) {
                     Map<String, Object> pessoa = pessoas.get(i);

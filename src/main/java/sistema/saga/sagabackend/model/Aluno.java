@@ -72,9 +72,9 @@ public class Aluno {
         return alunoDAO.get(conexao,pessoas);
     }
 
-    public List<Aluno> buscarTodosSemMatricula(Conexao conexao,List<Map<String, Object>>  pessoas) {
+    public List<Aluno> buscarTodosSemMatricula(Conexao conexao,int anoLetivo,List<Map<String, Object>>  pessoas) {
         AlunoDAO alunoDAO = new AlunoDAO();
-        return alunoDAO.buscaAlunosSemMatricula(conexao,pessoas);
+        return alunoDAO.buscaAlunosSemMatricula(conexao,anoLetivo,pessoas);
     }
 
     public boolean alterar(Conexao conexao) {

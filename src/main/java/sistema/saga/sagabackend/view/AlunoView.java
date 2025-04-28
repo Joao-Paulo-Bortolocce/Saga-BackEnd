@@ -25,8 +25,8 @@ public class AlunoView {
     }
 
     @GetMapping(value = "/buscarTodosSemMatricula")
-    ResponseEntity<Object> buscarTodosSemMatricula(){
-        return alunoCtrl.buscarTodosSemMatricula();
+    ResponseEntity<Object> buscarTodosSemMatricula(@RequestParam(name = "anoLetivo") int anoLetivo){
+        return alunoCtrl.buscarTodosSemMatricula(anoLetivo);
     }
 
     @GetMapping(value = "/{ra}")
