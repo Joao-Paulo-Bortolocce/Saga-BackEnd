@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class GerenciaConexao {
     private  Conexao conexao;
     private static final String URL = "jdbc:postgresql://localhost/";
-    private static final String BASE_NAME = "saga";
-    private static final String USER = "postgres";
+    private static final String BASE_NAME = "backendsaga";
+    private static final String USER = "postgresql";
     private static final String SENHA = "postgres123";
 
     public GerenciaConexao() {
@@ -35,7 +35,7 @@ public class GerenciaConexao {
     public boolean criarBD(String BD) {
         try {
             String url = "jdbc:postgresql://localhost/";
-            Connection con = DriverManager.getConnection(url, "postgres", "postgres123");
+            Connection con = DriverManager.getConnection(url, "postgresql", "postgres123");
 
             Statement statement = con.createStatement();
             statement.execute("CREATE DATABASE " + BD + " WITH OWNER = postgres ENCODING = 'UTF8'  "
@@ -58,7 +58,7 @@ public class GerenciaConexao {
         comandos.add("--port");
         comandos.add("5432");
         comandos.add("--username");
-        comandos.add("postgres");
+        comandos.add("postgresql");
         comandos.add("--format");
         comandos.add("custom");
         comandos.add("--blobs");
@@ -96,7 +96,7 @@ public class GerenciaConexao {
         comandos.add("--port");
         comandos.add("5432");
         comandos.add("--username");
-        comandos.add("postgres");
+        comandos.add("postgresql");
         comandos.add("--dbname");
         comandos.add(database);
         comandos.add("--verbose");
