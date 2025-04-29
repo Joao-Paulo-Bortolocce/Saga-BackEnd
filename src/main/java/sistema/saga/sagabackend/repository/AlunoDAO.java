@@ -2,9 +2,9 @@ package sistema.saga.sagabackend.repository;
 
 import org.springframework.stereotype.Repository;
 import sistema.saga.sagabackend.model.Aluno;
-import sistema.saga.sagabackend.model.Pessoa;
 
-import java.sql.Date;
+
+
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
