@@ -1,11 +1,13 @@
 package sistema.saga.sagabackend.model;
 
+import org.springframework.stereotype.Component;
 import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.AnoLetivoDAO;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Component
 public class AnoLetivo {
     private int id;
     private LocalDate inicio, fim;

@@ -60,15 +60,11 @@ public class TurmaDAO {
         String sql;
 
         if (filtro == null || filtro.isEmpty()) {
-            sql = """
-            SELECT * FROM turma
-            ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
-        """;
+            sql = "SELECT * FROM turma ORDER BY turma_letra, serieturma_id, turmaanoletivo_id";
         }
         else {
             sql = """
-            SELECT * FROM turma 
-            WHERE turma_letra ILIKE '%#1%' 
+            SELECT * FROM turma WHERE turma_letra ILIKE '%#1%'
                OR CAST(serieturma_id AS TEXT) ILIKE '%#1%' 
                OR CAST(turmaanoletivo_id AS TEXT) ILIKE '%#1%'
             ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
@@ -97,7 +93,6 @@ public class TurmaDAO {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar turmas", e);
         }
-
         return turmas;
     }
 }

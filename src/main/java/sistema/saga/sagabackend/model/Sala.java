@@ -1,10 +1,12 @@
 package sistema.saga.sagabackend.model;
 
+import org.springframework.stereotype.Component;
 import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.SalaDAO;
 
 import java.util.List;
 
+@Component
 public class Sala {
     private int id;
     private String descricao;

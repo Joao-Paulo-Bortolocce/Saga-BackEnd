@@ -183,15 +183,7 @@ public class TurmaCtrl {
         try {
             GerenciaConexao gc = new GerenciaConexao();
             Turma turma = new Turma();
-
-            List<Turma> turmas;
-            if (termo == null || termo.isEmpty()) {
-                turmas = turma.buscarTodos(gc.getConexao());
-            }
-            else {
-                turmas = turma.buscarPorTermo(termo, gc.getConexao());
-            }
-
+            List<Turma> turmas = turma.buscarTodos(gc.getConexao());
             gc.Desconectar();
 
             if (turmas != null && !turmas.isEmpty()) {

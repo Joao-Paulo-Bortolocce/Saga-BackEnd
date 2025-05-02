@@ -1,19 +1,21 @@
 package sistema.saga.sagabackend.repository;
 
+import org.springframework.stereotype.Repository;
 import sistema.saga.sagabackend.model.Sala;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class SalaDAO {
     public boolean gravar(Sala sala, Conexao conexao) {
         String sql = """
         INSERT INTO salas (salas_ncarteiras, salas_descricao)
-        VALUES (#1, '#2')
+        VALUES ('#1', '#2')
     """;
         sql = sql.replace("#1", String.valueOf(sala.getNcarterias()));
-        sql = sql.replace("#2", sala.getDescricao()).replace("'", "''");
+        sql = sql.replace("#2", sala.getDescricao());
 
         System.out.println("SQL executado: " + sql); // <--- debug aqui
 
@@ -69,12 +71,12 @@ public class SalaDAO {
         try {
             ResultSet rs = conexao.consultar(sql);
             while (rs.next()) {
-                Sala serie = new Sala(
+                Sala sala = new Sala(
                         rs.getInt("salas_id"),
                         rs.getInt("salas_ncarteiras"),
                         rs.getString("salas_descricao")
                 );
-                salas.add(serie);
+                salas.add(sala);
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar salas", e);
