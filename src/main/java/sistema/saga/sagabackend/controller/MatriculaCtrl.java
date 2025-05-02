@@ -108,15 +108,18 @@ public class MatriculaCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
                     else{
-                        Matricula aux= matriculaList.get(pos);
-                        if(aux.getSerie().getSerieNum()>matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())){
-                            resposta.put("status", false);
-                            resposta.put("mensagem", "Esta não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a "+aux.getSerie().getSerieDescr()+" no ano "+ aux.getAnoLetivo().getInicio()+" portanto a serie deve ser igual ou superior a essa!");
-                            //roolback; end trasaction;
-                            gerenciaConexao.getConexao().rollback();
-                            gerenciaConexao.getConexao().fimTransacao();
-                            gerenciaConexao.Desconectar();
-                            return ResponseEntity.badRequest().body(resposta);
+                        if(matriculaList.size()>0){
+
+                            Matricula aux= matriculaList.get(pos);
+                            if(aux.getSerie().getSerieNum()>matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())){
+                                resposta.put("status", false);
+                                resposta.put("mensagem", "Esta não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a "+aux.getSerie().getSerieDescr()+" no ano "+ aux.getAnoLetivo().getInicio()+" portanto a serie deve ser igual ou superior a essa!");
+                                //roolback; end trasaction;
+                                gerenciaConexao.getConexao().rollback();
+                                gerenciaConexao.getConexao().fimTransacao();
+                                gerenciaConexao.Desconectar();
+                                return ResponseEntity.badRequest().body(resposta);
+                            }
                         }
                     }
 
