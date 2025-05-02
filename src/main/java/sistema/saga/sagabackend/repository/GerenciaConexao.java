@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class GerenciaConexao {
     private  Conexao conexao;
     private static final String URL = "jdbc:postgresql://localhost/";
-    private static final String BASE_NAME = "sagaAux";
-//    private static final String BASE_NAME = "saga";
+//    private static final String BASE_NAME = "sagaAux";
+    private static final String BASE_NAME = "saga";
     private static final String USER = "postgres";
     private static final String SENHA = "postgres123";
 
