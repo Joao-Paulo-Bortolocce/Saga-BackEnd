@@ -7,6 +7,7 @@ import sistema.saga.sagabackend.model.Pessoa;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,8 +136,12 @@ public class PessoaDAO {
         return pessoas;
     }
 
-    public List<Pessoa> buscarTodosSemAlunos(String filtro,Conexao conexao,List<Map<String,Object>> enderecos) {
-        String sql = "SELECT * FROM pessoa p JOIN endereco e ON p.pessoa_enderecoid = e.endereco_id WHERE p.pessoa_cpf NOT IN (SELECT a.aluno_pessoa_cpf FROM aluno a) AND p.pessoa_nome LIKE '%#1%'ORDER BY p.pessoa_nome;";
+    public List<Pessoa> buscarTodosSemAlunos(String filtro,Conexao conexao,List<Map<String,Object>> enderecos, boolean aluno) {
+        String sql = "SELECT * FROM pessoa p JOIN endereco e ON p.pessoa_enderecoid = e.endereco_id WHERE ";
+        if (aluno){
+            sql+=  " p.pessoa_datanascimento >= CURRENT_DATE - INTERVAL '12 years' AND ";
+        }
+        sql+= "p.pessoa_cpf NOT IN (SELECT a.aluno_pessoa_cpf FROM aluno a) AND p.pessoa_nome LIKE '%#1%'ORDER BY p.pessoa_nome;";
         sql = sql.replace("#1", filtro);
 
         List<Pessoa> pessoas = new ArrayList<>();

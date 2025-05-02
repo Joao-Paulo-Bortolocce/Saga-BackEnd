@@ -17,35 +17,60 @@ public class MatriculaDAO {
 
     public boolean gravar(Matricula matricula, Conexao conexao) {
         String sql = """
-                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_aprovado, matricula_data) 
-                    VALUES (#1, #2, #3, #5, '#6')
+                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_aprovado, matricula_data, matricula_valido) 
+                    VALUES (#1, #2, #3, #5, '#6',#7)
                 """;
         sql = sql.replace("#1", "" + matricula.getAluno().getRa());
         sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
         sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
         sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
         sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
+        sql = sql.replace("#7", matricula.isValido() ? "true" : "false");
         return conexao.manipular(sql);
     }
 
     public boolean alterar(Matricula matricula, Conexao conexao) {
-        String sql = """
+        String sql;
+        if(matricula.getTurma()!=null){
+            sql = """
                     UPDATE matricula SET
                         matricula_aluno_ra = #1,
                         matricula_anoletivo_id = #2,
                         matricula_serie_id = #3,
                         matricula_turma_letra = '#4',
                         matricula_aprovado = #5,
-                        matricula_data = '#6'
-                    WHERE matricula_id = #7
+                        matricula_data = '#6',
+                        matricula_valido = #7
+                    WHERE matricula_id = #8
                 """;
-        sql = sql.replace("#1", "" + matricula.getAluno().getRa());
-        sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
-        sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
-        sql = sql.replace("#4", "" + matricula.getTurma().getLetra());
-        sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
-        sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
-        sql = sql.replace("#7", "" + matricula.getId());
+            sql = sql.replace("#1", "" + matricula.getAluno().getRa());
+            sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
+            sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
+            sql = sql.replace("#4", "" + matricula.getTurma().getLetra());
+            sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
+            sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
+            sql = sql.replace("#7", matricula.isValido() ? "true" : "false");
+            sql = sql.replace("#8", "" + matricula.getId());
+        }
+        else{
+            sql = """
+                    UPDATE matricula SET
+                        matricula_aluno_ra = #1,
+                        matricula_anoletivo_id = #2,
+                        matricula_serie_id = #3,
+                        matricula_aprovado = #5,
+                        matricula_data = '#6',
+                        matricula_valido = #7
+                    WHERE matricula_id = #8
+                """;
+            sql = sql.replace("#1", "" + matricula.getAluno().getRa());
+            sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
+            sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
+            sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
+            sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
+            sql = sql.replace("#7", matricula.isValido() ? "true" : "false");
+            sql = sql.replace("#8", "" + matricula.getId());
+        }
         return conexao.manipular(sql);
     }
 
@@ -54,7 +79,7 @@ public class MatriculaDAO {
         return conexao.manipular(sql);
     }
 
-    public Matricula getMatricula(Matricula matricula, Conexao conexao, Map<String, Object> aluno, Map<String, Object> ano, Map<String, Object> serie, Map<String, Object> turma) {
+    public List<Matricula> getMatricula(Matricula mat, Conexao conexao, List< Map<String, Object>> alunos, List< Map<String, Object>> anos, List< Map<String, Object>> series, List< Map<String, Object>> turmas) {
         String sql = """
         SELECT * 
         FROM matricula 
@@ -70,19 +95,18 @@ public class MatriculaDAO {
                             OR turma_letra = matricula_turma_letra
                         )
         WHERE matricula_aluno_ra = '#1'
-          AND matricula_anoletivo_id = '#2'
         ORDER BY pessoa_nome
     """;
 
-        sql = sql.replace("#1", String.valueOf(matricula.getAluno().getRa()));
-        sql = sql.replace("#2", String.valueOf(matricula.getAnoLetivo().getId()));
-
+        sql = sql.replace("#1", String.valueOf(mat.getAluno().getRa()));
+        List<Matricula> matriculaList= new ArrayList<>();
         try {
             ResultSet rs = conexao.consultar(sql);
-            if (rs.next()) {
-                matricula = new Matricula();
+            while (rs.next()) {
+                Matricula matricula= new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();
@@ -93,58 +117,60 @@ public class MatriculaDAO {
                 end.put("endereco_id", rs.getInt("endereco_id"));
                 end.put("endereco_cidade", rs.getString("endereco_cidade"));
                 end.put("endereco_uf", rs.getString("endereco_uf"));
-
                 Map<String, Object> pessoa = new HashMap<>();
                 pessoa.put("pessoa_cpf", rs.getString("pessoa_cpf"));
                 pessoa.put("pessoa_nome", rs.getString("pessoa_nome"));
                 pessoa.put("pessoa_rg", rs.getString("pessoa_rg"));
-                java.sql.Date dataNascSql = rs.getDate("pessoa_datanascimento");
-                if (dataNascSql != null)
-                    pessoa.put("pessoa_datanascimento", dataNascSql);
+                pessoa.put("pessoa_datanascimento", rs.getDate("pessoa_datanascimento"));
                 pessoa.put("pessoa_sexo", rs.getString("pessoa_sexo"));
                 pessoa.put("pessoa_locNascimento", rs.getString("pessoa_locnascimento"));
                 pessoa.put("pessoa_estadoNascimento", rs.getString("pessoa_estadonascimento"));
                 pessoa.put("pessoa_estadoCivil", rs.getString("pessoa_estadocivil"));
                 pessoa.put("endereco", end);
 
+                Map<String, Object> aluno = new HashMap<>();
                 aluno.put("aluno_ra", rs.getInt("aluno_ra"));
                 aluno.put("aluno_restricaomedica", rs.getString("aluno_restricaomedica"));
                 aluno.put("pessoa", pessoa);
+                alunos.add(aluno);
 
-                ano.put("anoletivo_id", rs.getInt("anoletivo_id"));
-                ano.put("anoletivo_inicio", rs.getDate("anoletivo_inicio"));
-                ano.put("anoletivo_termino", rs.getDate("anoletivo_termino"));
+                Map<String, Object> ano= new HashMap<>();
+                ano.put("anoletivo_id",rs.getInt("anoletivo_id"));
+                ano.put("anoletivo_inicio",rs.getDate("anoletivo_inicio"));
+                ano.put("anoletivo_termino",rs.getDate("anoletivo_termino"));
+                anos.add(ano);
 
-                serie.put("serie_id", rs.getInt("serie_id"));
-                serie.put("serie_num", rs.getInt("serie_num"));
-                serie.put("serie_descr", rs.getString("serie_descr"));
+                Map<String, Object> serie= new HashMap<>();
+                serie.put("serie_id",rs.getInt("serie_id"));
+                serie.put("serie_num",rs.getInt("serie_num"));
+                serie.put("serie_descr",rs.getString("serie_descr"));
+                series.add(serie);
 
-                turma.put("serie", serie);
-                turma.put("anoletivo", ano);
+                Map<String, Object> turma= new HashMap<>();
+                turma.put("serie",serie);
+                turma.put("anoletivo",ano);
+                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turmas.add(turma);
 
-                byte letraByte = rs.getByte("turma_letra");
-                if (!rs.wasNull()) {
-                    turma.put("turma_letra", letraByte);
-                }
-
-                return matricula;
+                matriculaList.add(matricula);
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao buscar matrícula", e);
         }
 
-        return null;
+        return matriculaList;
     }
 
 
     public List<Matricula> get(Conexao conexao, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         String sql = """
-                   SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
+                 SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
                  JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf
                  JOIN endereco ON pessoa_enderecoid = endereco_id
                  JOIN anoLetivo ON anoletivo_id = matricula_anoletivo_id
                  JOIN serie ON serie_id = matricula_serie_id
-                 LEFT JOIN turma ON turmaanoletivo_id = matricula_anoletivo_id AND serieturma_id = matricula_serie_id AND (matricula_turma_letra IS NULL OR turma_letra = matricula_turma_letra)                
+                 LEFT JOIN turma ON turmaanoletivo_id = matricula_anoletivo_id AND serieturma_id = matricula_serie_id
+                 AND (matricula_turma_letra IS NULL OR turma_letra = matricula_turma_letra)                
                  ORDER BY pessoa_nome;
                 """;
         List<Matricula> lista = new ArrayList<>();
@@ -155,6 +181,7 @@ public class MatriculaDAO {
                 Matricula matricula = new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();
@@ -212,7 +239,7 @@ public class MatriculaDAO {
         return lista;
     }
 
-    public List<Matricula> buscarTodasFiltradas(Conexao conexao,Matricula mat, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
+    public List<Matricula> buscarTodasFiltradas(Conexao conexao,Matricula mat,int valido, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         Boolean teste=false;
         String where="where";
         if(mat.getSerie().getSerieId()!=0){
@@ -224,6 +251,15 @@ public class MatriculaDAO {
                 where+=" and ";
             teste=true;
             where+=" anoletivo_id="+mat.getAnoLetivo().getId();
+        }
+        if(valido>0){
+            if(teste)
+                where+=" and ";
+            teste=true;
+            if (valido==1)
+                where+=" matricula_valido=true";
+            else
+                where+=" matricula_valido=false";
         }
         String sql = """
                    SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
@@ -245,6 +281,7 @@ public class MatriculaDAO {
                 Matricula matricula = new Matricula();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setValido(rs.getBoolean("matricula_valido"));
                 matricula.setData(rs.getDate("matricula_data").toLocalDate());
 
                 Map<String, Object> end = new HashMap<>();

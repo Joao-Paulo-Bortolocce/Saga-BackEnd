@@ -216,7 +216,18 @@ public class PessoaCtrl {
         if (verificaIntegridade(cpf)) {
             try {
                 Pessoa pessoa = new Pessoa(cpf);
+                List<Pessoa> pessoaList= new ArrayList<>();
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                List<Map<String, Object>> end= new ArrayList<>();
+                pessoaList=pessoa.buscarTodosSemAlunos(gerenciaConexao.getConexao(),end,false);
+                int i;
+                for (i = 0; i < pessoaList.size() && pessoaList.get(i).getCpf().compareToIgnoreCase(pessoa.getCpf())!=0; i++);
+                if(i==pessoaList.size() ){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Pessoa está cadastrada como aluno e não pode ser excluida!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
                 if (pessoa.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Pessoa excluída com sucesso!");
@@ -316,13 +327,13 @@ public class PessoaCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarTodosSemAlunos() {
+    public ResponseEntity<Object> buscarTodosSemAlunos(boolean aluno) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Pessoa pessoa = new Pessoa();
             List<Map<String,Object>> enderecos = new ArrayList<>();
-            List<Pessoa> pessoaList = pessoa.buscarTodosSemAlunos(gerenciaConexao.getConexao(), enderecos);
+            List<Pessoa> pessoaList = pessoa.buscarTodosSemAlunos(gerenciaConexao.getConexao(), enderecos,aluno);
             if (pessoaList != null ) {
                 for (int i = 0; i < enderecos.size(); i++) {
                     Map<String, Object>  end= enderecos.get(i);

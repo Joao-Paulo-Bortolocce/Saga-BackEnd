@@ -18,8 +18,10 @@ public class Matricula {
     private Turma turma;
     private boolean aprovado;
     private LocalDate data;
+    private boolean valido;
 
-    public Matricula(int id, Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data) {
+
+    public Matricula(int id, Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data, boolean valido) {
         this.id = id;
         this.aluno = aluno;
         this.anoLetivo = anoLetivo;
@@ -27,18 +29,19 @@ public class Matricula {
         this.turma = turma;
         this.aprovado = aprovado;
         this.data = data;
+        this.valido=valido;
     }
 
-    public Matricula(Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data) {
-        this(0,  aluno,  anoLetivo,  serie,  turma,  aprovado,  data);
+    public Matricula(Aluno aluno, AnoLetivo anoLetivo, Serie serie, Turma turma, boolean aprovado, LocalDate data, boolean valido) {
+        this(0,  aluno,  anoLetivo,  serie,  turma,  aprovado,  data,valido);
     }
 
     public Matricula(int id) {
-        this(id,null,null,null,null,false,null);
+        this(id,null,null,null,null,false,null,false);
     }
 
     public Matricula() {
-        this(0,null,null,null,null,false,null);
+        this(0,null,null,null,null,false,null,false);
     }
 
     public int getId() {
@@ -97,14 +100,22 @@ public class Matricula {
         this.data = data;
     }
 
+    public boolean isValido() {
+        return valido;
+    }
+
+    public void setValido(boolean valido) {
+        this.valido = valido;
+    }
+
     public boolean apagar(Conexao conexao) {
         MatriculaDAO matriculaDAO = new MatriculaDAO();
         return matriculaDAO.apagar(this.getId(),conexao);
     }
 
-    public Matricula buscaMatricula(Conexao conexao, Matricula matricula, Map<String, Object> aluno, Map<String, Object> ano, Map<String, Object> serie, Map<String, Object> turma){
+    public List<Matricula> buscaMatricula(Conexao conexao, List< Map<String, Object>> aluno, List< Map<String, Object>> ano, List< Map<String, Object>> serie, List< Map<String, Object>> turma){
         MatriculaDAO matriculaDAO = new MatriculaDAO();
-        return matriculaDAO.getMatricula(matricula,conexao,aluno,ano,serie,turma);
+        return matriculaDAO.getMatricula(this,conexao,aluno,ano,serie,turma);
     }
 
     public List<Matricula> buscarTodas(Conexao conexao, List<Map<String, Object>>alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
@@ -112,9 +123,9 @@ public class Matricula {
         return matriculaDAO.get(conexao,alunos,anos,series,turmas);
     }
 
-    public List<Matricula> buscarTodasFiltradas(Conexao conexao,Matricula matricula, List<Map<String, Object>>alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
+    public List<Matricula> buscarTodasFiltradas(Conexao conexao,Matricula matricula,int valido, List<Map<String, Object>>alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         MatriculaDAO matriculaDAO = new MatriculaDAO();
-        return matriculaDAO.buscarTodasFiltradas(conexao,matricula,alunos,anos,series,turmas);
+        return matriculaDAO.buscarTodasFiltradas(conexao,matricula,valido,alunos,anos,series,turmas);
     }
 
     public boolean alterar(Conexao conexao) {
