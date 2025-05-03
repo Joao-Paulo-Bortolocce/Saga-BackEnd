@@ -39,7 +39,6 @@ public class TurmaDAO {
         sql = sql.replace("#2", String.valueOf(turma.getSerie().getSerieId()));
         sql = sql.replace("#3", String.valueOf(turma.getAnoLetivo().getId()));
 
-        System.out.println("SQL: " + sql);
         return conexao.manipular(sql);
     }
 
