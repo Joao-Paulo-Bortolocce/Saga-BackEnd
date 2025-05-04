@@ -65,8 +65,8 @@ public class MatriculaCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    anoLetivo=anoLetivo.buscaAnoLetivo(gerenciaConexao.getConexao());
-                    if (anoLetivo==null) {
+
+                    if ( anoLetivo.buscaAnos(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "O ano Letivo que deseja matricular não está cadastrado!");
                         //roolback; end trasaction;
@@ -195,9 +195,9 @@ public class MatriculaCtrl {
                     }
 
 
-                    if (matricula.getAnoLetivo().buscaAnoLetivo(gerenciaConexao.getConexao())==null) {
+                    if (matricula.getAnoLetivo().buscaAnos(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "O ano Letivo que deseja matricular não está cadastrado!");
+                        resposta.put("mensagem", "O ano Letivo que deseja alterar a  matricula não está cadastrado!");
                         //roolback; end trasaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
