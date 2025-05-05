@@ -88,7 +88,7 @@ public class TurmaDAO {
 
                 AnoLetivo ano = new AnoLetivo();
                 ano.setId(rs.getInt("turmaanoletivo_id"));
-                ano.buscarAnoLetivo(conexao); // <-- busca data início/fim
+                ano.buscaAnos(conexao); // <-- busca data início/fim
                 turma.setAnoLetivo(ano);
 
                 turmas.add(turma);

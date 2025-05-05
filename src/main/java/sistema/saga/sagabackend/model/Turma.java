@@ -51,7 +51,7 @@ public class Turma {
         return turmaDAO.apagar(this,conexao);
     }
 
-    public List<Turma> buscarTodos(Conexao conexao) {
+    public static List<Turma> buscarTodos(Conexao conexao) {
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.get("", conexao);
     }

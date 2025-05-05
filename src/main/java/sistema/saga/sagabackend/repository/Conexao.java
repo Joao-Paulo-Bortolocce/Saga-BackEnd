@@ -39,13 +39,19 @@ public class Conexao {
     public boolean manipular(String sql) {
         boolean executou = false;
         try {
+            System.out.println(">> SQL EXECUTADO:");
+            System.out.println(sql);
+
             Statement statement = connect.createStatement();
             int result = statement.executeUpdate(sql);
             statement.close();
-            if (result >= 1)
-                executou = true;
+
+            System.out.println(">> Linhas afetadas: " + result);
+            executou = result >= 1;
         } catch (SQLException sqlex) {
-            erro = "Erro: " + sqlex.toString();
+            erro = "Erro ao executar SQL: " + sqlex.getMessage();
+            System.out.println(">> ERRO no SQL:");
+            sqlex.printStackTrace(); // Mostra exatamente o erro do PostgreSQL
         }
         return executou;
     }

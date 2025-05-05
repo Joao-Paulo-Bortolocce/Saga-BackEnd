@@ -40,7 +40,7 @@ public class TurmaCtrl {
                     // Verifica se o ano letivo existe
                     AnoLetivo anoLetivo = new AnoLetivo();
                     anoLetivo.setId(turmaAnoLetivoId);
-                    int idAnoConfirmado = anoLetivo.buscarAnoLetivo(gerenciaConexao.getConexao()); // você precisa criar esse método
+                    int idAnoConfirmado = anoLetivo.buscaAnos(gerenciaConexao.getConexao());
                     if (idAnoConfirmado == 0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "Ano letivo não encontrado.");

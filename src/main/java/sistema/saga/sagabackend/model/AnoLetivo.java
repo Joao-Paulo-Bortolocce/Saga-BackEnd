@@ -1,10 +1,11 @@
 package sistema.saga.sagabackend.model;
 
 import org.springframework.stereotype.Component;
-import sistema.saga.sagabackend.repository.AnoLetivoDAO;
 import sistema.saga.sagabackend.repository.Conexao;
+import sistema.saga.sagabackend.repository.AnoLetivoDAO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class AnoLetivo {
@@ -53,9 +54,28 @@ public class AnoLetivo {
         this.fim = fim;
     }
 
-    public int buscarAnoLetivo(Conexao conexao) {
-        AnoLetivoDAO dao = new AnoLetivoDAO();
-        return dao.getAnoLetivo(this, conexao);
+    public boolean apagar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.apagar(this,conexao);
     }
 
+    public int buscaAnos(Conexao conexao){
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.getAno(this,conexao);
+    }
+
+    public List<AnoLetivo> buscarTodos(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.get("",conexao);
+    }
+
+    public boolean alterar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.alterar(this,conexao);
+    }
+
+    public boolean gravar(Conexao conexao) {
+        AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
+        return anoLetivoDAO.gravar(this,conexao);
+    }
 }
