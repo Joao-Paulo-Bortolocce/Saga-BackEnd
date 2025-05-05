@@ -137,7 +137,7 @@ public class MatriculaDAO {
                 Map<String, Object> ano= new HashMap<>();
                 ano.put("anoletivo_id",rs.getInt("anoletivo_id"));
                 ano.put("anoletivo_inicio",rs.getDate("anoletivo_inicio"));
-                ano.put("anoletivo_termino",rs.getDate("anoletivo_termino"));
+                ano.put("anoletivo_fim",rs.getDate("anoletivo_fim"));
                 anos.add(ano);
 
                 Map<String, Object> serie= new HashMap<>();
@@ -212,7 +212,7 @@ public class MatriculaDAO {
                 Map<String, Object> ano= new HashMap<>();
                 ano.put("anoletivo_id",rs.getInt("anoletivo_id"));
                 ano.put("anoletivo_inicio",rs.getDate("anoletivo_inicio"));
-                ano.put("anoletivo_termino",rs.getDate("anoletivo_termino"));
+                ano.put("anoletivo_fim",rs.getDate("anoletivo_fim"));
                 anos.add(ano);
 
                 Map<String, Object> serie= new HashMap<>();
@@ -312,7 +312,7 @@ public class MatriculaDAO {
                 Map<String, Object> ano= new HashMap<>();
                 ano.put("anoletivo_id",rs.getInt("anoletivo_id"));
                 ano.put("anoletivo_inicio",rs.getDate("anoletivo_inicio"));
-                ano.put("anoletivo_termino",rs.getDate("anoletivo_termino"));
+                ano.put("anoletivo_fim",rs.getDate("anoletivo_fim"));
                 anos.add(ano);
 
                 Map<String, Object> serie= new HashMap<>();

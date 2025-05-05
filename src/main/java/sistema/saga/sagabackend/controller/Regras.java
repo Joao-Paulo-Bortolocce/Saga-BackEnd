@@ -117,9 +117,9 @@ public class Regras {
 
         int id = (int) anoMap.get("anoletivo_id");
         LocalDate inicio = ((java.sql.Date) anoMap.get("anoletivo_inicio")).toLocalDate();
-        LocalDate termino = ((java.sql.Date) anoMap.get("anoletivo_termino")).toLocalDate();
+        LocalDate fim = ((java.sql.Date) anoMap.get("anoletivo_fim")).toLocalDate();
 
-        return new AnoLetivo(id, inicio, termino);
+        return new AnoLetivo(id, inicio, fim);
     }
 
     public static AnoLetivo HashToAnoLetivoFront(Map<String, Object> anoMap) {
@@ -130,8 +130,8 @@ public class Regras {
         String dt = (String) anoMap.get("inicio");
         LocalDate inicio = LocalDate.parse(dt);
         dt = (String) anoMap.get("fim");
-        LocalDate termino= LocalDate.parse(dt);
-        return new AnoLetivo(id, inicio, termino);
+        LocalDate fim= LocalDate.parse(dt);
+        return new AnoLetivo(id, inicio, fim);
     }
 
     public static Serie HashToSerie(Map<String, Object> serieMap) {

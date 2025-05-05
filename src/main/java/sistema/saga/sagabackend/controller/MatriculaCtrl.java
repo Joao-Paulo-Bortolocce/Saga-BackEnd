@@ -8,10 +8,7 @@ import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MatriculaCtrl {
@@ -89,16 +86,21 @@ public class MatriculaCtrl {
                         aux.setSerie(Regras.HashToSerie(serieMap.get(i)));
                         aux.setTurma(Regras.HashToTurma(turmaMap.get(i)));
                     }
-                    int i, maior=-1000, pos=0;
-                    LocalDate ano;
+                    int i, maior=-1000,menor=1000000, pos=0, posMenor=0;
+
                     for (i = 0; i < matriculaList.size() && (matricula.getAluno().getRa()!=matriculaList.get(i).getAluno().getRa() || matricula.getAnoLetivo().getId()!=matriculaList.get(i).getAnoLetivo().getId()); i++) {
                         if(matriculaList.get(i).getSerie().getSerieNum()>maior){
                             maior=matriculaList.get(i).getSerie().getSerieNum();
                             pos=i;
-                            ano=matriculaList.get(i).getAnoLetivo().getInicio();
+
+                        }
+                        if(matriculaList.get(i).getSerie().getSerieNum()<menor){
+                            menor=matriculaList.get(i).getSerie().getSerieNum();
+                            posMenor=i;
+
                         }
                     }
-                    if (i<matriculaList.size()) {
+                     if (i<matriculaList.size()) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "Esta matricula ja está cadastrada!");
                         //roolback; end trasaction;
@@ -111,9 +113,19 @@ public class MatriculaCtrl {
                         if(matriculaList.size()>0){
 
                             Matricula aux= matriculaList.get(pos);
-                            if(aux.getSerie().getSerieNum()>matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())){
+                            if(maior>matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())){
                                 resposta.put("status", false);
-                                resposta.put("mensagem", "Esta não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a "+aux.getSerie().getSerieDescr()+" no ano "+ aux.getAnoLetivo().getInicio()+" portanto a serie deve ser igual ou superior a essa!");
+                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a "+aux.getSerie().getSerieDescr()+" no ano "+ aux.getAnoLetivo().getInicio() +" portanto a serie deve ser igual ou superior a essa!");
+                                //roolback; end trasaction;
+                                gerenciaConexao.getConexao().rollback();
+                                gerenciaConexao.getConexao().fimTransacao();
+                                gerenciaConexao.Desconectar();
+                                return ResponseEntity.badRequest().body(resposta);
+                            }
+                            aux=matriculaList.get(posMenor);
+                            if(menor<matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isAfter(matricula.getAnoLetivo().getInicio())){
+                                resposta.put("status", false);
+                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a "+aux.getSerie().getSerieDescr()+" no ano "+ aux.getAnoLetivo().getInicio() +" portanto a serie deve ser igual ou inferior a essa!");
                                 //roolback; end trasaction;
                                 gerenciaConexao.getConexao().rollback();
                                 gerenciaConexao.getConexao().fimTransacao();
