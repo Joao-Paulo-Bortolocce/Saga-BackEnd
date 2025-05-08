@@ -13,7 +13,7 @@ public class GerenciaConexao {
     private static final String URL = "jdbc:postgresql://localhost/";
     private static final String BASE_NAME = "saga";
     private static final String USER = "postgres";
-    private static final String SENHA = "postgres"; //voltar para postgres123
+    private static final String SENHA = "postgres123"; //voltar para postgres123
 
     public GerenciaConexao() {
         Conectar();
