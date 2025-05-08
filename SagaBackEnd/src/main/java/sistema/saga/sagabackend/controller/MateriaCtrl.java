@@ -70,7 +70,7 @@ public class MateriaCtrl {
     }
 
     private boolean verificaIntegridade(int elemento) {
-        return elemento != 0
+        return elemento != 0;
     }
     private boolean verificaIntegridade(String elemento) {
         return elemento != null && !elemento.trim().isEmpty();
