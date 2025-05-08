@@ -58,9 +58,11 @@ public class ReuniaoDAO {
     public List<Reuniao> get(String filtro, Conexao conexao) {
         List<Reuniao> reunioes = new ArrayList<>();
         String sql;
-        if (filtro == null || filtro.isEmpty()) {
+
+        if (filtro == null || filtro.trim().isEmpty()) {
             sql = "SELECT * FROM reuniao ORDER BY reuniao_data DESC";
         } else {
+            filtro = filtro.trim(); // Remove espaços extras
             sql = "SELECT * FROM reuniao WHERE " +
                     "CAST(reuniao_id AS TEXT) ILIKE '%" + filtro + "%' OR " +
                     "CAST(reuniao_data AS TEXT) ILIKE '%" + filtro + "%' OR " +

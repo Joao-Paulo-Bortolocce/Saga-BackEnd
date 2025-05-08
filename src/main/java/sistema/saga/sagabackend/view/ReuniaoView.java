@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sistema.saga.sagabackend.controller.ReuniaoCtrl;
+import sistema.saga.sagabackend.controller.TurmaCtrl;
 import sistema.saga.sagabackend.model.Turma;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
@@ -17,6 +18,8 @@ public class ReuniaoView {
 
     @Autowired
     private ReuniaoCtrl reuniaoCtrl;
+    @Autowired
+    private TurmaCtrl turmaCtrl;
 
     @PostMapping("/gravar")
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
@@ -45,9 +48,6 @@ public class ReuniaoView {
 
     @GetMapping("/turmas")
     public ResponseEntity<Object> buscarTurmas() {
-        GerenciaConexao gc = new GerenciaConexao();
-        List<Turma> turmas = Turma.buscarTodos(gc.getConexao());
-        gc.Desconectar();
-        return ResponseEntity.ok(turmas);
+        return turmaCtrl.buscarTurmas("");
     }
 }
