@@ -38,7 +38,7 @@ public class TurmaView {
         return turmaCtrl.buscarTurmas("");
     }
 
-    @GetMapping("/{termo}")
+    @GetMapping("/buscar/{termo}")
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return turmaCtrl.buscarTurmas(termo);
     }
