@@ -39,7 +39,7 @@ public class AnoLetivoView {
         return anoLetivoCtrl.buscarAnos("");
     }
 
-    @GetMapping("/{termo}")
+    @GetMapping("/buscar/{termo}")
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return anoLetivoCtrl.buscarAnos(termo);
     }
