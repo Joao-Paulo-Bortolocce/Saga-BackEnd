@@ -7,6 +7,10 @@ import sistema.saga.sagabackend.repository.AnoLetivoDAO;
 import java.time.LocalDate;
 import java.util.List;
 
+<<<<<<< HEAD
+=======
+@Component
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
 public class AnoLetivo {
     private int id;
     private LocalDate inicio, fim;
@@ -77,4 +81,8 @@ public class AnoLetivo {
         AnoLetivoDAO anoLetivoDAO = new AnoLetivoDAO();
         return anoLetivoDAO.gravar(this,conexao);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

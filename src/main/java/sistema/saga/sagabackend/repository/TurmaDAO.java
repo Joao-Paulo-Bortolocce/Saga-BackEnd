@@ -39,7 +39,10 @@ public class TurmaDAO {
         sql = sql.replace("#2", String.valueOf(turma.getSerie().getSerieId()));
         sql = sql.replace("#3", String.valueOf(turma.getAnoLetivo().getId()));
 
+<<<<<<< HEAD
         System.out.println("SQL: " + sql);
+=======
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
         return conexao.manipular(sql);
     }
 
@@ -60,11 +63,23 @@ public class TurmaDAO {
         String sql;
 
         if (filtro == null || filtro.isEmpty()) {
+<<<<<<< HEAD
             sql = "SELECT * FROM turma ORDER BY turma_letra, serieturma_id, turmaanoletivo_id";
         }
         else {
             sql = """
             SELECT * FROM turma WHERE turma_letra ILIKE '%#1%'
+=======
+            sql = """
+            SELECT * FROM turma
+            ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
+        """;
+        }
+        else {
+            sql = """
+            SELECT * FROM turma 
+            WHERE turma_letra ILIKE '%#1%' 
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
                OR CAST(serieturma_id AS TEXT) ILIKE '%#1%' 
                OR CAST(turmaanoletivo_id AS TEXT) ILIKE '%#1%'
             ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
@@ -93,6 +108,13 @@ public class TurmaDAO {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar turmas", e);
         }
+<<<<<<< HEAD
         return turmas;
     }
 }
+=======
+
+        return turmas;
+    }
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

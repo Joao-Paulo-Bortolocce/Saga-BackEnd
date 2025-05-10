@@ -40,7 +40,11 @@ public class TurmaCtrl {
                     // Verifica se o ano letivo existe
                     AnoLetivo anoLetivo = new AnoLetivo();
                     anoLetivo.setId(turmaAnoLetivoId);
+<<<<<<< HEAD
                     int idAnoConfirmado = anoLetivo.buscaAnos(gerenciaConexao.getConexao()); // você precisa criar esse método
+=======
+                    int idAnoConfirmado = anoLetivo.buscaAnos(gerenciaConexao.getConexao());
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
                     if (idAnoConfirmado == 0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "Ano letivo não encontrado.");
@@ -183,7 +187,19 @@ public class TurmaCtrl {
         try {
             GerenciaConexao gc = new GerenciaConexao();
             Turma turma = new Turma();
+<<<<<<< HEAD
             List<Turma> turmas = turma.buscarTodos(gc.getConexao());
+=======
+
+            List<Turma> turmas;
+            if (termo == null || termo.isEmpty()) {
+                turmas = turma.buscarTodos(gc.getConexao());
+            }
+            else {
+                turmas = turma.buscarPorTermo(termo, gc.getConexao());
+            }
+
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
             gc.Desconectar();
 
             if (turmas != null && !turmas.isEmpty()) {
@@ -215,4 +231,8 @@ public class TurmaCtrl {
     private boolean verificaIntegridade(int elemento) {
         return elemento > 0;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

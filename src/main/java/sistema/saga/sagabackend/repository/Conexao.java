@@ -1,4 +1,5 @@
 package sistema.saga.sagabackend.repository;
+<<<<<<< HEAD
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -6,6 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+=======
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
 import java.sql.*;
 
 public class Conexao {
@@ -46,6 +49,7 @@ public class Conexao {
     public boolean manipular(String sql) {
         boolean executou = false;
         try {
+<<<<<<< HEAD
             Statement statement = connect.createStatement();
             int result = statement.executeUpdate(sql);
             statement.close();
@@ -53,6 +57,21 @@ public class Conexao {
                 executou = true;
         } catch (SQLException sqlex) {
             erro = "Erro: " + sqlex.toString();
+=======
+            System.out.println(">> SQL EXECUTADO:");
+            System.out.println(sql);
+
+            Statement statement = connect.createStatement();
+            int result = statement.executeUpdate(sql);
+            statement.close();
+
+            System.out.println(">> Linhas afetadas: " + result);
+            executou = result >= 1;
+        } catch (SQLException sqlex) {
+            erro = "Erro ao executar SQL: " + sqlex.getMessage();
+            System.out.println(">> ERRO no SQL:");
+            sqlex.printStackTrace(); // Mostra exatamente o erro do PostgreSQL
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
         }
         return executou;
     }
@@ -160,5 +179,9 @@ public class Conexao {
 //    @Bean
 //    public JdbcTemplate jdbcTemplate() {
 //        return new JdbcTemplate(dataSource());
+<<<<<<< HEAD
 //    }
 
+=======
+//    }
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

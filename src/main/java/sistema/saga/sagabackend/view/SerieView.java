@@ -40,7 +40,11 @@ public class SerieView {
         return serieCtrl.buscarSeries("");
     }
 
+<<<<<<< HEAD
     @GetMapping("/{termo}")
+=======
+    @GetMapping("/buscar/{termo}")
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return serieCtrl.buscarSeries(termo);
     }

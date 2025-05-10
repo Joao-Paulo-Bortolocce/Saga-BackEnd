@@ -2,6 +2,10 @@ package sistema.saga.sagabackend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+<<<<<<< HEAD
+=======
+import org.springframework.web.bind.annotation.CrossOrigin;
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
 import sistema.saga.sagabackend.model.Serie;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
@@ -142,7 +146,11 @@ public class SerieCtrl {
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
             Serie serie = new Serie();
+<<<<<<< HEAD
             List<Serie> series = serie.buscarTodos(gerenciaConexao.getConexao());
+=======
+            List<Serie> series = serie.buscar(gerenciaConexao.getConexao(), termo);
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
             gerenciaConexao.Desconectar();
 
             if (series != null && !series.isEmpty()) {

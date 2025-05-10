@@ -51,7 +51,11 @@ public class Turma {
         return turmaDAO.apagar(this,conexao);
     }
 
+<<<<<<< HEAD
     public List<Turma> buscarTodos(Conexao conexao) {
+=======
+    public static List<Turma> buscarTodos(Conexao conexao) {
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.get("", conexao);
     }
@@ -70,4 +74,8 @@ public class Turma {
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.gravar(this,conexao);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

@@ -8,11 +8,19 @@
         <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+<<<<<<< HEAD
     <groupId>sistema.saga</groupId>
     <artifactId>Saga-Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Saga-Backend</name>
     <description>Saga-Backend</description>
+=======
+    <groupId>unoeste.leandro</groupId>
+    <artifactId>SagaBE</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>SagaBE</name>
+    <description>SagaBE</description>
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
     <url/>
     <licenses>
         <license/>

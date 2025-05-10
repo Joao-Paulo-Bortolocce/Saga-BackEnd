@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class GerenciaConexao {
     private  Conexao conexao;
+<<<<<<< HEAD
     private static final String URL = "jdbc:postgresql://db.hwzwvvtscsfgklklppga.supabase.co:5432/";
     private static final String BASE_NAME = "postgres";
     private static final String USER = "postgres";
@@ -18,6 +19,12 @@ public class GerenciaConexao {
 //    private static final String BASE_NAME = "saga";
 //    private static final String USER = "postgres";
 //    private static final String SENHA = "postgres123";
+=======
+    private static final String URL = "jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/"; //MUDANDO PARA BANCO ONLINE
+    private static final String BASE_NAME = "postgres";
+    private static final String USER = "postgres.hwzwvvtscsfgklklppga";
+    private static final String SENHA = "postgres123";
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
 
     public GerenciaConexao() {
         Conectar();
@@ -25,7 +32,13 @@ public class GerenciaConexao {
 
     public boolean Conectar() {
         conexao = new Conexao();
+<<<<<<< HEAD
         return conexao.conectar(URL, BASE_NAME, USER, SENHA);
+=======
+        boolean conectado = conexao.conectar(URL, BASE_NAME, USER, SENHA);
+        System.out.println(">>> Conexão com banco: " + (conectado ? "SUCESSO" : "FALHOU"));
+        return conectado;
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
     }
 
     public boolean Desconectar() {
@@ -126,5 +139,9 @@ public class GerenciaConexao {
             return false;
         }
     }
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

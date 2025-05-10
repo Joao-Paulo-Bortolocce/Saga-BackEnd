@@ -158,7 +158,11 @@ public class AnoLetivoCtrl {
             gerenciaConexao.Desconectar();
             if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
                 resposta.put("status", true);
+<<<<<<< HEAD
                 resposta.put("series", anoLetivoList);
+=======
+                resposta.put("anos", anoLetivoList);
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
@@ -180,4 +184,8 @@ public class AnoLetivoCtrl {
     private boolean verificaIntegridade(LocalDate elemento) {
         return elemento != null;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403

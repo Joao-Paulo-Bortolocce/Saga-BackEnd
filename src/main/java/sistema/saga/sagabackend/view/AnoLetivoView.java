@@ -34,13 +34,25 @@ public class AnoLetivoView {
         return anoLetivoCtrl.apagarAno(id);
     }
 
+<<<<<<< HEAD
     @GetMapping(value = "buscarTodos")
+=======
+    @GetMapping(value = "/buscarTodos")
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
     public ResponseEntity<Object> buscarTodos() {
         return anoLetivoCtrl.buscarAnos("");
     }
 
+<<<<<<< HEAD
     @GetMapping("/{termo}")
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return anoLetivoCtrl.buscarAnos(termo);
     }
 }
+=======
+    @GetMapping("/buscar/{termo}")
+    public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
+        return anoLetivoCtrl.buscarAnos(termo);
+    }
+}
+>>>>>>> ffbd4c8b9f14764ab1933c9bae2da73391cdc403
