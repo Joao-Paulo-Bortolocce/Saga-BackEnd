@@ -34,7 +34,7 @@ public class AnoLetivoView {
         return anoLetivoCtrl.apagarAno(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping(value = "/buscarTodos")
     public ResponseEntity<Object> buscarTodos() {
         return anoLetivoCtrl.buscarAnos("");
     }

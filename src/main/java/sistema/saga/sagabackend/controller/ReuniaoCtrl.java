@@ -184,15 +184,9 @@ public class ReuniaoCtrl {
 
             gc.Desconectar();
 
-            if (!lista.isEmpty()) {
-                resposta.put("status", true);
-                resposta.put("reunioes", lista);
-                return ResponseEntity.ok(resposta);
-            } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma reunião encontrada.");
-                return ResponseEntity.badRequest().body(resposta);
-            }
+            resposta.put("status", true);
+            resposta.put("reunioes", lista);
+            return ResponseEntity.ok(resposta);
 
         } catch (Exception e) {
             resposta.put("status", false);
