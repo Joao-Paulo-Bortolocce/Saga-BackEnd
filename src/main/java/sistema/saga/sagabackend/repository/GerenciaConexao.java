@@ -10,10 +10,22 @@ import java.util.ArrayList;
 
 public class GerenciaConexao {
     private  Conexao conexao;
-    private static final String URL = "jdbc:postgresql://localhost/";
-    private static final String BASE_NAME = "backendsaga";
-    private static final String USER = "postgresql";
-    private static final String SENHA = "postgres123";
+
+
+    private static final String URL = "jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/";
+    private static final String BASE_NAME = "postgres";
+    private static final String USER = "postgres.hwzwvvtscsfgklklppga";
+    private static final String SENHA ="postgres123";
+
+//    private static final String URL = "jdbc:postgresql://db.hwzwvvtscsfgklklppga.supabase.co:5432/";
+//    private static final String BASE_NAME = "postgres";
+//    private static final String USER = "postgres";
+//    private static final String SENHA = "postgres123";
+//    private static final String URL = "jdbc:postgresql://localhost/";
+//    private static final String BASE_NAME = "saga";
+//    private static final String USER = "postgres";
+//    private static final String SENHA = "postgres123";
+
 
     public GerenciaConexao() {
         Conectar();

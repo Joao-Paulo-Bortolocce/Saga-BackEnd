@@ -7,6 +7,9 @@ import sistema.saga.sagabackend.repository.AlunoDAO;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.Map;
+
+
 @Component
 public class Aluno {
 
@@ -61,14 +64,21 @@ public class Aluno {
         return alunoDAO.apagar(this.getRa(),conexao);
     }
 
-    public String buscaAluno(Conexao conexao, Aluno aluno){
+
+    public Aluno buscaAluno(Conexao conexao, Aluno aluno, Map<String, Object> pessoa){
         AlunoDAO alunoDAO = new AlunoDAO();
-        return alunoDAO.getAluno(aluno,conexao);
+        return alunoDAO.getAluno(aluno,conexao,pessoa);
     }
 
-    public List<Aluno> buscarTodos(Conexao conexao, List<String> cpfsPessoa) {
+    public List<Aluno> buscarTodos(Conexao conexao,List<Map<String, Object>>  pessoas) {
         AlunoDAO alunoDAO = new AlunoDAO();
-        return alunoDAO.get(conexao,cpfsPessoa);
+        return alunoDAO.get(conexao,pessoas);
+    }
+
+    public List<Aluno> buscarTodosSemMatricula(Conexao conexao,int anoLetivo,List<Map<String, Object>>  pessoas) {
+        AlunoDAO alunoDAO = new AlunoDAO();
+        return alunoDAO.buscaAlunosSemMatricula(conexao,anoLetivo,pessoas);
+
     }
 
     public boolean alterar(Conexao conexao) {

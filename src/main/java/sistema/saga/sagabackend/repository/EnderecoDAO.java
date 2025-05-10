@@ -15,13 +15,22 @@ public class EnderecoDAO {
     }
 
     public boolean gravar(Endereco endereco, Conexao conexao) {
-        String sql = """
+        String sql;
+        if(endereco.getComplemento()==null){
+            sql = """
+                INSERT INTO endereco(endereco_rua, endereco_numero, endereco_cep, endereco_cidade, endereco_uf) 
+                VALUES ('#1', '#2', '#4', '#5', '#6')
+                """;
+        }
+        else{
+            sql = """
                 INSERT INTO endereco(endereco_rua, endereco_numero, endereco_complemento, endereco_cep, endereco_cidade, endereco_uf) 
                 VALUES ('#1', '#2', '#3', '#4', '#5', '#6')
                 """;
+            sql = sql.replace("#3", endereco.getComplemento());
+        }
         sql = sql.replace("#1", endereco.getRua());
         sql = sql.replace("#2",""+endereco.getNumero());
-        sql = sql.replace("#3", endereco.getComplemento());
         sql = sql.replace("#4", endereco.getCep());
         sql = sql.replace("#5", endereco.getCidade());
         sql = sql.replace("#6", endereco.getUf());
@@ -30,15 +39,25 @@ public class EnderecoDAO {
     }
 
     public boolean alterar(Endereco endereco, Conexao conexao) {
-        String sql = """
+        String sql;
+        if(endereco.getComplemento()==null){
+            sql = """
+                UPDATE endereco 
+                SET endereco_rua = '#1', endereco_numero = '#2', endereco_cep = '#4', endereco_cidade = '#5', endereco_uf = '#6' 
+                WHERE endereco_id = '#7'
+                """;
+        }
+        else{
+            sql = """
                 UPDATE endereco 
                 SET endereco_rua = '#1', endereco_numero = '#2', endereco_complemento = '#3', 
                 endereco_cep = '#4', endereco_cidade = '#5', endereco_uf = '#6' 
                 WHERE endereco_id = '#7'
                 """;
+            sql = sql.replace("#3", endereco.getComplemento());
+        }
         sql = sql.replace("#1", endereco.getRua());
         sql = sql.replace("#2", ""+endereco.getNumero());
-        sql = sql.replace("#3", endereco.getComplemento());
         sql = sql.replace("#4", endereco.getCep());
         sql = sql.replace("#5", endereco.getCidade());
         sql = sql.replace("#6", endereco.getUf());

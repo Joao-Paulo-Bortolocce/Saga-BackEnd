@@ -16,10 +16,8 @@ public class PessoaView {
     @Autowired
     private PessoaCtrl pessoaCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping(value = "")
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
-
-
         return pessoaCtrl.gravarPessoa(dados);
     }
 
@@ -28,17 +26,27 @@ public class PessoaView {
         return pessoaCtrl.buscarTodos();
     }
 
+    @GetMapping(value = "/buscarTodosSemAlunos")
+    ResponseEntity<Object> buscarTodosSemAlunos(){
+        return pessoaCtrl.buscarTodosSemAlunos(true);
+    }
+
+    @GetMapping(value = "/buscarSemAlunos/{cpf}")
+    ResponseEntity<Object> buscarSemAlunos(){
+        return pessoaCtrl.buscarTodosSemAlunos(true);
+    }
+
     @GetMapping(value = "/{cpf}")
     ResponseEntity<Object> buscar(@PathVariable(name="cpf")String cpf){
         return pessoaCtrl.buscarPessoa(cpf);
     }
 
-    @DeleteMapping(value = "/apagar/{cpf}")
+    @DeleteMapping(value = "/{cpf}")
     ResponseEntity<Object> apagar(@PathVariable(name = "cpf") String cpf){
         return pessoaCtrl.apagarPessoa(cpf);
     }
 
-    @PutMapping(value = "/alterar")
+    @PutMapping(value = "")
     ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
 
         return pessoaCtrl.alterarPessoa(dados);
