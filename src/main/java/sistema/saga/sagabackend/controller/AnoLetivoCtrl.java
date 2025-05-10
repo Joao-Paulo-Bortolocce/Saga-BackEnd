@@ -158,7 +158,7 @@ public class AnoLetivoCtrl {
             gerenciaConexao.Desconectar();
             if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("series", anoLetivoList);
+                resposta.put("anos", anoLetivoList);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
