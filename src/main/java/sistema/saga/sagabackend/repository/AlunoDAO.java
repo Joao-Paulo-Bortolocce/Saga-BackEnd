@@ -5,11 +5,13 @@ import sistema.saga.sagabackend.model.Aluno;
 
 
 
+
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Repository
 public class AlunoDAO {
@@ -43,6 +45,7 @@ public class AlunoDAO {
         return conexao.manipular(sql);
     }
 
+
     public Aluno getAluno(Aluno alu, Conexao conexao, Map<String, Object> pessoa) {
         String sql = "SELECT * FROM aluno JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf JOIN endereco ON pessoa_enderecoid = endereco_id WHERE aluno_ra = " + alu.getRa()+" ORDER BY pessoa_nome";
         try {
@@ -70,12 +73,14 @@ public class AlunoDAO {
                 end.put("endereco_uf", rs.getString("endereco_uf"));
                 pessoa.put("endereco",end);
                 return aluno;
+
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return null;
     }
+
 
     public List<Aluno> get( Conexao conexao,List<Map<String, Object>> pessoas) {
         String sql = "SELECT * FROM aluno JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf JOIN endereco ON pessoa_enderecoid = endereco_id ORDER BY pessoa_nome;";
@@ -130,6 +135,7 @@ public class AlunoDAO {
         sql=sql.replace("#1",condicao);
         List<Aluno> lista = new ArrayList<>();
         Map<String, Object> resposta = new HashMap<>();
+
         try {
             ResultSet rs = conexao.consultar(sql);
             while (rs.next()) {
@@ -137,6 +143,7 @@ public class AlunoDAO {
                 aluno.setRa(rs.getInt("aluno_ra"));
                 aluno.setRestricaoMedica(rs.getString("aluno_restricaomedica"));
                 aluno.setPessoa(null);
+
                 Map<String,Object> pessoa= new HashMap<>();
 
                 pessoa.put("pessoa_cpf", rs.getString("pessoa_cpf"));

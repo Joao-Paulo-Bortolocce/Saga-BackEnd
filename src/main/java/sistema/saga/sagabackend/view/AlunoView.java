@@ -14,15 +14,18 @@ public class AlunoView {
     @Autowired
     private AlunoCtrl alunoCtrl;
 
+
     @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return alunoCtrl.gravarAluno(dados);
     }
 
+
     @GetMapping(value = "/buscarTodos")
     ResponseEntity<Object> buscarTodos(){
         return alunoCtrl.buscarTodos();
     }
+
 
     @GetMapping(value = "/buscarTodosSemMatricula")
     ResponseEntity<Object> buscarTodosSemMatricula(@RequestParam(name = "anoLetivo") int anoLetivo){
