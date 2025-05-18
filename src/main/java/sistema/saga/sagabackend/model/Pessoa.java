@@ -134,6 +134,11 @@ public class Pessoa {
         return pessoaDAO.buscarTodosSemAlunos("",conexao,enderecos,aluno);
     }
 
+    public List<Pessoa> buscarTodosSemProfissional(Conexao conexao,List<Map<String,Object>> enderecos) {
+        PessoaDAO pessoaDAO = new PessoaDAO();
+        return pessoaDAO.buscarTodosSemProfissional("",conexao,enderecos);
+    }
+
     public boolean alterar(Conexao conexao) {
         PessoaDAO pessoaDAO = new PessoaDAO();
         return pessoaDAO.alterar(this,conexao);

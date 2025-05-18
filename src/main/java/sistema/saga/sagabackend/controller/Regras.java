@@ -200,4 +200,14 @@ public class Regras {
 
         return new Matricula(id,HashToAlunoFront(alunoMap),HashToAnoLetivoFront(anoLetivoMap),HashToSerieFront(serieMap),null,aprovado,data,valido);
     }
+
+    public static Graduacao HashToGraduacao(Map<String, Object> graduacaoMap) {
+        if (graduacaoMap.isEmpty())
+            return null;
+
+        int id = (int) graduacaoMap.get("graduacao_id");
+        String descricao = (String) graduacaoMap.get("graduacao_descricao");
+
+        return new Graduacao(id, descricao,null);
+    }
 }
