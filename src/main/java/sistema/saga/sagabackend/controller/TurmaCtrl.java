@@ -1,3 +1,4 @@
+
 package sistema.saga.sagabackend.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class TurmaCtrl {
     public ResponseEntity<Object> gravarTurma(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        char turmaLetra = dados.get("turmaletra").toString().charAt(0);
+        char turmaLetra = dados.get("turma_letra").toString().charAt(0);
         int turmaSerieId = (int) dados.get("serie_id");
         int turmaAnoLetivoId = (int) dados.get("anoletivo_id");
 
@@ -183,7 +184,15 @@ public class TurmaCtrl {
         try {
             GerenciaConexao gc = new GerenciaConexao();
             Turma turma = new Turma();
-            List<Turma> turmas = turma.buscarTodos(gc.getConexao());
+
+            List<Turma> turmas;
+            if (termo == null || termo.isEmpty()) {
+                turmas = turma.buscarTodos(gc.getConexao());
+            }
+            else {
+                turmas = turma.buscarPorTermo(termo, gc.getConexao());
+            }
+
             gc.Desconectar();
 
             if (turmas != null && !turmas.isEmpty()) {
@@ -198,6 +207,7 @@ public class TurmaCtrl {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             resposta.put("status", false);
             resposta.put("mensagem", "Erro ao buscar turmas");
             return ResponseEntity.badRequest().body(resposta);

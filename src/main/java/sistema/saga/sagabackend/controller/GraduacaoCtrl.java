@@ -16,17 +16,14 @@ public class GraduacaoCtrl {
     public ResponseEntity<Object> gravarGraduacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
         String gradDescricao = (String) dados.get("descricao");
-        String dataStr = (String) dados.get("data");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate gradData = LocalDate.parse(dataStr, formatter);
 
-        if (verificaIntegridade(gradDescricao) && verificaIntegridade(String.valueOf(gradData))) {
+        if (verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(gradDescricao, gradData);
+                    Graduacao graduacao = new Graduacao(gradDescricao);
                     if (graduacao.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Graduação inserida com sucesso!");
@@ -65,18 +62,14 @@ public class GraduacaoCtrl {
     public ResponseEntity<Object> alterarGraduacao(int id, Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
         String gradDescricao = (String) dados.get("descricao");
-        String dataStr = (String) dados.get("data");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate gradData = LocalDate.parse(dataStr, formatter);
 
-        if (verificaIntegridade(id) && verificaIntegridade(gradDescricao) &&
-                verificaIntegridade(String.valueOf(gradData))) {
+        if (verificaIntegridade(id) && verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(id, gradDescricao, gradData);
+                    Graduacao graduacao = new Graduacao(id, gradDescricao);
                     if (graduacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Graduação alterada com sucesso!");
@@ -153,7 +146,7 @@ public class GraduacaoCtrl {
 
             if (graduacaos != null && !graduacaos.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("graduações", graduacaos);
+                resposta.put("listaGraduacao", graduacaos);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);

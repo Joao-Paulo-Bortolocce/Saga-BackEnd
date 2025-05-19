@@ -39,7 +39,6 @@ public class TurmaDAO {
         sql = sql.replace("#2", String.valueOf(turma.getSerie().getSerieId()));
         sql = sql.replace("#3", String.valueOf(turma.getAnoLetivo().getId()));
 
-        System.out.println("SQL: " + sql);
         return conexao.manipular(sql);
     }
 
@@ -60,18 +59,21 @@ public class TurmaDAO {
         String sql;
 
         if (filtro == null || filtro.isEmpty()) {
-            sql = "SELECT * FROM turma ORDER BY turma_letra, serieturma_id, turmaanoletivo_id";
+            sql = """
+            SELECT * FROM turma
+            ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
+        """;
         }
         else {
             sql = """
-            SELECT * FROM turma WHERE turma_letra ILIKE '%#1%'
+            SELECT * FROM turma 
+            WHERE turma_letra ILIKE '%#1%' 
                OR CAST(serieturma_id AS TEXT) ILIKE '%#1%' 
                OR CAST(turmaanoletivo_id AS TEXT) ILIKE '%#1%'
             ORDER BY turma_letra, serieturma_id, turmaanoletivo_id
         """;
             sql = sql.replace("#1", filtro);
         }
-
         try {
             ResultSet rs = conexao.consultar(sql);
             while (rs.next()) {
@@ -93,6 +95,7 @@ public class TurmaDAO {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar turmas", e);
         }
+
         return turmas;
     }
 }

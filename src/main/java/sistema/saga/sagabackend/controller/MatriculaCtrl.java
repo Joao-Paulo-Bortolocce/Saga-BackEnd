@@ -289,6 +289,7 @@ public class MatriculaCtrl {
                 return ResponseEntity.badRequest().body(resposta);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
             gerenciaConexao.Desconectar();
@@ -322,6 +323,7 @@ public class MatriculaCtrl {
                 return ResponseEntity.badRequest().body(resposta);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
             gerenciaConexao.Desconectar();

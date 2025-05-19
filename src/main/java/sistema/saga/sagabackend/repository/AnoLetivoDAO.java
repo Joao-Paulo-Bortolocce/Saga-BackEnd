@@ -11,7 +11,7 @@ import java.util.List;
 public class AnoLetivoDAO {
     public boolean gravar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
-        INSERT INTO anoletivo (anoletivo_inicio, anoletivo_fim)
+        INSERT INTO anoletivo (anoletivo_inicio, anoletivo_termino)
         VALUES (#1, '#2')
     """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
@@ -21,7 +21,7 @@ public class AnoLetivoDAO {
 
     public boolean alterar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
-            UPDATE anoletivo SET anoletivo_inicio = '#1', anoletivo_fim = '#2'
+            UPDATE anoletivo SET anoletivo_inicio = '#1', anoletivo_termino = '#2'
             WHERE anoletivo_id = '#3'
         """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
@@ -45,7 +45,7 @@ public class AnoLetivoDAO {
             if (rs.next()) {
                 anoLetivo.setId(rs.getInt("anoletivo_id"));
                 anoLetivo.setInicio(rs.getDate("anoletivo_inicio").toLocalDate());
-                anoLetivo.setFim(rs.getDate("anoletivo_fim").toLocalDate());
+                anoLetivo.setFim(rs.getDate("anoletivo_termino").toLocalDate());
                 return rs.getInt("anoletivo_id");
             }
         } catch (Exception e) {
@@ -72,12 +72,12 @@ public class AnoLetivoDAO {
                 AnoLetivo anoLetivo = new AnoLetivo(
                         rs.getInt("anoletivo_id"),
                         rs.getDate("anoletivo_inicio").toLocalDate(),
-                        rs.getDate("anoletivo_fim").toLocalDate()
+                        rs.getDate("anoletivo_termino").toLocalDate()
                 );
                 anoLetivoList.add(anoLetivo);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao consultar séries", e);
+            throw new RuntimeException("Erro ao consultar ano letivo", e);
         }
 
         return anoLetivoList;

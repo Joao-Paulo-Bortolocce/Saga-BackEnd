@@ -12,11 +12,10 @@ import java.util.List;
 public class GraduacaoDAO {
     public boolean gravar(Graduacao graduacao, Conexao conexao) {
         String sql = """
-        INSERT INTO graduacao (graduacao_descricao, graduacao_data)
-        VALUES ('#1', '#2')
+        INSERT INTO graduacao (graduacao_descricao)
+        VALUES ('#1')
         """;
         sql = sql.replace("#1", graduacao.getDescricao());
-        sql = sql.replace("#2", ""+graduacao.getData());
 
         return conexao.manipular(sql);
     }
@@ -24,12 +23,11 @@ public class GraduacaoDAO {
     public boolean alterar(Graduacao graduacao, Conexao conexao) {
         String sql = """
             UPDATE graduacao 
-            SET graduacao_descricao = '#1', graduacao_data = '#2'
-            WHERE graduacao_id = '#3'
+            SET graduacao_descricao = '#1'
+            WHERE graduacao_id = '#2'
         """;
         sql = sql.replace("#1", graduacao.getDescricao());
-        sql = sql.replace("#2", ""+graduacao.getData());
-        sql = sql.replace("#3", ""+graduacao.getId());
+        sql = sql.replace("#2", ""+graduacao.getId());
         return conexao.manipular(sql);
     }
 
@@ -47,7 +45,6 @@ public class GraduacaoDAO {
             if (rs.next()) {
                 graduacao.setId(rs.getInt("graduacao_id"));
                 graduacao.setDescricao(rs.getString("graduacao_descricao"));
-                graduacao.setData(rs.getDate("graduacao_data").toLocalDate());
                 return rs.getInt("graduacao_id");
             }
         } catch (Exception e) {
@@ -71,8 +68,7 @@ public class GraduacaoDAO {
             while (rs.next()) {
                 Graduacao graduacao = new Graduacao(
                         rs.getInt("graduacao_id"),
-                        rs.getString("descricao_descricao"),
-                        rs.getDate("graduacao_data").toLocalDate()
+                        rs.getString("graduacao_descricao")
                 );
                 graduacaos.add(graduacao);
             }

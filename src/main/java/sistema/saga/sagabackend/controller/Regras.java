@@ -4,6 +4,7 @@ import sistema.saga.sagabackend.model.*;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Objects;
 
 public class Regras {
 
@@ -94,10 +95,7 @@ public class Regras {
             return null;
         Map<String, Object> serieMap = (Map<String, Object>) turmaMap.get("serie");
         Map<String, Object> anoLetivoMap = (Map<String, Object>) turmaMap.get("anoletivo");
-        Byte letraByte = (Byte) turmaMap.get("turma_letra");
-        if (letraByte == 0)
-            return null;
-        char letra = (char) letraByte.byteValue();
+        char letra = (char) turmaMap.get("turma_letra");
         Serie serie = Regras.HashToSerie(serieMap);
         AnoLetivo anoLetivo = Regras.HashToAnoLetivo(anoLetivoMap);
         return new Turma(anoLetivo, serie, letra);

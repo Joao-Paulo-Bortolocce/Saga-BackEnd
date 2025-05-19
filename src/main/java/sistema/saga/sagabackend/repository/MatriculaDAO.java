@@ -17,12 +17,13 @@ public class MatriculaDAO {
 
     public boolean gravar(Matricula matricula, Conexao conexao) {
         String sql = """
-                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_aprovado, matricula_data) 
-                    VALUES (#1, #2, #3, #5, '#6')
+                    INSERT INTO matricula (matricula_aluno_ra, matricula_anoletivo_id, matricula_serie_id, matricula_turma_letra, matricula_aprovado, matricula_data) 
+                    VALUES (#1, #2, #3, #4, #5, '#6')
                 """;
         sql = sql.replace("#1", "" + matricula.getAluno().getRa());
         sql = sql.replace("#2", "" + matricula.getAnoLetivo().getId());
         sql = sql.replace("#3", "" + matricula.getSerie().getSerieId());
+        sql = sql.replace("#4", "" + matricula.getTurma().getLetra());
         sql = sql.replace("#5", matricula.isAprovado() ? "true" : "false");
         sql = sql.replace("#6", "" + Date.valueOf(matricula.getData()));
         return conexao.manipular(sql);
@@ -69,13 +70,9 @@ public class MatriculaDAO {
                             matricula_turma_letra IS NULL 
                             OR turma_letra = matricula_turma_letra
                         )
-        WHERE matricula_aluno_ra = '#1'
-          AND matricula_anoletivo_id = '#2'
-        ORDER BY pessoa_nome
+        WHERE matricula_id = '#1' ORDER BY matricula_id
     """;
-
-        sql = sql.replace("#1", String.valueOf(matricula.getAluno().getRa()));
-        sql = sql.replace("#2", String.valueOf(matricula.getAnoLetivo().getId()));
+    sql = sql.replace("#1", ""+matricula.getId());
 
         try {
             ResultSet rs = conexao.consultar(sql);
@@ -121,15 +118,12 @@ public class MatriculaDAO {
 
                 turma.put("serie", serie);
                 turma.put("anoletivo", ano);
-
-                byte letraByte = rs.getByte("turma_letra");
-                if (!rs.wasNull()) {
-                    turma.put("turma_letra", letraByte);
-                }
+                turma.put("turma_letra", rs.getString("turma_letra").charAt(0));
 
                 return matricula;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Erro ao buscar matrícula", e);
         }
 
@@ -139,7 +133,7 @@ public class MatriculaDAO {
 
     public List<Matricula> get(Conexao conexao, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         String sql = """
-                   SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
+                 SELECT * FROM matricula JOIN aluno ON matricula_aluno_ra = aluno_ra
                  JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf
                  JOIN endereco ON pessoa_enderecoid = endereco_id
                  JOIN anoLetivo ON anoletivo_id = matricula_anoletivo_id
@@ -197,10 +191,8 @@ public class MatriculaDAO {
                 Map<String, Object> turma= new HashMap<>();
                 turma.put("serie",serie);
                 turma.put("anoletivo",ano);
-                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turma.put("turma_letra",rs.getString("turma_letra").charAt(0));
                 turmas.add(turma);
-
-
 
                 lista.add(matricula);
             }
@@ -208,7 +200,6 @@ public class MatriculaDAO {
             lista = null;
             throw new RuntimeException(e);
         }
-
         return lista;
     }
 
@@ -287,7 +278,7 @@ public class MatriculaDAO {
                 Map<String, Object> turma= new HashMap<>();
                 turma.put("serie",serie);
                 turma.put("anoletivo",ano);
-                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turma.put("turma_letra",rs.getString("turma_letra").charAt(0));
                 turmas.add(turma);
 
 

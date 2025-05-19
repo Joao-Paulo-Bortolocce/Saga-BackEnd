@@ -14,7 +14,7 @@ public class GraduacaoView {
     @Autowired
     private GraduacaoCtrl graduacaoCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return graduacaoCtrl.gravarGraduacao(dados);
     }
@@ -34,7 +34,7 @@ public class GraduacaoView {
         return graduacaoCtrl.excluirGraduacao(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping(value = "/buscarTodos")
     public ResponseEntity<Object> buscarTodos() {
         return graduacaoCtrl.buscarGraduacao("");
     }
