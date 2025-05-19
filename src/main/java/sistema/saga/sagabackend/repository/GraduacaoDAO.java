@@ -47,7 +47,6 @@ public class GraduacaoDAO {
             if (rs.next()) {
                 graduacao.setId(rs.getInt("graduacao_id"));
                 graduacao.setDescricao(rs.getString("graduacao_descricao"));
-                graduacao.setData(rs.getDate("graduacao_data").toLocalDate());
                 return rs.getInt("graduacao_id");
             }
         } catch (Exception e) {
@@ -72,7 +71,7 @@ public class GraduacaoDAO {
                 Graduacao graduacao = new Graduacao(
                         rs.getInt("graduacao_id"),
                         rs.getString("descricao_descricao"),
-                        rs.getDate("graduacao_data").toLocalDate()
+                        null
                 );
                 graduacaos.add(graduacao);
             }

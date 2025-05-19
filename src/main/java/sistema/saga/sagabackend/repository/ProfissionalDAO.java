@@ -35,7 +35,7 @@ public class ProfissionalDAO {
                 profissional_dataadmissao = '#2',
                 profissional_graduacao_id = #3,
                 profissional_usuario = '#4',
-                profissional_senha = '#5'
+                profissional_senha = '#5',
                 profissional_pessoa_cpf = '#6'
             WHERE profissional_ra = #7
         """;

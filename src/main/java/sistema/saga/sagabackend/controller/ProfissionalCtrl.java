@@ -23,7 +23,7 @@ public class ProfissionalCtrl {
         String dataStr = (String) dados.get("profissional_dataAdmissao");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dataAdmissao = LocalDate.parse(dataStr, formatter);
-        String user = (String) dados.get("profissional_user");
+        String user = (String) dados.get("profissional_usuario");
         String senha = (String) dados.get("profissional_senha");
         Map<String, Object> pessoa = (Map<String, Object>) dados.get("profissional_pessoa");
         String cpf = (String) pessoa.get("cpf");
@@ -121,17 +121,17 @@ public class ProfissionalCtrl {
 
     public ResponseEntity<Object> alterarProfissional(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int ra = Integer.parseInt((String) dados.get("profissional_ra"));
-        int tipo = Integer.parseInt((String) dados.get("profissional_tipo"));
+        int ra = Integer.parseInt(""+ dados.get("profissional_ra"));
+        int tipo = Integer.parseInt(""+ dados.get("profissional_tipo"));
         String dataStr = (String) dados.get("profissional_dataAdmissao");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate dataAdmissao = LocalDate.parse(dataStr, formatter);
-        String user = (String) dados.get("profissional_user");
+        String user = (String) dados.get("profissional_usuario");
         String senha = (String) dados.get("profissional_senha");
         Map<String, Object> pessoa = (Map<String, Object>) dados.get("profissional_pessoa");
         String cpf = (String) pessoa.get("cpf");
         Map<String, Object> graduacao = (Map<String, Object>) dados.get("profissional_graduacao");
-        int idGraduacao = Integer.parseInt((String) graduacao.get("id"));
+        int idGraduacao = Integer.parseInt(""+ graduacao.get("id"));
 
         if (Regras.verificaIntegridade(ra) &&
                 Regras.verificaIntegridade(tipo) &&
