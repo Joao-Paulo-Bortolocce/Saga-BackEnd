@@ -21,7 +21,7 @@ public class NotificacaoCtrl {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate data = LocalDate.parse(dataStr, formatter);
 
-        if (verificaIntegridade(mensagem) && verificaIntegridade(data)) {
+        if (Regras.verificaIntegridade(mensagem) && Regras.verificaIntegridade(data)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -63,10 +63,10 @@ public class NotificacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarNotificacao(int id) {
+    public ResponseEntity<Object> visualizarNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -76,14 +76,14 @@ public class NotificacaoCtrl {
                     notificacao.setNot_id(id);
                     if (notificacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Notificação alterada com sucesso!");
+                        resposta.put("mensagem", "Notificação visualizada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao alterar notificação!");
+                        resposta.put("mensagem", "Erro ao visualizar notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -91,7 +91,7 @@ public class NotificacaoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro durante a alteração");
+                    resposta.put("mensagem", "Erro durante a visualização");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -112,7 +112,7 @@ public class NotificacaoCtrl {
     public ResponseEntity<Object> excluirNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             try {
                 Notificacao notificacao = new Notificacao();
                 notificacao.setNot_id(id);
@@ -165,15 +165,4 @@ public class NotificacaoCtrl {
         }
     }
 
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
-    }
-
-    public static boolean verificaIntegridade(LocalDate elemento) {
-        return elemento != null;
-    }
 }

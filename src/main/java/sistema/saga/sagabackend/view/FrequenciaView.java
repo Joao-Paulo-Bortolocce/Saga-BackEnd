@@ -18,4 +18,10 @@ public class FrequenciaView {
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return frequenciaCtrl.gravarFrequencia(dados);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> buscarPorId(@PathVariable int id) {
+        return frequenciaCtrl.buscarFreqAluno(id);
+    }
+
 }

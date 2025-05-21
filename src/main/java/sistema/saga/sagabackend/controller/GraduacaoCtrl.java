@@ -17,7 +17,7 @@ public class GraduacaoCtrl {
         Map<String, Object> resposta = new HashMap<>();
         String gradDescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(gradDescricao)) {
+        if (Regras.verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -63,7 +63,7 @@ public class GraduacaoCtrl {
         Map<String, Object> resposta = new HashMap<>();
         String gradDescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(id) && verificaIntegridade(gradDescricao)) {
+        if (Regras.verificaIntegridade(id) && Regras.verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -108,7 +108,7 @@ public class GraduacaoCtrl {
     public ResponseEntity<Object> excluirGraduacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             try {
                 Graduacao graduacao = new Graduacao();
                 graduacao.setId(id);
@@ -159,13 +159,5 @@ public class GraduacaoCtrl {
             resposta.put("mensagem", "Erro ao buscar graduações");
             return ResponseEntity.badRequest().body(resposta);
         }
-    }
-
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
     }
 }

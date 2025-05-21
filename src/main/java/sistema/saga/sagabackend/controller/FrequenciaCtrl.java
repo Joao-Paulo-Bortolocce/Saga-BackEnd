@@ -7,7 +7,9 @@ import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -56,8 +58,6 @@ public class FrequenciaCtrl {
                         matricula.setSerie(Regras.HashToSerie(serie));
                         matricula.setTurma(Regras.HashToTurma(turma));
                     }
-
-                    // Cria e grava a frequência
                     Frequencia freq = new Frequencia(matricula, presente, data);
 
                     if (freq.gravar(gerenciaConexao.getConexao())) {
@@ -75,9 +75,7 @@ public class FrequenciaCtrl {
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
-
                 } catch (Exception e) {
-                    e.printStackTrace();
                     resposta.put("status", false);
                     resposta.put("mensagem", "Erro durante o processo de gravação.");
                     gerenciaConexao.getConexao().rollback();
@@ -90,10 +88,61 @@ public class FrequenciaCtrl {
                 resposta.put("mensagem", "Dados inválidos.");
                 return ResponseEntity.badRequest().body(resposta);
             }
-
         } catch (Exception e) {
             resposta.put("status", false);
             resposta.put("mensagem", "Erro inesperado.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+
+    public ResponseEntity<Object> buscarFreqAluno(int id) {
+        Map<String, Object> resposta = new HashMap<>();
+        try {
+            GerenciaConexao gc = new GerenciaConexao();
+
+            Matricula matricula = new Matricula(id);
+            Map<String, Object> aluno = new HashMap<>();
+            Map<String, Object> ano = new HashMap<>();
+            Map<String, Object> serie = new HashMap<>();
+            Map<String, Object> turma = new HashMap<>();
+            matricula = matricula.buscaMatricula(gc.getConexao(), matricula, aluno, ano, serie, turma);
+
+            if (matricula == null) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "O aluno informado não está cadastrado.");
+                gc.getConexao().rollback();
+                gc.getConexao().fimTransacao();
+                gc.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+            else{
+                matricula.setAluno(Regras.HashToAluno(aluno));
+                matricula.setAnoLetivo(Regras.HashToAnoLetivo(ano));
+                matricula.setSerie(Regras.HashToSerie(serie));
+                matricula.setTurma(Regras.HashToTurma(turma));
+            }
+
+            Frequencia freq = new Frequencia();
+            freq.setMatricula(matricula);
+            List<Frequencia> frequencias = new ArrayList<>();
+            frequencias = freq.buscar(gc.getConexao());
+            gc.Desconectar();
+
+            if (frequencias != null && !frequencias.isEmpty()) {
+                resposta.put("status", true);
+                resposta.put("frequencias", frequencias);
+                return ResponseEntity.ok(resposta);
+            }
+            else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Nenhuma frequencia encontrada.");
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro ao buscar frequencias");
             return ResponseEntity.badRequest().body(resposta);
         }
     }

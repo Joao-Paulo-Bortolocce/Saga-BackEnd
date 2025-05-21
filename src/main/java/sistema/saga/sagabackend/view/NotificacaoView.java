@@ -21,12 +21,12 @@ public class NotificacaoView {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> alterar(@PathVariable int id) {
-        return notificacaoCtrl.alterarNotificacao(id);
+        return notificacaoCtrl.visualizarNotificacao(id);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> patch(@PathVariable int id) {
-        return notificacaoCtrl.alterarNotificacao(id);
+        return notificacaoCtrl.visualizarNotificacao(id);
     }
 
     @DeleteMapping("/{id}")

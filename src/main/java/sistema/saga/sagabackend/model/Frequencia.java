@@ -5,6 +5,7 @@ import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.FrequenciaDAO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class Frequencia {
@@ -49,5 +50,10 @@ public class Frequencia {
     public boolean gravar(Conexao conexao) {
         FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
         return frequenciaDAO.gravar(this,conexao);
+    }
+
+    public List<Frequencia> buscar(Conexao conexao) {
+        FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
+        return frequenciaDAO.buscarId(this.matricula.getId(),conexao);
     }
 }
