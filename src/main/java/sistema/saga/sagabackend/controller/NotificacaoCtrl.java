@@ -153,8 +153,8 @@ public class NotificacaoCtrl {
                 resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.ok(resposta);
             } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma notificação encontrada.");
+                resposta.put("status", true);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.badRequest().body(resposta);
             }
 

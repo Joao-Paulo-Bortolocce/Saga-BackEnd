@@ -59,8 +59,9 @@ public class GraduacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarGraduacao(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarGraduacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
+        int id = (int) dados.get("id");
         String gradDescricao = (String) dados.get("descricao");
 
         if (Regras.verificaIntegridade(id) && Regras.verificaIntegridade(gradDescricao)) {

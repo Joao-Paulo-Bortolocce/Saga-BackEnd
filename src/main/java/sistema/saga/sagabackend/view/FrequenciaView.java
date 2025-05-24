@@ -19,9 +19,18 @@ public class FrequenciaView {
         return frequenciaCtrl.gravarFrequencia(dados);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> buscarPorId(@PathVariable int id) {
-        return frequenciaCtrl.buscarFreqAluno(id);
+    @GetMapping("{id}/{data}")
+    public ResponseEntity<Object> buscarPorId(@PathVariable int id, @PathVariable String data) {
+        return frequenciaCtrl.buscarFreqAluno(id, data);
     }
 
+    @PutMapping
+    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
+        return frequenciaCtrl.alterarFrequencia(dados);
+    }
+
+    /*@GetMapping("/{ano}")
+    public ResponseEntity<Object> busacarPorAno(){
+        return
+    }*/
 }

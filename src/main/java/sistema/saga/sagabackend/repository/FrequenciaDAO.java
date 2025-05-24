@@ -24,19 +24,40 @@ public class FrequenciaDAO {
         return conexao.manipular(sql);
     }
 
-    public List<Frequencia> buscarId(int id, Conexao conexao) {
-        List<Frequencia> frequencias = new ArrayList<>();
+    public boolean alterar(Frequencia frequencia, Conexao conexao) {
         String sql = """
-        SELECT * FROM frequencia WHERE matricula_id = #1
+            UPDATE frequencia SET frequencia_presente = #1
+            WHERE matricula_id = #2 AND frequencia_data = #3
         """;
-        sql = sql.replace("#1", "" + id);
+        sql = sql.replace("#1", frequencia.isPresente() ? "true" : "false");
+        sql = sql.replace("#2", "" + frequencia.getMatricula().getId());
+        sql = sql.replace("#3", "" + Date.valueOf(frequencia.getData()));
+
+        return conexao.manipular(sql);
+    }
+
+    public boolean apagar(Frequencia frequencia, Conexao conexao) {
+        String sql = "DELETE FROM frequencia WHERE matricula_id = '#1' AND frequencia_data = #2";
+
+        sql = sql.replace("#1", "" + frequencia.getMatricula().getId());
+        sql = sql.replace("#2", "" + Date.valueOf(frequencia.getData()));
+
+        return conexao.manipular(sql);
+    }
+
+    public List<Frequencia> buscarId(Frequencia frequencia, Conexao conexao) {
+        List<Frequencia> frequencias = new ArrayList<>();
+        String sql = "SELECT * FROM frequencia WHERE matricula_id = #1 AND EXTRACT(YEAR FROM frequencia_data) = #2";
+        sql = sql.replace("#1", "" + frequencia.getMatricula().getId());
+        sql = sql.replace("#2", String.valueOf(frequencia.getData().getYear()));
+
 
         try {
             ResultSet rs = conexao.consultar(sql);
             while (rs.next()) {
-                Frequencia frequencia = new Frequencia();
-                frequencia.setPresente(rs.getBoolean("frequencia_presente"));
-                frequencia.setData(rs.getDate("frequencia_data").toLocalDate());
+                Frequencia freq = new Frequencia();
+                freq.setPresente(rs.getBoolean("frequencia_presente"));
+                freq.setData(rs.getDate("frequencia_data").toLocalDate());
 
                 Matricula matricula = new Matricula();
                 Map<String, Object> aluno = new HashMap<>();
@@ -45,14 +66,13 @@ public class FrequenciaDAO {
                 Map<String, Object> turma = new HashMap<>();
                 matricula.setId(rs.getInt("matricula_id"));
                 matricula.buscaMatricula(conexao, matricula, aluno, ano, serie, turma);
-                frequencia.setMatricula(matricula);
+                freq.setMatricula(matricula);
 
-                frequencias.add(frequencia);
+                frequencias.add(freq);
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar frequencia", e);
         }
-
         return frequencias;
     }
 }

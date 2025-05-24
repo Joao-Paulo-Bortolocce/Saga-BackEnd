@@ -23,6 +23,11 @@ public class Frequencia {
         this(null, false, null);
     }
 
+    public Frequencia(Matricula matricula, LocalDate data) {
+        this.matricula = matricula;
+        this.data = data;
+    }
+
     public Matricula getMatricula() {
         return matricula;
     }
@@ -52,8 +57,18 @@ public class Frequencia {
         return frequenciaDAO.gravar(this,conexao);
     }
 
-    public List<Frequencia> buscar(Conexao conexao) {
+    public  boolean alterar(Conexao conexao) {
         FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
-        return frequenciaDAO.buscarId(this.matricula.getId(),conexao);
+        return frequenciaDAO.alterar(this,conexao);
+    }
+
+    public boolean excluir(Conexao conexao) {
+        FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
+        return frequenciaDAO.apagar(this,conexao);
+    }
+
+    public List<Frequencia> buscarId(Conexao conexao) {
+        FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
+        return frequenciaDAO.buscarId(this,conexao);
     }
 }

@@ -13,7 +13,7 @@ public class Regras {
     }
 
     public static boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
+        return elemento >= 0;
     }
 
     public static boolean verificaIntegridade(LocalDate elemento) {

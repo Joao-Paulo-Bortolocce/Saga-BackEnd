@@ -20,13 +20,8 @@ public class GraduacaoView {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> alterar(@PathVariable int id, @RequestBody Map<String, Object> dados) {
-        return graduacaoCtrl.alterarGraduacao(id, dados);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> patch(@PathVariable int id, @RequestBody Map<String, Object> dados) {
-        return graduacaoCtrl.alterarGraduacao(id, dados);
+    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
+        return graduacaoCtrl.alterarGraduacao(dados);
     }
 
     @DeleteMapping("/{id}")

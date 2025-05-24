@@ -34,7 +34,7 @@ public class SalaView {
         return salaCtrl.excluirSala(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping
     public ResponseEntity<Object> buscarTodos() {
         return salaCtrl.buscarSala("");
     }

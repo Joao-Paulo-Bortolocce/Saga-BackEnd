@@ -22,8 +22,7 @@ public class GraduacaoDAO {
 
     public boolean alterar(Graduacao graduacao, Conexao conexao) {
         String sql = """
-            UPDATE graduacao 
-            SET graduacao_descricao = '#1'
+            UPDATE graduacao SET graduacao_descricao = '#1'
             WHERE graduacao_id = '#2'
         """;
         sql = sql.replace("#1", graduacao.getDescricao());
