@@ -7,7 +7,7 @@ import sistema.saga.sagabackend.controller.ProfissionalCtrl;
 
 import java.util.Map;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping(value = "profissional")
 public class ProfissionalView {

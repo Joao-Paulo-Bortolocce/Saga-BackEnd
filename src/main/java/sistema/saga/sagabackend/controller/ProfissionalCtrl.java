@@ -18,7 +18,7 @@ import java.util.Map;
 public class ProfissionalCtrl {
     public ResponseEntity<Object> gravarProfissional(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int ra = Integer.parseInt((String) dados.get("profissional_ra"));
+        int rn = Integer.parseInt((String) dados.get("profissional_rn"));
         int tipo = Integer.parseInt((String) dados.get("profissional_tipo"));
         String dataStr = (String) dados.get("profissional_dataAdmissao");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -30,7 +30,7 @@ public class ProfissionalCtrl {
         Map<String, Object> graduacao = (Map<String, Object>) dados.get("profissional_graduacao");
         int idGraduacao = Integer.parseInt((String) graduacao.get("id"));
 
-        if (Regras.verificaIntegridade(ra) &&
+        if (Regras.verificaIntegridade(rn) &&
                 Regras.verificaIntegridade(tipo) &&
                 Regras.verificaIntegridade(cpf)&&
                 Regras.verificaIntegridade(dataAdmissao) &&
@@ -70,7 +70,7 @@ public class ProfissionalCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Profissional profissional= new Profissional(ra,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
+                    Profissional profissional= new Profissional(rn,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
                     if(profissional.buscaProfissional(gerenciaConexao.getConexao(),profissional,pessoa,graduacao)!=null){
                         resposta.put("status", false);
                         resposta.put("mensagem", "Este Ra já esta cadastrado!");
@@ -121,7 +121,7 @@ public class ProfissionalCtrl {
 
     public ResponseEntity<Object> alterarProfissional(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int ra = Integer.parseInt(""+ dados.get("profissional_ra"));
+        int rn = Integer.parseInt(""+ dados.get("profissional_rn"));
         int tipo = Integer.parseInt(""+ dados.get("profissional_tipo"));
         String dataStr = (String) dados.get("profissional_dataAdmissao");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -133,7 +133,7 @@ public class ProfissionalCtrl {
         Map<String, Object> graduacao = (Map<String, Object>) dados.get("profissional_graduacao");
         int idGraduacao = Integer.parseInt(""+ graduacao.get("id"));
 
-        if (Regras.verificaIntegridade(ra) &&
+        if (Regras.verificaIntegridade(rn) &&
                 Regras.verificaIntegridade(tipo) &&
                 Regras.verificaIntegridade(cpf)&&
                 Regras.verificaIntegridade(dataAdmissao) &&
@@ -173,7 +173,7 @@ public class ProfissionalCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Profissional profissional= new Profissional(ra,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
+                    Profissional profissional= new Profissional(rn,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
                     if(profissional.buscaProfissional(gerenciaConexao.getConexao(),profissional,pessoa,graduacao)==null){
                         resposta.put("status", false);
                         resposta.put("mensagem", "Este Ra não esta cadastrado!");
@@ -222,24 +222,34 @@ public class ProfissionalCtrl {
 
     }
 
-    public ResponseEntity<Object> apagarProfissional(int  ra) {
+    public ResponseEntity<Object> apagarProfissional(int  rn) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (Regras.verificaIntegridade(ra)) {
+        if (Regras.verificaIntegridade(rn)) {
             try {
-                Profissional profissional = new Profissional(ra);
+                Profissional profissional = new Profissional(rn);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
                 List<Map<String, Object>> pessoas = new ArrayList<>();
 //                List<Profissional> profissionalList= profissional.buscarTodosSemMatricula(gerenciaConexao.getConexao(),0,pessoas); Ver se não há registros desse funcionario
 //                int i;
-//                for (i = 0; i < profissionalList.size() && ra!=profissionalList.get(i).getRa(); i++) ;
+//                for (i = 0; i < profissionalList.size() && rn!=profissionalList.get(i).getRa(); i++) ;
 //                if(i==profissionalList.size()){
 //                    resposta.put("status", false);
 //                    resposta.put("mensagem", "Exclusão não pode ser realizada, pois existem matriculas cadastrados para esse profissional!");
 //                    gerenciaConexao.Desconectar();
 //                    return ResponseEntity.badRequest().body(resposta);
 //                }
-
+                Map<String, Object> aux= new HashMap<>();
+                profissional=profissional.buscaProfissional(gerenciaConexao.getConexao(),profissional,aux,aux);
+                if(profissional.getProfissional_tipo()==3){
+                   List<Map<String,Object>> graduacoes= new ArrayList<>();
+                    if(profissional.buscarGestao(gerenciaConexao.getConexao(),pessoas,graduacoes).size()==1){
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Sistema não pode ficar sem nenhum profissional de gestão cadastrado, insira outro para poder excluir este!");
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+                }
                 if (profissional.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Profissional excluído com sucesso!");
@@ -298,11 +308,11 @@ public class ProfissionalCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarProfissional(int ra) {
+    public ResponseEntity<Object> buscarProfissional(int rn) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Profissional profissional = new Profissional(ra);
+            Profissional profissional = new Profissional(rn);
             Map<String, Object> pessoa= new HashMap<>();
             Map<String, Object> graduacao= new HashMap<>();
             profissional = profissional.buscaProfissional(gerenciaConexao.getConexao(), profissional,pessoa,graduacao);
@@ -315,7 +325,7 @@ public class ProfissionalCtrl {
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existe profissional cadastrado com o RA: "+ra);
+                resposta.put("mensagem", "Não existe profissional cadastrado com o RA: "+rn);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
@@ -327,18 +337,18 @@ public class ProfissionalCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarUsuario(int ra, String senha) {
+    public ResponseEntity<Object> buscarUsuario(int rn, String senha) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Profissional usuario = new Profissional().buscaUsuario(gerenciaConexao.getConexao(), ra,senha);
+            Profissional usuario = new Profissional().buscaUsuario(gerenciaConexao.getConexao(), rn,senha);
             if (usuario != null) {
                 resposta.put("status", true);
                 resposta.put("usuario", usuario);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
-                usuario= new Profissional(ra);
+                usuario= new Profissional(rn);
                 usuario=usuario.buscaProfissional(gerenciaConexao.getConexao(), usuario, new HashMap<>(), new HashMap<>());
                 resposta.put("status", false);
                 if(usuario!=null)
