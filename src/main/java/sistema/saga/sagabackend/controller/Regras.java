@@ -165,7 +165,7 @@ public class Regras {
         Map<String, Object> salaMap = (Map<String, Object>) turmaMap.get("sala");
 
         Object letraObj = turmaMap.get("turma_letra");
-        if (letraObj == null) return null;
+        if (letraObj == null || letraObj.equals(0)) return null;
 
         char letra;
         if (letraObj instanceof String str && str.length() == 1) {
@@ -177,6 +177,9 @@ public class Regras {
         } else {
             return null;
         }
+
+        if(letra==0)
+            return null;
 
         Serie serie = (serieMap != null) ? Regras.HashToSerie(serieMap) : null;
         AnoLetivo anoLetivo = (anoLetivoMap != null) ? Regras.HashToAnoLetivo(anoLetivoMap) : null;

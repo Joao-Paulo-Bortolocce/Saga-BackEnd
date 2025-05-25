@@ -159,6 +159,7 @@ public class NotificacaoCtrl {
             }
 
         } catch (Exception e) {
+
             resposta.put("status", false);
             resposta.put("mensagem", "Erro ao buscar as notificações");
             return ResponseEntity.badRequest().body(resposta);

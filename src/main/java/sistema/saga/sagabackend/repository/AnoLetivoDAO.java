@@ -11,7 +11,7 @@ import java.util.List;
 public class AnoLetivoDAO {
     public boolean gravar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
-        INSERT INTO anoletivo (anoletivo_inicio, anoletivo_termino)
+        INSERT INTO anoletivo (anoletivo_inicio, anoletivo_fim)
         VALUES (#1, '#2')
     """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
@@ -21,7 +21,7 @@ public class AnoLetivoDAO {
 
     public boolean alterar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
-            UPDATE anoletivo SET anoletivo_inicio = '#1', anoletivo_termino = '#2'
+            UPDATE anoletivo SET anoletivo_inicio = '#1', anoletivo_fim = '#2'
             WHERE anoletivo_id = '#3'
         """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
@@ -45,7 +45,7 @@ public class AnoLetivoDAO {
             if (rs.next()) {
                 anoLetivo.setId(rs.getInt("anoletivo_id"));
                 anoLetivo.setInicio(rs.getDate("anoletivo_inicio").toLocalDate());
-                anoLetivo.setFim(rs.getDate("anoletivo_termino").toLocalDate());
+                anoLetivo.setFim(rs.getDate("anoletivo_fim").toLocalDate());
                 return rs.getInt("anoletivo_id");
             }
         } catch (Exception e) {
