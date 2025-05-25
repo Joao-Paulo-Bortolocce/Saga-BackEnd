@@ -11,15 +11,35 @@ public class Turma {
     private AnoLetivo anoLetivo;
     private Serie serie;
     private char letra;
+    private Profissional profissional;
+    private Sala sala;
 
-    public Turma(AnoLetivo anoLetivo, Serie serie, char letra) {
+    public Turma(AnoLetivo anoLetivo, Serie serie, char letra, Profissional profissional, Sala sala) {
         this.anoLetivo = anoLetivo;
         this.serie = serie;
         this.letra = letra;
+        this.profissional = profissional;
+        this.sala = sala;
+    }
+
+    public Profissional getProfissional() {
+        return profissional;
+    }
+
+    public void setProfissional(Profissional profissional) {
+        this.profissional = profissional;
+    }
+
+    public Sala getSala() {
+        return sala;
+    }
+
+    public void setSala(Sala sala) {
+        this.sala = sala;
     }
 
     public Turma() {
-        this(null,null,'z');
+        this(null,null,'z',null,null);
     }
 
     public AnoLetivo getAnoLetivo() {

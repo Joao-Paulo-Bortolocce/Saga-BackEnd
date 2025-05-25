@@ -2,9 +2,7 @@ package sistema.saga.sagabackend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.AnoLetivo;
-import sistema.saga.sagabackend.model.Serie;
-import sistema.saga.sagabackend.model.Turma;
+import sistema.saga.sagabackend.model.*;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.util.HashMap;
@@ -16,43 +14,75 @@ public class TurmaCtrl {
     public ResponseEntity<Object> gravarTurma(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
         char turmaLetra = dados.get("turmaletra").toString().charAt(0);
-        int turmaSerieId = (int) dados.get("serie_id");
-        int turmaAnoLetivoId = (int) dados.get("anoletivo_id");
+        Object serieObj = dados.get("serie_id");
+        Object anoObj = dados.get("anoletivo_id");
+        Object profObj = dados.get("profissional_rn");
+        Object salaObj = dados.get("sala_id");
 
-        if (verificaIntegridade(turmaLetra) && verificaIntegridade(turmaSerieId) && verificaIntegridade(turmaAnoLetivoId)) {
+
+        if (serieObj == null || anoObj == null || profObj == null || salaObj == null) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Dados obrigatórios ausentes");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+
+        int turmaSerieId = ((Number) serieObj).intValue();
+        int turmaAnoLetivoId = ((Number) anoObj).intValue();
+        int turmaProfissionalRa = ((Number) profObj).intValue();
+        int turmaSalaId = ((Number) salaObj).intValue();
+
+        if (verificaIntegridade(turmaLetra) && verificaIntegridade(turmaSerieId)
+                && verificaIntegridade(turmaAnoLetivoId) && verificaIntegridade(turmaProfissionalRa)
+                && verificaIntegridade(turmaSalaId)) {
+
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
 
-                    // Verifica se a série existe
                     Serie serie = new Serie();
                     serie.setSerieId(turmaSerieId);
-                    int idSerieConfirmado = serie.buscaSerie(gerenciaConexao.getConexao());
-                    if (idSerieConfirmado == 0) {
+                    if (serie.buscaSerie(gerenciaConexao.getConexao()) == 0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "Série não encontrada.");
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    // Verifica se o ano letivo existe
                     AnoLetivo anoLetivo = new AnoLetivo();
                     anoLetivo.setId(turmaAnoLetivoId);
-                    int idAnoConfirmado = anoLetivo.buscaAnos(gerenciaConexao.getConexao());
-                    if (idAnoConfirmado == 0) {
+                    if (anoLetivo.buscaAnos(gerenciaConexao.getConexao()) == 0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "Ano letivo não encontrado.");
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    // Criando objeto Turma
+                    Profissional prof = new Profissional();
+                    prof.setProfissional_rn(turmaProfissionalRa);
+                    if (prof.buscaProfissional(gerenciaConexao.getConexao(), prof, new HashMap<>(), new HashMap<>()) == null) {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Profissional não encontrado.");
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+
+                    Sala sala = new Sala();
+                    sala.setId(turmaSalaId);
+                    if (sala.buscaSerie(gerenciaConexao.getConexao()) == 0) {
+                        resposta.put("status", false);
+                        resposta.put("mensagem", "Sala não encontrada.");
+                        gerenciaConexao.Desconectar();
+                        return ResponseEntity.badRequest().body(resposta);
+                    }
+
                     Turma turma = new Turma();
                     turma.setLetra(turmaLetra);
                     turma.setSerie(serie);
                     turma.setAnoLetivo(anoLetivo);
+                    turma.setProfissional(prof);
+                    turma.setSala(sala);
 
                     if (turma.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
@@ -69,8 +99,7 @@ public class TurmaCtrl {
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
 
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -83,68 +112,109 @@ public class TurmaCtrl {
                 resposta.put("mensagem", "Erro ao iniciar conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        }
-        else {
+        } else {
             resposta.put("status", false);
             resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    public ResponseEntity<Object> alterarTurma(String letraAntiga, int serieId, int anoLetivoId, Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarTurma(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (!dados.containsKey("novaLetra") || !verificaIntegridade(dados.get("novaLetra").toString())) {
-            resposta.put("status", false);
-            resposta.put("mensagem", "Nova letra inválida");
-            return ResponseEntity.badRequest().body(resposta);
-        }
-        else{
-            try {
-                GerenciaConexao gc = new GerenciaConexao();
-
-                Turma turma = new Turma();
-                turma.setLetra(letraAntiga.charAt(0));
-
-                Serie serie = new Serie();
-                serie.setSerieId(serieId);
-                turma.setSerie(serie);
-
-                AnoLetivo ano = new AnoLetivo();
-                ano.setId(anoLetivoId);
-                turma.setAnoLetivo(ano);
-
-                char novaLetra = dados.get("novaLetra").toString().charAt(0);
-
-                gc.getConexao().iniciarTransacao();
-                boolean sucesso = turma.alterar(novaLetra, gc.getConexao());
-                if (sucesso) {
-                    gc.getConexao().commit();
-                    resposta.put("status", true);
-                    resposta.put("mensagem", "Letra da turma alterada com sucesso!");
-                } else {
-                    gc.getConexao().rollback();
-                    resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao alterar a turma.");
-                }
-                gc.getConexao().fimTransacao();
-                gc.Desconectar();
-                return ResponseEntity.ok(resposta);
-
-            } catch (Exception e) {
+        try {
+            // Validações básicas
+            if (!dados.containsKey("letraAtual") || !verificaIntegridade(dados.get("letraAtual").toString()) ||
+                    !dados.containsKey("novaLetra") || !verificaIntegridade(dados.get("novaLetra").toString()) ||
+                    !dados.containsKey("serie_id") || !dados.containsKey("anoletivo_id") ||
+                    !dados.containsKey("profissional_rn") || !dados.containsKey("sala_id")) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Erro na alteração");
+                resposta.put("mensagem", "Dados incompletos ou inválidos para alteração.");
                 return ResponseEntity.badRequest().body(resposta);
             }
+
+            // Conversão dos dados recebidos
+            char letraAntiga = dados.get("letraAtual").toString().charAt(0);
+            char novaLetra = dados.get("novaLetra").toString().charAt(0);
+            int serieId = (int) dados.get("serie_id");
+            int anoLetivoId = (int) dados.get("anoletivo_id");
+            int profissionalRa = (int) dados.get("profissional_rn");
+            int salaId = (int) dados.get("sala_id");
+
+            GerenciaConexao gc = new GerenciaConexao();
+
+            // Verificação e montagem dos objetos necessários
+            Serie serie = new Serie(serieId, 0, "");
+            if (serie.buscaSerie(gc.getConexao()) == 0) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Série não encontrada.");
+                gc.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+            AnoLetivo ano = new AnoLetivo(anoLetivoId, null, null);
+            if (ano.buscaAnos(gc.getConexao()) == 0) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Ano letivo não encontrado.");
+                gc.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+            Profissional prof = new Profissional(profissionalRa);
+            if (prof.buscaProfissional(gc.getConexao(), prof, new HashMap<>(), new HashMap<>()) == null) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Profissional não encontrado.");
+                gc.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+            Sala sala = new Sala(salaId, 0, "");
+            if (sala.buscaSerie(gc.getConexao()) == 0) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Sala não encontrada.");
+                gc.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+            // Montagem da turma
+            Turma turma = new Turma();
+            turma.setLetra(letraAntiga);
+            turma.setSerie(serie);
+            turma.setAnoLetivo(ano);
+            turma.setProfissional(prof);
+            turma.setSala(sala);
+
+            gc.getConexao().iniciarTransacao();
+            boolean sucesso = turma.alterar(novaLetra, gc.getConexao());
+
+            if (sucesso) {
+                gc.getConexao().commit();
+                resposta.put("status", true);
+                resposta.put("mensagem", "Turma alterada com sucesso!");
+            } else {
+                gc.getConexao().rollback();
+                resposta.put("status", false);
+                resposta.put("mensagem", "Erro ao alterar a turma.");
+            }
+
+            gc.getConexao().fimTransacao();
+            gc.Desconectar();
+            return ResponseEntity.ok(resposta);
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro interno na alteração.");
+            return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    public ResponseEntity<Object> excluirTurma(String letra, int serieId, int anoLetivoId) {
+
+    public ResponseEntity<Object> excluirTurma(String letra, int serieId, int anoLetivoId, int profissionalRa, int salaId) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(letra) && verificaIntegridade(serieId) && verificaIntegridade(anoLetivoId)) {
+        if (verificaIntegridade(letra) && verificaIntegridade(serieId) && verificaIntegridade(anoLetivoId)
+                && verificaIntegridade(profissionalRa) && verificaIntegridade(salaId)) {
             try {
-                // Monta objeto Turma
                 Turma turma = new Turma();
                 turma.setLetra(letra.charAt(0));
 
@@ -155,6 +225,14 @@ public class TurmaCtrl {
                 AnoLetivo anoLetivo = new AnoLetivo();
                 anoLetivo.setId(anoLetivoId);
                 turma.setAnoLetivo(anoLetivo);
+
+                Profissional profissional = new Profissional();
+                profissional.setProfissional_rn(profissionalRa);
+                turma.setProfissional(profissional);
+
+                Sala sala = new Sala();
+                sala.setId(salaId);
+                turma.setSala(sala);
 
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
                 if (turma.apagar(gerenciaConexao.getConexao())) {
@@ -177,6 +255,7 @@ public class TurmaCtrl {
             return ResponseEntity.badRequest().body(resposta);
         }
     }
+
 
     public ResponseEntity<Object> buscarTurmas(String termo) {
         Map<String, Object> resposta = new HashMap<>();

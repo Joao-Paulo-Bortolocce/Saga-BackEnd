@@ -14,7 +14,6 @@ public class GerenciaConexao {
     private static final String BASE_NAME = "postgres";
     private static final String USER = "postgres.hwzwvvtscsfgklklppga";
     private static final String SENHA = "postgres123";
-
     public GerenciaConexao() {
         Conectar();
     }
@@ -22,7 +21,7 @@ public class GerenciaConexao {
     public boolean Conectar() {
         conexao = new Conexao();
         boolean conectado = conexao.conectar(URL, BASE_NAME, USER, SENHA);
-        System.out.println(">>> Conexão com banco: " + (conectado ? "SUCESSO" : "FALHOU"));
+        System.out.println(">>> Conexão com banco de dados PostgresSQL: " + (conectado ? "SUCESSO" : "FALHOU"));
         return conectado;
     }
 
