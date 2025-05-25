@@ -175,4 +175,49 @@ public class PessoaDAO {
 
         return pessoas;
     }
+
+    public List<Pessoa> buscarTodosSemProfissional(String filtro,Conexao conexao,List<Map<String,Object>> enderecos) {
+        String sql = """
+                SELECT *
+                FROM pessoa p
+                JOIN endereco e ON p.pessoa_enderecoid = e.endereco_id
+                WHERE p.pessoa_datanascimento <= CURRENT_DATE - INTERVAL '18 years'
+                  AND p.pessoa_cpf NOT IN (
+                    SELECT profissional_pessoa_cpf FROM profissional
+                )
+                  AND p.pessoa_nome ILIKE '%#1%'
+                ORDER BY p.pessoa_nome;
+        """;
+        sql=sql.replace("#1",filtro);
+        List<Pessoa> pessoas = new ArrayList<>();
+        try{
+            ResultSet resultSet = conexao.consultar(sql);
+            while (resultSet.next()) {
+                String pessoaCpf = resultSet.getString("pessoa_cpf");
+                String pessoaRg = resultSet.getString("pessoa_rg");
+                String pessoaNome = resultSet.getString("pessoa_nome");
+                Date pessoaDataNascimento = resultSet.getDate("pessoa_datanascimento");
+                String pessoaSexo = resultSet.getString("pessoa_sexo");
+                String pessoaLocNascimento = resultSet.getString("pessoa_locnascimento");
+                String pessoaEstadoNascimento = resultSet.getString("pessoa_estadonascimento");
+                String pessoaEstadoCivil = resultSet.getString("pessoa_estadocivil");
+                Map<String, Object> end= new HashMap<>();
+               end.put("endereco_rua", resultSet.getString("endereco_rua"));
+                end.put("endereco_num", resultSet.getInt("endereco_numero"));
+                end.put("endereco_complemento", resultSet.getString("endereco_complemento"));
+                end.put("endereco_cep", resultSet.getString("endereco_cep"));
+                end.put("endereco_id", resultSet.getInt("endereco_id"));
+                end.put("endereco_cidade", resultSet.getString("endereco_cidade"));
+                end.put("endereco_uf", resultSet.getString("endereco_uf"));
+                enderecos.add(end);
+                pessoas.add(new Pessoa(pessoaCpf, pessoaRg, pessoaNome, pessoaDataNascimento.toLocalDate(),
+                        pessoaSexo, pessoaLocNascimento, pessoaEstadoNascimento, null, pessoaEstadoCivil));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return pessoas;
+    }
 }

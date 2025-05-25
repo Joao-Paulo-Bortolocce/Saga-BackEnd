@@ -79,6 +79,81 @@ public class MatriculaDAO {
         return conexao.manipular(sql);
     }
 
+    public Matricula getMatricula(Matricula matricula, Conexao conexao, Map<String, Object> aluno, Map<String, Object> ano, Map<String, Object> serie, Map<String, Object> turma) {
+        String sql = """
+        SELECT * 
+        FROM matricula 
+        JOIN aluno ON matricula_aluno_ra = aluno_ra
+        JOIN pessoa ON aluno_pessoa_cpf = pessoa_cpf
+        JOIN endereco ON pessoa_enderecoid = endereco_id
+        JOIN anoLetivo ON anoletivo_id = matricula_anoletivo_id
+        JOIN serie ON serie_id = matricula_serie_id
+        LEFT JOIN turma ON turmaanoletivo_id = matricula_anoletivo_id 
+                        AND serieturma_id = matricula_serie_id 
+                        AND (
+                            matricula_turma_letra IS NULL 
+                            OR turma_letra = matricula_turma_letra
+                        )
+        WHERE matricula_id = '#1' ORDER BY matricula_id
+    """;
+        sql = sql.replace("#1", ""+matricula.getId());
+
+        try {
+            ResultSet rs = conexao.consultar(sql);
+            if (rs.next()) {
+                matricula = new Matricula();
+                matricula.setId(rs.getInt("matricula_id"));
+                matricula.setAprovado(rs.getBoolean("matricula_aprovado"));
+                matricula.setData(rs.getDate("matricula_data").toLocalDate());
+
+                Map<String, Object> end = new HashMap<>();
+                end.put("endereco_rua", rs.getString("endereco_rua"));
+                end.put("endereco_num", rs.getInt("endereco_numero"));
+                end.put("endereco_complemento", rs.getString("endereco_complemento"));
+                end.put("endereco_cep", rs.getString("endereco_cep"));
+                end.put("endereco_id", rs.getInt("endereco_id"));
+                end.put("endereco_cidade", rs.getString("endereco_cidade"));
+                end.put("endereco_uf", rs.getString("endereco_uf"));
+
+                Map<String, Object> pessoa = new HashMap<>();
+                pessoa.put("pessoa_cpf", rs.getString("pessoa_cpf"));
+                pessoa.put("pessoa_nome", rs.getString("pessoa_nome"));
+                pessoa.put("pessoa_rg", rs.getString("pessoa_rg"));
+                java.sql.Date dataNascSql = rs.getDate("pessoa_datanascimento");
+                if (dataNascSql != null)
+                    pessoa.put("pessoa_datanascimento", dataNascSql);
+                pessoa.put("pessoa_sexo", rs.getString("pessoa_sexo"));
+                pessoa.put("pessoa_locNascimento", rs.getString("pessoa_locnascimento"));
+                pessoa.put("pessoa_estadoNascimento", rs.getString("pessoa_estadonascimento"));
+                pessoa.put("pessoa_estadoCivil", rs.getString("pessoa_estadocivil"));
+                pessoa.put("endereco", end);
+
+                aluno.put("aluno_ra", rs.getInt("aluno_ra"));
+                aluno.put("aluno_restricaomedica", rs.getString("aluno_restricaomedica"));
+                aluno.put("pessoa", pessoa);
+
+                ano.put("anoletivo_id", rs.getInt("anoletivo_id"));
+                ano.put("anoletivo_inicio", rs.getDate("anoletivo_inicio"));
+                ano.put("anoletivo_termino", rs.getDate("anoletivo_termino"));
+
+                serie.put("serie_id", rs.getInt("serie_id"));
+                serie.put("serie_num", rs.getInt("serie_num"));
+                serie.put("serie_descr", rs.getString("serie_descr"));
+
+                turma.put("serie", serie);
+                turma.put("anoletivo", ano);
+                turma.put("turma_letra", rs.getString("turma_letra").charAt(0));
+
+                return matricula;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao buscar matrícula", e);
+        }
+
+        return null;
+    }
+
     public List<Matricula> getMatricula(Matricula mat, Conexao conexao, List< Map<String, Object>> alunos, List< Map<String, Object>> anos, List< Map<String, Object>> series, List< Map<String, Object>> turmas) {
         String sql = """
         SELECT * 

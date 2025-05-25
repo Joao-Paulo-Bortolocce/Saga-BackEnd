@@ -118,6 +118,13 @@ public class Matricula {
         return matriculaDAO.getMatricula(this,conexao,aluno,ano,serie,turma);
     }
 
+
+    public Matricula buscaMatricula(Conexao conexao, Matricula matricula, Map<String, Object> aluno, Map<String, Object> ano, Map<String, Object> serie, Map<String, Object> turma){
+        MatriculaDAO matriculaDAO = new MatriculaDAO();
+        return matriculaDAO.getMatricula(matricula,conexao,aluno,ano,serie,turma);
+    }
+
+
     public List<Matricula> buscarTodas(Conexao conexao, List<Map<String, Object>>alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
         MatriculaDAO matriculaDAO = new MatriculaDAO();
         return matriculaDAO.get(conexao,alunos,anos,series,turmas);

@@ -2,7 +2,7 @@ package sistema.saga.sagabackend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.Graduacao;
+import sistema.saga.sagabackend.model.Notificacao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
@@ -12,28 +12,32 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GraduacaoCtrl {
-    public ResponseEntity<Object> gravarGraduacao(Map<String, Object> dados) {
+public class NotificacaoCtrl {
+    public ResponseEntity<Object> gravarNotificacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String gradDescricao = (String) dados.get("descricao");
 
-        if (Regras.verificaIntegridade(gradDescricao)) {
+        String mensagem = (String) dados.get("mensagem");
+        String dataStr = (String) dados.get("data");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate data = LocalDate.parse(dataStr, formatter);
+
+        if (Regras.verificaIntegridade(mensagem) && Regras.verificaIntegridade(data)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(gradDescricao);
-                    if (graduacao.gravar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao(mensagem, data);
+                    if (notificacao.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Graduação inserida com sucesso!");
+                        resposta.put("mensagem", "Notificação inserida com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao inserir graduação!");
+                        resposta.put("mensagem", "Erro ao inserir notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -59,28 +63,27 @@ public class GraduacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarGraduacao(Map<String, Object> dados) {
+    public ResponseEntity<Object> visualizarNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
-        int id = (int) dados.get("id");
-        String gradDescricao = (String) dados.get("descricao");
 
-        if (Regras.verificaIntegridade(id) && Regras.verificaIntegridade(gradDescricao)) {
+        if (Regras.verificaIntegridade(id)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(id, gradDescricao);
-                    if (graduacao.alterar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao();
+                    notificacao.setNot_id(id);
+                    if (notificacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Graduação alterada com sucesso!");
+                        resposta.put("mensagem", "Notificação visualizada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao alterar graduação!");
+                        resposta.put("mensagem", "Erro ao visualizar notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -88,7 +91,7 @@ public class GraduacaoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro durante a alteração");
+                    resposta.put("mensagem", "Erro durante a visualização");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -106,22 +109,22 @@ public class GraduacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> excluirGraduacao(int id) {
+    public ResponseEntity<Object> excluirNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
         if (Regras.verificaIntegridade(id)) {
             try {
-                Graduacao graduacao = new Graduacao();
-                graduacao.setId(id);
+                Notificacao notificacao = new Notificacao();
+                notificacao.setNot_id(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (graduacao.apagar(gerenciaConexao.getConexao())) {
+                if (notificacao.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Graduação excluída com sucesso!");
+                    resposta.put("mensagem", "Notificação excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao excluir graduação!");
+                    resposta.put("mensagem", "Erro ao excluir notificação!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
@@ -137,28 +140,29 @@ public class GraduacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarGraduacao(String termo) {
+    public ResponseEntity<Object> buscarNotificacao() {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            Graduacao graduacao = new Graduacao();
-            List<Graduacao> graduacaos = graduacao.buscarTodos(gerenciaConexao.getConexao());
+            Notificacao notificacao = new Notificacao();
+            List<Notificacao> notificacaoList = notificacao.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
 
-            if (graduacaos != null && !graduacaos.isEmpty()) {
+            if (notificacaoList != null && !notificacaoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("listaGraduacao", graduacaos);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.ok(resposta);
             } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma graduação encontrada.");
+                resposta.put("status", true);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar graduações");
+            resposta.put("mensagem", "Erro ao buscar as notificações");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
+
 }

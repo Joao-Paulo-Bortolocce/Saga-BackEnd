@@ -14,7 +14,7 @@ public class SalaView {
     @Autowired
     private SalaCtrl salaCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return salaCtrl.gravarSala(dados);
     }
@@ -34,7 +34,7 @@ public class SalaView {
         return salaCtrl.excluirSala(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping
     public ResponseEntity<Object> buscarTodos() {
         return salaCtrl.buscarSala("");
     }

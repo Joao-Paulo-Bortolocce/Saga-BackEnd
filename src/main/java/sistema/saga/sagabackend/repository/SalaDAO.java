@@ -9,12 +9,12 @@ import java.util.List;
 
 @Repository
 public class SalaDAO {
-    public boolean gravar(Sala sala, Conexao conexao) {
+    public boolean  gravar(Sala sala, Conexao conexao) {
         String sql = """
         INSERT INTO salas (salas_ncarteiras, salas_descricao)
-        VALUES ('#1', '#2')
+        VALUES (#1, '#2')
     """;
-        sql = sql.replace("#1", String.valueOf(sala.getNcarterias()));
+        sql = sql.replace("#1", String.valueOf(sala.getNcarteiras()));
         sql = sql.replace("#2", sala.getDescricao());
 
         System.out.println("SQL executado: " + sql); // <--- debug aqui
@@ -28,7 +28,7 @@ public class SalaDAO {
             SET salas_ncarteiras = '#1', salas_descricao = '#2'
             WHERE salas_id = '#3'
         """;
-        sql = sql.replace("#1", String.valueOf(sala.getNcarterias()));
+        sql = sql.replace("#1", String.valueOf(sala.getNcarteiras()));
         sql = sql.replace("#2", sala.getDescricao());
         sql = sql.replace("#3", String.valueOf(sala.getId()));
         return conexao.manipular(sql);
@@ -47,7 +47,7 @@ public class SalaDAO {
             ResultSet rs = conexao.consultar(sql);
             if (rs.next()) {
                 sala.setId(rs.getInt("salas_id"));
-                sala.setNcarterias(rs.getInt("salas_ncarteiras"));
+                sala.setNcarteiras(rs.getInt("salas_ncarteiras"));
                 sala.setDescricao(rs.getString("salas_descricao"));
                 return rs.getInt("salas_id");
             }

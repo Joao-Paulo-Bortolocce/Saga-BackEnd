@@ -366,6 +366,45 @@ public class PessoaCtrl {
         }
     }
 
+    public ResponseEntity<Object> buscarTodosSemProfissional() {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Pessoa pessoa = new Pessoa();
+            List<Map<String,Object>> enderecos = new ArrayList<>();
+            List<Pessoa> pessoaList = pessoa.buscarTodosSemProfissional(gerenciaConexao.getConexao(), enderecos);
+            if (pessoaList != null ) {
+                for (int i = 0; i < enderecos.size(); i++) {
+                    Map<String, Object>  end= enderecos.get(i);
+                    Endereco endereco = new Endereco(
+                            ((Number) end.get("endereco_id")).longValue(),
+                            (String) end.get("endereco_rua"),
+                            (int) end.get("endereco_num"),
+                            (String) end.get("endereco_complemento"),
+                            (String) end.get("endereco_cep"),
+                            (String) end.get("endereco_cidade"),
+                            (String) end.get("endereco_uf")
+                    );
+                    pessoaList.get(i).setEndereco(endereco);
+                }
+                resposta.put("status", true);
+                resposta.put("listaDePessoas", pessoaList);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem pessoas cadastradas");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
     private boolean verificaIntegridade(String elemento) {
         return elemento != null && !elemento.trim().isEmpty();
     }

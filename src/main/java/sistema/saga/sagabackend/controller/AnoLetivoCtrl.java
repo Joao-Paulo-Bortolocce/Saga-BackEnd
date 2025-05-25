@@ -14,6 +14,7 @@ import java.util.Map;
 
 @Service
 public class AnoLetivoCtrl {
+
     public ResponseEntity<Object> gravarAno(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
         String inicioStr = (String) dados.get("inicio");
@@ -156,9 +157,10 @@ public class AnoLetivoCtrl {
             AnoLetivo anoLetivo = new AnoLetivo();
             List<AnoLetivo> anoLetivoList = anoLetivo.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
+
             if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("anos", anoLetivoList);
+                resposta.put("anoletivo", anoLetivoList);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);

@@ -36,6 +36,11 @@ public class PessoaView {
         return pessoaCtrl.buscarTodosSemAlunos(true);
     }
 
+    @GetMapping(value = "/buscarTodosSemProfissional")
+    ResponseEntity<Object> buscarTodosSemProfissional(){
+        return pessoaCtrl.buscarTodosSemProfissional();
+    }
+
     @GetMapping(value = "/{cpf}")
     ResponseEntity<Object> buscar(@PathVariable(name="cpf")String cpf){
         return pessoaCtrl.buscarPessoa(cpf);

@@ -59,9 +59,9 @@ public class Serie {
         return serieDAO.getSerie(this,conexao);
     }
 
-    public List<Serie> buscarTodos(Conexao conexao) {
+    public List<Serie> buscar(Conexao conexao, String termo) {
         SerieDAO serieDAO = new SerieDAO();
-        return serieDAO.get("",conexao);
+        return serieDAO.get(termo,conexao);
     }
 
     public boolean alterar(Conexao conexao) {
