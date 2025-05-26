@@ -329,6 +329,12 @@ public class MatriculaDAO {
             teste=true;
             where+=" anoletivo_id="+mat.getAnoLetivo().getId();
         }
+        if(mat.getTurma()!=null){
+            if(teste)
+                where+=" and ";
+            teste=true;
+            where+=" matricula_turma_letra="+mat.getTurma().getLetra();
+        }
         if(valido>0){
             if(teste)
                 where+=" and ";

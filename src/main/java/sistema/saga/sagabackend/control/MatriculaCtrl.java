@@ -456,13 +456,15 @@ public class MatriculaCtrl {
     }
 
 
-    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId, int valido) {
+    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId, int valido, String turmaLetra) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Matricula matricula = new Matricula();
             matricula.setSerie(new Serie(serieId, 0, ""));
             matricula.setAnoLetivo(new AnoLetivo(anoLetivoId));
+            if(turmaLetra!=null)
+                matricula.setTurma(new Turma(null,null,turmaLetra.charAt(0),null,null));
             List<Map<String, Object>> alunos = new ArrayList<>();
             List<Map<String, Object>> anos = new ArrayList<>();
             List<Map<String, Object>> series = new ArrayList<>();
