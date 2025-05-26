@@ -25,8 +25,13 @@ public class MatriculaView {
     }
 
     @GetMapping(value = "/buscarTodasFiltradas")
-    ResponseEntity<Object> buscarTodasFiltradas(@RequestParam(name = "serie") int serie,@RequestParam(name = "anoLetivo") int anoLetivo,@RequestParam(name = "valido") int valido ){
-        return matriculaCtrl.buscarTodasFiltradas(serie,anoLetivo,valido);
+    ResponseEntity<Object> buscarTodasFiltradas(
+            @RequestParam(name = "serie") int serie,
+            @RequestParam(name = "anoLetivo") int anoLetivo,
+            @RequestParam(name = "valido") int valido,
+            @RequestParam(name = "turmaLetra", required = false) String turmaLetra
+    ) {
+        return matriculaCtrl.buscarTodasFiltradas(serie, anoLetivo, valido, turmaLetra);
     }
 
     @GetMapping(value = "/{ra}")
@@ -42,5 +47,16 @@ public class MatriculaView {
     @PutMapping
     ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
         return matriculaCtrl.alterarMatricula(dados);
+    }
+
+    @GetMapping(value = "/buscarSemTurma")
+    public ResponseEntity<Object> buscarMatriculasSemTurma(@RequestParam(name = "serie") int serieId,
+                                                           @RequestParam(name = "anoLetivo") int anoLetivoId) {
+        return matriculaCtrl.buscarMatriculasSemTurma(serieId, anoLetivoId);
+    }
+
+    @PutMapping("/removerTurma/{id}")
+    public ResponseEntity<Object> removerTurma(@PathVariable(name = "id") int id) {
+        return matriculaCtrl.removerTurmaDaMatricula(id);
     }
 }

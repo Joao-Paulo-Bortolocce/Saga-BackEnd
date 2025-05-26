@@ -123,9 +123,13 @@ public class Matricula {
         return matriculaDAO.get(conexao,alunos,anos,series,turmas);
     }
 
-    public List<Matricula> buscarTodasFiltradas(Conexao conexao,Matricula matricula,int valido, List<Map<String, Object>>alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
+    public List<Matricula> buscarTodasFiltradas(
+            Conexao conexao, Matricula matricula, int valido, String turmaLetra,
+            List<Map<String, Object>> alunos, List<Map<String, Object>> anos,
+            List<Map<String, Object>> series, List<Map<String, Object>> turmas
+    ) {
         MatriculaDAO matriculaDAO = new MatriculaDAO();
-        return matriculaDAO.buscarTodasFiltradas(conexao,matricula,valido,alunos,anos,series,turmas);
+        return matriculaDAO.buscarTodasFiltradas(conexao, matricula, valido, turmaLetra, alunos, anos, series, turmas);
     }
 
     public boolean alterar(Conexao conexao) {
@@ -136,5 +140,15 @@ public class Matricula {
     public boolean gravar(Conexao conexao) {
         MatriculaDAO matriculaDAO = new MatriculaDAO();
         return matriculaDAO.gravar(this,conexao);
+    }
+
+    public List<Matricula> buscarMatriculasSemTurma(Conexao conexao, Matricula mat, List<Map<String, Object>> alunos, List<Map<String, Object>> anos, List<Map<String, Object>> series, List<Map<String, Object>> turmas) {
+        MatriculaDAO matriculaDAO = new MatriculaDAO();
+        return matriculaDAO.buscarMatriculasSemTurma(conexao,mat,alunos,anos,series,turmas);
+    }
+
+    public boolean removerTurmaDaMatricula(Conexao conexao) {
+        MatriculaDAO matriculaDAO = new MatriculaDAO();
+        return matriculaDAO.removerTurmaDaMatricula(this, conexao);
     }
 }

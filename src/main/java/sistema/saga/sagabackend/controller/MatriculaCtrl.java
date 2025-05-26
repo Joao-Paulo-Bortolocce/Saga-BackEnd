@@ -4,8 +4,10 @@ import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.*;
+import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -364,21 +366,26 @@ public class MatriculaCtrl {
     }
 
 
-    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId,int valido) {
+    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId, int valido, String turmaLetra) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Matricula matricula = new Matricula();
-            matricula.setSerie(new Serie(serieId,0,""));
+            matricula.setSerie(new Serie(serieId, 0, ""));
             matricula.setAnoLetivo(new AnoLetivo(anoLetivoId));
+
             List<Map<String, Object>> alunos = new ArrayList<>();
             List<Map<String, Object>> anos = new ArrayList<>();
             List<Map<String, Object>> series = new ArrayList<>();
             List<Map<String, Object>> turmas = new ArrayList<>();
-            List<Matricula> matriculaList = matricula.buscarTodasFiltradas(gerenciaConexao.getConexao(),matricula, valido, alunos,anos,series,turmas);
-            if (matriculaList != null) {
+
+            List<Matricula> matriculaList = matricula.buscarTodasFiltradas(
+                    gerenciaConexao.getConexao(), matricula, valido, turmaLetra, alunos, anos, series, turmas
+            );
+
+            if (matriculaList != null && !matriculaList.isEmpty()) {
                 for (int i = 0; i < alunos.size(); i++) {
-                    Matricula mat= matriculaList.get(i);
+                    Matricula mat = matriculaList.get(i);
                     mat.setAluno(Regras.HashToAluno(alunos.get(i)));
                     mat.setAnoLetivo(Regras.HashToAnoLetivo(anos.get(i)));
                     mat.setSerie(Regras.HashToSerie(series.get(i)));
@@ -386,19 +393,101 @@ public class MatriculaCtrl {
                 }
                 resposta.put("status", true);
                 resposta.put("listaDeMatriculas", matriculaList);
-                gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matriculas cadastradas");
-                gerenciaConexao.Desconectar();
+                resposta.put("mensagem", "Nenhuma matrícula encontrada");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+        finally {
+            gerenciaConexao.Desconectar();
+        }
+    }
+
+    public ResponseEntity<Object> buscarMatriculasSemTurma(int serieId, int anoLetivoId) {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Matricula mat = new Matricula();
+            mat.setSerie(new Serie(serieId, 0, ""));
+            mat.setAnoLetivo(new AnoLetivo(anoLetivoId));
+            List<Map<String, Object>> alunos = new ArrayList<>();
+            List<Map<String, Object>> anos = new ArrayList<>();
+            List<Map<String, Object>> series = new ArrayList<>();
+            List<Map<String, Object>> turmas = new ArrayList<>();
+
+            List<Matricula> lista = mat.buscarMatriculasSemTurma(gerenciaConexao.getConexao(), mat, alunos, anos, series, turmas);
+
+            if (lista != null) {
+                for (int i = 0; i < alunos.size(); i++) {
+                    Matricula m = lista.get(i);
+                    m.setAluno(Regras.HashToAluno(alunos.get(i)));
+                    m.setAnoLetivo(Regras.HashToAnoLetivo(anos.get(i)));
+                    m.setSerie(Regras.HashToSerie(series.get(i)));
+                    m.setTurma(null); // Garantir que vem sem turma
+                }
+                resposta.put("status", true);
+                resposta.put("listaDeMatriculas", lista);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não há alunos sem turma.");
+            }
+
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.ok(resposta);
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro ao buscar alunos sem turma.");
             gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
     }
+
+    public ResponseEntity<Object> removerTurmaDaMatricula(int idMatricula) {
+        Map<String, Object> resposta = new HashMap<>();
+
+        if (!Regras.verificaIntegridade(idMatricula)) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "ID da matrícula inválido.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+
+        try {
+            GerenciaConexao gerenciaConexao = new GerenciaConexao();
+            gerenciaConexao.getConexao().iniciarTransacao();
+
+            Matricula matricula = new Matricula(idMatricula);
+
+            boolean ok = matricula.removerTurmaDaMatricula(gerenciaConexao.getConexao());
+
+            if (ok) {
+                gerenciaConexao.getConexao().commit();
+                resposta.put("status", true);
+                resposta.put("mensagem", "Turma removida com sucesso da matrícula.");
+                gerenciaConexao.getConexao().fimTransacao();
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                gerenciaConexao.getConexao().rollback();
+                resposta.put("status", false);
+                resposta.put("mensagem", "Falha ao remover turma da matrícula.");
+                gerenciaConexao.getConexao().fimTransacao();
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro interno ao remover turma da matrícula.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
 }
