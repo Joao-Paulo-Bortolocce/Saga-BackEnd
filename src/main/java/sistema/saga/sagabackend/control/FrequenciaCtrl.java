@@ -1,9 +1,8 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.*;
-import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;

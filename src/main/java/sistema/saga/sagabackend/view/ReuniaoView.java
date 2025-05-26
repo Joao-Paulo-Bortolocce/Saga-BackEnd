@@ -3,12 +3,9 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.ReuniaoCtrl;
-import sistema.saga.sagabackend.controller.TurmaCtrl;
-import sistema.saga.sagabackend.model.Turma;
-import sistema.saga.sagabackend.repository.GerenciaConexao;
+import sistema.saga.sagabackend.control.ReuniaoCtrl;
+import sistema.saga.sagabackend.control.TurmaCtrl;
 
-import java.util.List;
 import java.util.Map;
 
 @CrossOrigin

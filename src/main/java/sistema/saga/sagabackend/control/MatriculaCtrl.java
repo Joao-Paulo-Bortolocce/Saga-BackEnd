@@ -1,8 +1,8 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import sistema.saga.sagabackend.model.*;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
@@ -13,9 +13,11 @@ import java.util.*;
 @Service
 public class MatriculaCtrl {
     private final Matricula matricula;
+    private final ContentNegotiatingViewResolver contentNegotiatingViewResolver;
 
-    public MatriculaCtrl(Matricula matricula) {
+    public MatriculaCtrl(Matricula matricula, ContentNegotiatingViewResolver contentNegotiatingViewResolver) {
         this.matricula = matricula;
+        this.contentNegotiatingViewResolver = contentNegotiatingViewResolver;
     }
 
     public ResponseEntity<Object> gravarMatricula(Map<String, Object> dados) {
@@ -87,50 +89,143 @@ public class MatriculaCtrl {
                             aux.setSerie(Regras.HashToSerie(serieMap.get(i)));
                             aux.setTurma(Regras.HashToTurma(turmaMap.get(i)));
                         }
-                        int i, maior = -1000, menor = 1000000, pos = 0, posMenor = 0;
-
-                        for (i = 0; i < matriculaList.size() && (matricula.getAluno().getRa() != matriculaList.get(i).getAluno().getRa() || matricula.getAnoLetivo().getId() != matriculaList.get(i).getAnoLetivo().getId()); i++) {
+                        int anoAtual = matricula.getAnoLetivo().getInicio().getYear();
+                        int serieAtual = matricula.getSerie().getSerieNum();
+                        boolean repetiu = false, correto = true;
+                        int anoAux, serieAux, anoRepetiu = 0, serieRepetiu = 0;
+                        int maior = -1000, menor = 1000000, anoMaior = 0, anoMenor = 0;
+                        String serieErro = "";
+                        for (int i = 0; i < matriculaList.size() && correto; i++) {
+                            anoAux = matriculaList.get(i).getAnoLetivo().getInicio().getYear();
+                            serieAux = matriculaList.get(i).getSerie().getSerieNum();
                             if (matriculaList.get(i).getSerie().getSerieNum() > maior) {
                                 maior = matriculaList.get(i).getSerie().getSerieNum();
-                                pos = i;
-
+                                anoMaior=anoAux;
                             }
                             if (matriculaList.get(i).getSerie().getSerieNum() < menor) {
                                 menor = matriculaList.get(i).getSerie().getSerieNum();
-                                posMenor = i;
-
+                                anoMenor=anoAux;
+                            }
+                            if (serieAtual == serieAux) {
+                                anoRepetiu = anoAux;
+                                serieRepetiu = serieAux;
+                                repetiu = true;
+                                correto = false;
+                            } else {
+                                if (anoAtual > anoAux && serieAtual < serieAux) {
+                                    anoRepetiu = anoAux;
+                                    serieErro = matriculaList.get(i).getSerie().getSerieDescr();
+                                    correto = false;
+                                } else if (anoAtual < anoAux && serieAtual > serieAux) {
+                                    anoRepetiu = anoAux;
+                                    serieErro = matriculaList.get(i).getSerie().getSerieDescr();
+                                    correto = false;
+                                } else {
+                                    if(anoAtual==anoAux){
+                                        anoRepetiu = anoAux;
+                                        correto = false;
+                                    }
+                                }
                             }
                         }
-                        if (i < matriculaList.size()) {
+
+                        if (repetiu) {
+                            if (serieRepetiu == 3 || serieRepetiu == 5) {
+                                if (anoAtual != anoRepetiu - 1 && anoAtual != anoRepetiu + 1) {
+                                    resposta.put("status", false);
+                                    resposta.put("mensagem", "Um aluno só pode repetir anos consecutivos!");
+                                    //roolback; end trasaction;
+                                    gerenciaConexao.getConexao().rollback();
+                                    gerenciaConexao.getConexao().fimTransacao();
+                                    gerenciaConexao.Desconectar();
+                                    return ResponseEntity.badRequest().body(resposta);
+                                }
+                                repetiu = false;
+                                for (int i = 0; i < matriculaList.size() - 1; i++) {
+                                    anoAux = matriculaList.get(i).getAnoLetivo().getInicio().getYear();
+                                    serieAux = matriculaList.get(i).getSerie().getSerieNum();
+                                    for (int j = i + 1; j < matriculaList.size() && !repetiu; j++) {
+                                        if (matriculaList.get(j).getAnoLetivo().getInicio().getYear() == anoAux && matriculaList.get(j).getSerie().getSerieNum() == serieAux)
+                                            repetiu = true;
+                                    }
+                                }
+                                if (repetiu) {
+                                    resposta.put("status", false);
+                                    resposta.put("mensagem", "Este aluno ja reprovou anteriormente e não pode reprovar novamente!");
+                                    //roolback; end trasaction;
+                                    gerenciaConexao.getConexao().rollback();
+                                    gerenciaConexao.getConexao().fimTransacao();
+                                    gerenciaConexao.Desconectar();
+                                    return ResponseEntity.badRequest().body(resposta);
+                                }
+                                correto = true;
+                            } else {
+                                resposta.put("status", false);
+                                resposta.put("mensagem", "Um aluno só pode repetir o 3 ou o 5 ano!");
+                                //roolback; end trasaction;
+                                gerenciaConexao.getConexao().rollback();
+                                gerenciaConexao.getConexao().fimTransacao();
+                                gerenciaConexao.Desconectar();
+                                return ResponseEntity.badRequest().body(resposta);
+                            }
+                        }
+
+                        if (!correto) {
+                            String mensagem = "";
+                            if (anoAtual == anoRepetiu)
+                                mensagem = "Este aluno ja possui matricula no ano " + anoAtual;
+                            else if (anoAtual > anoRepetiu)
+                                mensagem = "A serie que o aluno realizou em " + anoRepetiu + " é superior à " + matricula.getSerie().getSerieDescr() + ", informe uma serie superior a " + serieErro + "!";
+                            else
+                                mensagem = "A serie que o aluno realizou em " + anoRepetiu + " é inferior à " + matricula.getSerie().getSerieDescr() + ", informe uma serie inferior a " + serieErro + "!";
                             resposta.put("status", false);
-                            resposta.put("mensagem", "Esta matricula ja está cadastrada!");
+                            resposta.put("mensagem", mensagem);
                             //roolback; end trasaction;
                             gerenciaConexao.getConexao().rollback();
                             gerenciaConexao.getConexao().fimTransacao();
                             gerenciaConexao.Desconectar();
                             return ResponseEntity.badRequest().body(resposta);
-                        } else {
-                            Matricula aux = matriculaList.get(pos);
-                            if (maior > matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())) {
-                                resposta.put("status", false);
-                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a " + aux.getSerie().getSerieDescr() + " no ano " + aux.getAnoLetivo().getInicio() + " portanto a serie deve ser igual ou superior a essa!");
-                                //roolback; end trasaction;
-                                gerenciaConexao.getConexao().rollback();
-                                gerenciaConexao.getConexao().fimTransacao();
-                                gerenciaConexao.Desconectar();
-                                return ResponseEntity.badRequest().body(resposta);
-                            }
-                            aux = matriculaList.get(posMenor);
-                            if (menor < matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isAfter(matricula.getAnoLetivo().getInicio())) {
-                                resposta.put("status", false);
-                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a " + aux.getSerie().getSerieDescr() + " no ano " + aux.getAnoLetivo().getInicio() + " portanto a serie deve ser igual ou inferior a essa!");
-                                //roolback; end trasaction;
-                                gerenciaConexao.getConexao().rollback();
-                                gerenciaConexao.getConexao().fimTransacao();
-                                gerenciaConexao.Desconectar();
-                                return ResponseEntity.badRequest().body(resposta);
-                            }
                         }
+                        int dist=anoAtual-anoMaior;
+                       if(serieAtual-maior>dist){
+                           resposta.put("status", false);
+                           resposta.put("mensagem", "O aluno esta pulando alguma(s) serie(s)");
+                           //roolback; end trasaction;
+                           gerenciaConexao.getConexao().rollback();
+                           gerenciaConexao.getConexao().fimTransacao();
+                           gerenciaConexao.Desconectar();
+                           return ResponseEntity.badRequest().body(resposta);
+                       }
+                        if( serieAtual-maior<dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta deixando alguma(s) serie(s) para trás");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+                        dist=anoAtual-anoMenor;
+                        if(serieAtual-menor>dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta pulando alguma(s) serie(s)");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+
+                        if( serieAtual-menor<dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta deixando alguma(s) serie(s) para trás");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+
                     }
 
                     aluno.setPessoa(Regras.HashToPessoa(pessoa));

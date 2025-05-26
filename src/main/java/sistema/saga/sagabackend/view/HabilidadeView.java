@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.HabilidadeCtrl;
+import sistema.saga.sagabackend.control.HabilidadeCtrl;
 
 import java.util.Map;
 

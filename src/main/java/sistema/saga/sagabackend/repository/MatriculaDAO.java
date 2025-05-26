@@ -224,7 +224,8 @@ public class MatriculaDAO {
                 Map<String, Object> turma= new HashMap<>();
                 turma.put("serie",serie);
                 turma.put("anoletivo",ano);
-                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turma.put("turma_letra", rs.getString("turma_letra"));
+
                 turmas.add(turma);
 
                 matriculaList.add(matricula);
@@ -299,7 +300,8 @@ public class MatriculaDAO {
                 Map<String, Object> turma= new HashMap<>();
                 turma.put("serie",serie);
                 turma.put("anoletivo",ano);
-                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turma.put("turma_letra", rs.getString("turma_letra"));
+
                 turmas.add(turma);
 
 
@@ -399,7 +401,7 @@ public class MatriculaDAO {
                 Map<String, Object> turma= new HashMap<>();
                 turma.put("serie",serie);
                 turma.put("anoletivo",ano);
-                turma.put("turma_letra",rs.getByte("turma_letra"));
+                turma.put("turma_letra", rs.getString("turma_letra"));
                 turmas.add(turma);
 
 

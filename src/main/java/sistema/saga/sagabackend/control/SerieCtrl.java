@@ -1,48 +1,39 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.AnoLetivo;
+import sistema.saga.sagabackend.model.Serie;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class AnoLetivoCtrl {
+public class SerieCtrl {
 
-    public ResponseEntity<Object> gravarAno(Map<String, Object> dados) {
+    public ResponseEntity<Object> gravarSerie(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String inicioStr = (String) dados.get("inicio");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
-        String fimStr = (String) dados.get("fim");
-        LocalDate fim = LocalDate.parse(fimStr, formatter);
+        int serieNum = (int) dados.get("serieNum");
+        String serieDescr = (String) dados.get("serieDescr");
 
-        if (verificaIntegridade(inicio) && verificaIntegridade(fim)) {
+        if (verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    //begin transaction
-                    AnoLetivo anoLetivo = new AnoLetivo(inicio,fim);
-                    if (anoLetivo.gravar(gerenciaConexao.getConexao())) {
+                    Serie serie = new Serie(serieNum, serieDescr);
+                    if (serie.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Ano letivo inserido com sucesso");
-                        //commit; end transaction;
+                        resposta.put("mensagem", "Série inserida com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Ano letivo não foi inserido!");
-                        //rollback end transaction;
+                        resposta.put("mensagem", "Erro ao inserir série!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -50,7 +41,7 @@ public class AnoLetivoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro na durante a insercao");
+                    resposta.put("mensagem", "Erro durante a inserção");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -58,7 +49,7 @@ public class AnoLetivoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
+                resposta.put("mensagem", "Erro ao iniciar conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -68,31 +59,28 @@ public class AnoLetivoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarAno(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarSerie(int id, Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String inicioStr = (String) dados.get("inicio");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
-        String fimStr = (String) dados.get("fim");
-        LocalDate fim = LocalDate.parse(fimStr, formatter);
+        int serieNum = (int) dados.get("serieNum");
+        String serieDescr = (String) dados.get("serieDescr");
 
-        if (verificaIntegridade(id) && verificaIntegridade(inicio) && verificaIntegridade(fim)) {
+        if (verificaIntegridade(id) && verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    AnoLetivo anoLetivo = new AnoLetivo(id,inicio,fim);
-                    if (anoLetivo.alterar(gerenciaConexao.getConexao())) {
+                    Serie serie = new Serie(id, serieNum, serieDescr);
+                    if (serie.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Ano letivo alterado com sucesso");
+                        resposta.put("mensagem", "Série alterada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Ano letivo não foi alterado!");
+                        resposta.put("mensagem", "Erro ao alterar série!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -100,7 +88,7 @@ public class AnoLetivoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro de conexão");
+                    resposta.put("mensagem", "Erro durante a alteração");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -108,7 +96,7 @@ public class AnoLetivoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
+                resposta.put("mensagem", "Erro ao iniciar conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -116,70 +104,69 @@ public class AnoLetivoCtrl {
             resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
-
     }
 
-    public ResponseEntity<Object> apagarAno(int id) {
+    public ResponseEntity<Object> excluirSerie(int id) {
         Map<String, Object> resposta = new HashMap<>();
+
         if (verificaIntegridade(id)) {
             try {
-                AnoLetivo anoLetivo = new AnoLetivo();
-                anoLetivo.setId(id);
+                Serie serie = new Serie();
+                serie.setSerieId(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (anoLetivo.apagar(gerenciaConexao.getConexao())) {
+                if (serie.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Ano letivo excluido com sucesso!");
+                    resposta.put("mensagem", "Série excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Exclusão não foi realizada!");
+                    resposta.put("mensagem", "Erro ao excluir série!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro de conexão");
+                resposta.put("mensagem", "Erro de conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Dados inválidos para exclusão!");
+            resposta.put("mensagem", "ID inválido");
             return ResponseEntity.badRequest().body(resposta);
         }
-
     }
 
-    public ResponseEntity<Object> buscarAnos(String termo) {
+    public ResponseEntity<Object> buscarSeries(String termo) {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            AnoLetivo anoLetivo = new AnoLetivo();
-            List<AnoLetivo> anoLetivoList = anoLetivo.buscarTodos(gerenciaConexao.getConexao());
+            Serie serie = new Serie();
+            List<Serie> series = serie.buscar(gerenciaConexao.getConexao(), termo);
             gerenciaConexao.Desconectar();
 
-            if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
+            if (series != null && !series.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("anoletivo", anoLetivoList);
+                resposta.put("series", series);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Nenhum ano letivo encontrado.");
+                resposta.put("mensagem", "Nenhuma série encontrada.");
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar anos letivos");
+            resposta.put("mensagem", "Erro ao buscar séries");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
+    private boolean verificaIntegridade(String elemento) {
+        return elemento != null && !elemento.trim().isEmpty();
     }
 
-    private boolean verificaIntegridade(LocalDate elemento) {
-        return elemento != null;
+    private boolean verificaIntegridade(int elemento) {
+        return elemento > 0;
     }
 }

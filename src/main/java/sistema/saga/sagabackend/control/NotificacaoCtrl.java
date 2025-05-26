@@ -1,40 +1,43 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import sistema.saga.sagabackend.model.Serie;
+import sistema.saga.sagabackend.model.Notificacao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class SerieCtrl {
-
-    public ResponseEntity<Object> gravarSerie(Map<String, Object> dados) {
+public class NotificacaoCtrl {
+    public ResponseEntity<Object> gravarNotificacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int serieNum = (int) dados.get("serieNum");
-        String serieDescr = (String) dados.get("serieDescr");
 
-        if (verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
+        String mensagem = (String) dados.get("mensagem");
+        String dataStr = (String) dados.get("data");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate data = LocalDate.parse(dataStr, formatter);
+
+        if (Regras.verificaIntegridade(mensagem) && Regras.verificaIntegridade(data)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Serie serie = new Serie(serieNum, serieDescr);
-                    if (serie.gravar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao(mensagem, data);
+                    if (notificacao.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Série inserida com sucesso!");
+                        resposta.put("mensagem", "Notificação inserida com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao inserir série!");
+                        resposta.put("mensagem", "Erro ao inserir notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -60,28 +63,27 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarSerie(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> visualizarNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
-        int serieNum = (int) dados.get("serieNum");
-        String serieDescr = (String) dados.get("serieDescr");
 
-        if (verificaIntegridade(id) && verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
+        if (Regras.verificaIntegridade(id)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Serie serie = new Serie(id, serieNum, serieDescr);
-                    if (serie.alterar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao();
+                    notificacao.setNot_id(id);
+                    if (notificacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Série alterada com sucesso!");
+                        resposta.put("mensagem", "Notificação visualizada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao alterar série!");
+                        resposta.put("mensagem", "Erro ao visualizar notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -89,7 +91,7 @@ public class SerieCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro durante a alteração");
+                    resposta.put("mensagem", "Erro durante a visualização");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -107,22 +109,22 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> excluirSerie(int id) {
+    public ResponseEntity<Object> excluirNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             try {
-                Serie serie = new Serie();
-                serie.setSerieId(id);
+                Notificacao notificacao = new Notificacao();
+                notificacao.setNot_id(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (serie.apagar(gerenciaConexao.getConexao())) {
+                if (notificacao.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Série excluída com sucesso!");
+                    resposta.put("mensagem", "Notificação excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao excluir série!");
+                    resposta.put("mensagem", "Erro ao excluir notificação!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
@@ -138,36 +140,30 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarSeries(String termo) {
+    public ResponseEntity<Object> buscarNotificacao() {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            Serie serie = new Serie();
-            List<Serie> series = serie.buscar(gerenciaConexao.getConexao(), termo);
+            Notificacao notificacao = new Notificacao();
+            List<Notificacao> notificacaoList = notificacao.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
 
-            if (series != null && !series.isEmpty()) {
+            if (notificacaoList != null && !notificacaoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("series", series);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.ok(resposta);
             } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma série encontrada.");
+                resposta.put("status", true);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
+
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar séries");
+            resposta.put("mensagem", "Erro ao buscar as notificações");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
-    }
 }

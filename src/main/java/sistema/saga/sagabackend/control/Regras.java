@@ -1,4 +1,4 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import sistema.saga.sagabackend.model.*;
 
