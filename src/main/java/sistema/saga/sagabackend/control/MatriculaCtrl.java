@@ -93,7 +93,7 @@ public class MatriculaCtrl {
                         int serieAtual = matricula.getSerie().getSerieNum();
                         boolean repetiu = false, correto = true;
                         int anoAux, serieAux, anoRepetiu = 0, serieRepetiu = 0;
-                        int maior = -1000, menor = 1000000, anoMaior = 0, anoMenor = 0;
+                        int maior = matriculaList.get(0).getSerie().getSerieNum(), menor = matriculaList.get(0).getSerie().getSerieNum(), anoMaior = 0, anoMenor = 0;
                         String serieErro = "";
                         for (int i = 0; i < matriculaList.size() && correto; i++) {
                             anoAux = matriculaList.get(i).getAnoLetivo().getInicio().getYear();
