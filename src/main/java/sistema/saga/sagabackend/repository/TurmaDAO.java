@@ -11,22 +11,32 @@ import java.util.List;
 @Repository
 public class TurmaDAO {
 
-    public boolean alterar(Turma turma, char novaLetra, Conexao conexao) {
+    public boolean alterar(Turma turma, char novaLetra, Conexao conexao, int serieAntiga, int anoAntigo, int profAntigo, int salaAntiga) {
         String sql = """
         UPDATE turma
-        SET turma_letra = '#1'
-        WHERE turma_letra = '#2'
-          AND serieturma_id = #3
-          AND turmaanoletivo_id = #4
-          AND turmaprofissional_rn = #5
-          AND turmasala_id = #6
+        SET turma_letra = '#1',
+            serieturma_id = #2,
+            turmaanoletivo_id = #3,
+            turmaprofissional_rn = #4,
+            turmasala_id = #5
+        WHERE turma_letra = '#6'
+          AND serieturma_id = #7
+          AND turmaanoletivo_id = #8
+          AND turmaprofissional_rn = #9
+          AND turmasala_id = #10
         """;
+
         sql = sql.replace("#1", String.valueOf(novaLetra));
-        sql = sql.replace("#2", String.valueOf(turma.getLetra()));
-        sql = sql.replace("#3", String.valueOf(turma.getSerie().getSerieId()));
-        sql = sql.replace("#4", String.valueOf(turma.getAnoLetivo().getId()));
-        sql = sql.replace("#5", String.valueOf(turma.getProfissional().getProfissional_rn()));
-        sql = sql.replace("#6", String.valueOf(turma.getSala().getId()));
+        sql = sql.replace("#2", String.valueOf(turma.getSerie().getSerieId()));
+        sql = sql.replace("#3", String.valueOf(turma.getAnoLetivo().getId()));
+        sql = sql.replace("#4", String.valueOf(turma.getProfissional().getProfissional_rn()));
+        sql = sql.replace("#5", String.valueOf(turma.getSala().getId()));
+
+        sql = sql.replace("#6", String.valueOf(turma.getLetra())); // valor antigo
+        sql = sql.replace("#7", String.valueOf(serieAntiga));
+        sql = sql.replace("#8", String.valueOf(anoAntigo));
+        sql = sql.replace("#9", String.valueOf(profAntigo));
+        sql = sql.replace("#10", String.valueOf(salaAntiga));
 
         return conexao.manipular(sql);
     }
