@@ -11,26 +11,6 @@ import java.util.List;
 @Repository
 public class TurmaDAO {
 
-    public boolean alterar(Turma turma, char novaLetra, Conexao conexao) {
-        String sql = """
-        UPDATE turma
-        SET turma_letra = '#1'
-        WHERE turma_letra = '#2'
-          AND serieturma_id = #3
-          AND turmaanoletivo_id = #4
-          AND turmaprofissional_rn = #5
-          AND turmasala_id = #6
-        """;
-        sql = sql.replace("#1", String.valueOf(novaLetra));
-        sql = sql.replace("#2", String.valueOf(turma.getLetra()));
-        sql = sql.replace("#3", String.valueOf(turma.getSerie().getSerieId()));
-        sql = sql.replace("#4", String.valueOf(turma.getAnoLetivo().getId()));
-        sql = sql.replace("#5", String.valueOf(turma.getProfissional().getProfissional_rn()));
-        sql = sql.replace("#6", String.valueOf(turma.getSala().getId()));
-
-        return conexao.manipular(sql);
-    }
-
     public boolean gravar(Turma turma, Conexao conexao) {
         String sql = """
         INSERT INTO turma (turma_letra, serieturma_id, turmaanoletivo_id, turmaprofissional_rn, turmasala_id)

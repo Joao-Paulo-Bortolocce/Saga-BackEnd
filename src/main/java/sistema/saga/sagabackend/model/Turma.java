@@ -81,10 +81,6 @@ public class Turma {
         return turmaDAO.get(termo, conexao);
     }
 
-    public boolean alterar(char novaLetra,Conexao conexao) {
-        TurmaDAO turmaDAO = new TurmaDAO();
-        return turmaDAO.alterar(this,novaLetra,conexao);
-    }
 
     public boolean gravar(Conexao conexao) { //abuu
         TurmaDAO turmaDAO = new TurmaDAO();

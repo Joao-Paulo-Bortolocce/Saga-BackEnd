@@ -25,7 +25,7 @@ public class MateriaView {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> consultarMateria(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Object> consultarMateria(@PathVariable(name = "id") int id) {
         return materiaCtrl.buscarMateria(id);
     }
 
@@ -35,7 +35,7 @@ public class MateriaView {
     }
 
     @DeleteMapping("/apagar/{id}")
-    public ResponseEntity<Object> apagar(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Object> apagar(@PathVariable(name = "id") int id) {
         return materiaCtrl.apagarMateria(id);
     }
 }

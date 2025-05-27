@@ -2,7 +2,7 @@ package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.Materia;
+import sistema.saga.sagabackend.model.HabilidadesDaFicha;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.util.HashMap;
@@ -10,50 +10,43 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MateriaCtrl {
-
-    private final Materia materia;
-
-    public MateriaCtrl(Materia materia) {
-        this.materia = materia;
-    }
-
-    public ResponseEntity<Object> gravarMateria(Map<String, Object> dados) {
+public class HabilidadesDaFichaCtrl {
+    public ResponseEntity<Object> gravarHabilidadesDaFicha(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int materia_id = (int) dados.get("materia_id");
-        String materia_nome = (String) dados.get("materia_nome");
-        int materia_carga = (int) dados.get("materia_carga");
-        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
+        int habilidadesDaFicha_habilidades_id = (int) dados.get("habilidadesDaFicha_habilidades_id");
+        int habilidadesDaFicha_ficha_id = (int) dados.get("habilidadesDaFicha_ficha_id");
+
+        if ( habilidadesDaFicha_habilidades_id >= 0 && habilidadesDaFicha_ficha_id >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
-                try{
+                try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
-                    if(materia.gravar(gerenciaConexao.getConexao())) {
+                    HabilidadesDaFicha habilidadesDaFicha = new HabilidadesDaFicha(0, habilidadesDaFicha_habilidades_id, habilidadesDaFicha_ficha_id);
+                    if (habilidadesDaFicha.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Matéria Inserida com sucesso");
+                        resposta.put("mensagem", "Habilidades Da Ficha registrada com sucesso");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Matéria não foi inserida!");
+                        resposta.put("mensagem", "Habilidades Da Ficha não foi registrada!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro durante a insercao");
+                    resposta.put("mensagem", "Ocorreu um erro durante o registro");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 resposta.put("status", false);
                 resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
@@ -65,22 +58,22 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarMateria(Map<String, Object> dados) {
+    public ResponseEntity<Object> alterar(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int materia_id = (int) dados.get("materia_id");
-        String materia_nome = (String) dados.get("materia_nome");
-        int materia_carga = (int) dados.get("materia_carga");
+        int habilidadesDaFicha_id = (int) dados.get("habilidadesDaFicha_id");
+        int habilidadesDaFicha_habilidades_id = (int) dados.get("habilidadesDaFicha_habilidades_id");
+        int habilidadesDaFicha_ficha_id = (int) dados.get("habilidadesDaFicha_ficha_id");
 
-        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
+        if(habilidadesDaFicha_id >= 0 && habilidadesDaFicha_habilidades_id >= 0 && habilidadesDaFicha_ficha_id >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
-                    if(materia.alterar(gerenciaConexao.getConexao())) {
+                    HabilidadesDaFicha habilidadesDaFicha = new HabilidadesDaFicha(habilidadesDaFicha_id, habilidadesDaFicha_habilidades_id, habilidadesDaFicha_ficha_id);
+                    if(habilidadesDaFicha.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Matéria: " + materia.getNome() + "alterada com sucesso!");
+                        resposta.put("mensagem", "Habilidades da Ficha: " + habilidadesDaFicha.getHabilidadesDaFicha_id() + "alterada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -88,7 +81,7 @@ public class MateriaCtrl {
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Matéria não foi alterada!");
+                        resposta.put("mensagem", "Habilidades da Ficha não foi alterada!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -115,46 +108,20 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarMateria(int id) {
-        Map<String, Object> resposta = new HashMap<>();
-        GerenciaConexao gerenciaConexao = new GerenciaConexao();
-        try {
-            Materia materia = new Materia(id);
-            if(materia != null) {
-                resposta.put("status", true);
-                resposta.put("Materia", materia);
-                gerenciaConexao.Desconectar();
-
-                return ResponseEntity.ok(resposta);
-            } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matérias cadastradas");
-                gerenciaConexao.Desconectar();
-
-                return ResponseEntity.badRequest().body(resposta);
-            }
-        } catch(Exception e) {
-            resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
-            gerenciaConexao.Desconectar();
-            return ResponseEntity.badRequest().body(resposta);
-        }
-    }
-
     public ResponseEntity<Object> buscarTodas() {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Materia materia = new Materia();
-            List<Materia> materias = materia.buscarMaterias(gerenciaConexao.getConexao());
-            if(materias != null && materias.size() > 0) {
+            HabilidadesDaFicha habilidadesDaFicha = new HabilidadesDaFicha();
+            List<HabilidadesDaFicha> habilidadesDaFichas = habilidadesDaFicha.buscarTodas(gerenciaConexao.getConexao());
+            if(habilidadesDaFichas != null && habilidadesDaFichas.size() > 0) {
                 resposta.put("status", true);
-                resposta.put("listaDeMaterias", materias);
+                resposta.put("listaDeHabilidadesDeFichas", habilidadesDaFichas);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matérias cadastradas");
+                resposta.put("mensagem", "Não existem habilidades de fichas cadastradas");
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
@@ -166,15 +133,40 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> apagarMateria(int materia_id) {
+    public ResponseEntity<Object> buscarHabDaFicha(int idFicha) {
         Map<String, Object> resposta = new HashMap<>();
-        if(materia_id >= 0) {
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            HabilidadesDaFicha habilidadesDaFicha = new HabilidadesDaFicha();
+            List<HabilidadesDaFicha> habilidadesDaFichas = habilidadesDaFicha.buscarTodasHabFicha(idFicha,gerenciaConexao.getConexao());
+            if (habilidadesDaFicha != null && habilidadesDaFichas.size() > 0) {
+                resposta.put("status", true);
+                resposta.put("listaDeHabilidadesDaFicha", habilidadesDaFichas);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem habilidades da ficha cadastradas com os filtros selecionados");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+    public ResponseEntity<Object> apagar(int idHab, int idFicha) {
+        Map<String, Object> resposta = new HashMap<>();
+        if(idHab >= 0 && idFicha >= 0) {
             try {
-                Materia materia = new Materia(materia_id);
+                HabilidadesDaFicha habilidadesDaFicha = new HabilidadesDaFicha(idHab, idFicha);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if(materia.apagar(gerenciaConexao.getConexao())) {
+                if(habilidadesDaFicha.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Matéria excluída com sucesso!");
+                    resposta.put("mensagem", "Habilidades da Ficha excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {

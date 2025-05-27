@@ -20,10 +20,6 @@ public class TurmaView {
         return turmaCtrl.gravarTurma(dados);
     }
 
-    @PutMapping("/alterar")
-    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
-        return turmaCtrl.alterarTurma(dados);
-    }
 
     @DeleteMapping("/{letra}/{serieId}/{anoLetivoId}/{profissionalRa}/{salaId}")
     public ResponseEntity<Object> excluir(@PathVariable String letra,

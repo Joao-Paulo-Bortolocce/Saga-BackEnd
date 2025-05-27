@@ -2,7 +2,7 @@ package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.Materia;
+import sistema.saga.sagabackend.model.Ficha;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.util.HashMap;
@@ -10,50 +10,46 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MateriaCtrl {
+public class FichaCtrl {
 
-    private final Materia materia;
-
-    public MateriaCtrl(Materia materia) {
-        this.materia = materia;
-    }
-
-    public ResponseEntity<Object> gravarMateria(Map<String, Object> dados) {
+    public ResponseEntity<Object> gravarFicha(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int materia_id = (int) dados.get("materia_id");
-        String materia_nome = (String) dados.get("materia_nome");
-        int materia_carga = (int) dados.get("materia_carga");
-        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
+        int ficha_id = (int) dados.get("ficha_id");
+        int ficha_bimestre_id = (int) dados.get("ficha_bimestre_id");
+        int ficha_bimestre_anoLetivo_id = (int) dados.get("ficha_bimestre_anoLetivo_id");
+        int ficha_bimestre_serie_id = (int) dados.get("ficha_bimestre_serie_id");
+
+        if (ficha_id >= 0 && ficha_bimestre_id >= 0 && ficha_bimestre_anoLetivo_id >= 0 && ficha_bimestre_serie_id >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
-                try{
+                try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
-                    if(materia.gravar(gerenciaConexao.getConexao())) {
+                    Ficha ficha = new Ficha(ficha_id, ficha_bimestre_id, ficha_bimestre_anoLetivo_id, ficha_bimestre_serie_id);
+                    if (ficha.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Matéria Inserida com sucesso");
+                        resposta.put("mensagem", "Ficha registrada com sucesso");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Matéria não foi inserida!");
+                        resposta.put("mensagem", "Ficha não foi registrada!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro durante a insercao");
+                    resposta.put("mensagem", "Ocorreu um erro durante o registro");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 resposta.put("status", false);
                 resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
@@ -65,22 +61,23 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarMateria(Map<String, Object> dados) {
+    public ResponseEntity<Object> alterar(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int materia_id = (int) dados.get("materia_id");
-        String materia_nome = (String) dados.get("materia_nome");
-        int materia_carga = (int) dados.get("materia_carga");
+        int ficha_id = (int) dados.get("ficha_id");
+        int ficha_bimestre_id = (int) dados.get("ficha_bimestre_id");
+        int ficha_bimestre_anoLetivo_id = (int) dados.get("ficha_bimestre_anoLetivo_id");
+        int ficha_bimestre_serie_id = (int) dados.get("ficha_bimestre_serie_id");
 
-        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
+        if(ficha_id >= 0 && ficha_bimestre_id >= 0 && ficha_bimestre_anoLetivo_id >= 0 && ficha_bimestre_serie_id >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
-                    if(materia.alterar(gerenciaConexao.getConexao())) {
+                    Ficha ficha = new Ficha(ficha_id, ficha_bimestre_id, ficha_bimestre_anoLetivo_id, ficha_bimestre_serie_id);
+                    if(ficha.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Matéria: " + materia.getNome() + "alterada com sucesso!");
+                        resposta.put("mensagem", "Ficha: " + ficha.getFicha_id() + "alterada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -88,7 +85,7 @@ public class MateriaCtrl {
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Matéria não foi alterada!");
+                        resposta.put("mensagem", "Ficha não foi alterada!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -115,46 +112,20 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarMateria(int id) {
-        Map<String, Object> resposta = new HashMap<>();
-        GerenciaConexao gerenciaConexao = new GerenciaConexao();
-        try {
-            Materia materia = new Materia(id);
-            if(materia != null) {
-                resposta.put("status", true);
-                resposta.put("Materia", materia);
-                gerenciaConexao.Desconectar();
-
-                return ResponseEntity.ok(resposta);
-            } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matérias cadastradas");
-                gerenciaConexao.Desconectar();
-
-                return ResponseEntity.badRequest().body(resposta);
-            }
-        } catch(Exception e) {
-            resposta.put("status", false);
-            resposta.put("mensagem", "Ocorreu um erro de conexão");
-            gerenciaConexao.Desconectar();
-            return ResponseEntity.badRequest().body(resposta);
-        }
-    }
-
     public ResponseEntity<Object> buscarTodas() {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Materia materia = new Materia();
-            List<Materia> materias = materia.buscarMaterias(gerenciaConexao.getConexao());
-            if(materias != null && materias.size() > 0) {
+            Ficha ficha = new Ficha();
+            List<Ficha> fichas = ficha.buscarTodas(gerenciaConexao.getConexao());
+            if(fichas != null && fichas.size() > 0) {
                 resposta.put("status", true);
-                resposta.put("listaDeMaterias", materias);
+                resposta.put("listaDeFichas", fichas);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matérias cadastradas");
+                resposta.put("mensagem", "Não existem fichas cadastradas");
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
@@ -166,15 +137,15 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> apagarMateria(int materia_id) {
+    public ResponseEntity<Object> apagar(int ficha_id) {
         Map<String, Object> resposta = new HashMap<>();
-        if(materia_id >= 0) {
+        if(ficha_id >= 0) {
             try {
-                Materia materia = new Materia(materia_id);
+                Ficha ficha = new Ficha(ficha_id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if(materia.apagar(gerenciaConexao.getConexao())) {
+                if(ficha.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Matéria excluída com sucesso!");
+                    resposta.put("mensagem", "Ficha excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
