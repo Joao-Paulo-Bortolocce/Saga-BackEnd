@@ -14,7 +14,7 @@ public class AnoLetivoView {
     @Autowired
     private AnoLetivoCtrl anoLetivoCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return anoLetivoCtrl.gravarAno(dados);
     }
@@ -34,7 +34,7 @@ public class AnoLetivoView {
         return anoLetivoCtrl.apagarAno(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping
     public ResponseEntity<Object> buscarTodos() {
         return anoLetivoCtrl.buscarAnos("");
     }
