@@ -25,19 +25,19 @@ public class ProfissionalView {
         return profissionalCtrl.buscarTodos();
     }
 
-    @GetMapping(value = "/{ra}/{senha}")
-    ResponseEntity<Object> buscarUsuario(@PathVariable(name="ra")int ra,@PathVariable(name="senha")String senha){
-        return profissionalCtrl.buscarUsuario(ra,senha);
+    @GetMapping(value = "/{rn}/{senha}")
+    ResponseEntity<Object> buscarUsuario(@PathVariable(name="rn")int rn,@PathVariable(name="senha")String senha){
+        return profissionalCtrl.buscarUsuario(rn,senha);
     }
 
-    @GetMapping(value = "/{ra}")
-    ResponseEntity<Object> buscar(@PathVariable(name="ra")int ra){
-        return profissionalCtrl.buscarProfissional(ra);
+    @GetMapping(value = "/{rn}")
+    ResponseEntity<Object> buscar(@PathVariable(name="rn")int rn){
+        return profissionalCtrl.buscarProfissional(rn);
     }
 
-    @DeleteMapping(value = "/{ra}")
-    ResponseEntity<Object> apagar(@PathVariable(name = "ra") int ra){
-        return profissionalCtrl.apagarProfissional(ra);
+    @DeleteMapping(value = "/{rn}")
+    ResponseEntity<Object> apagar(@PathVariable(name = "rn") int rn){
+        return profissionalCtrl.apagarProfissional(rn);
     }
 
     @PutMapping

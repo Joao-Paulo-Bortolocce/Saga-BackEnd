@@ -50,8 +50,8 @@ public class ProfissionalDAO {
         return conexao.manipular(sql);
     }
 
-    public boolean apagar(int ra, Conexao conexao) {
-        String sql = "DELETE FROM profissional WHERE profissional_rn = " + ra;
+    public boolean apagar(int rn, Conexao conexao) {
+        String sql = "DELETE FROM profissional WHERE profissional_rn = " + rn;
         return conexao.manipular(sql);
     }
 
@@ -162,11 +162,11 @@ public class ProfissionalDAO {
         return null;
     }
 
-    public Profissional getUsuario(Conexao conexao, int ra, String senha) {
+    public Profissional getUsuario(Conexao conexao, int rn, String senha) {
         String sql = """
                 SELECT * FROM profissional WHERE profissional_rn=#1 and profissional_senha='#2';
                 """;
-        sql=sql.replace("#1",""+ra);
+        sql=sql.replace("#1",""+rn);
         sql=sql.replace("#2",senha);
         List<Profissional> lista = new ArrayList<>();
         try {
