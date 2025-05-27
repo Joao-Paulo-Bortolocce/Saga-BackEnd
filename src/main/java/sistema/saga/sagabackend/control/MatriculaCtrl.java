@@ -354,6 +354,36 @@ public class MatriculaCtrl {
             try {
                 Matricula matricula = new Matricula(ra);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                 Map<String, Object> aluno= new HashMap();
+                 Map<String, Object> ano= new HashMap();
+                 Map<String, Object> serie= new HashMap();
+                Map<String, Object> turma=  new HashMap();
+                matricula=matricula.buscaMatricula(gerenciaConexao.getConexao(),matricula,aluno,ano,serie,turma);
+                if(matricula==null){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula não foi encontrada!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+                matricula.setAluno(Regras.HashToAluno(aluno));
+                matricula.setAnoLetivo(Regras.HashToAnoLetivo(ano));
+                matricula.setSerie(Regras.HashToSerie(serie));
+                matricula.setTurma(Regras.HashToTurma(turma));
+                if(matricula.getTurma()!=null){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula ja está enturmada e não pode ser excluida!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+                Frequencia frequencia= new Frequencia();
+                frequencia.setMatricula(matricula);
+                frequencia.setData(matricula.getAnoLetivo().getInicio());
+                if(frequencia.buscarId(gerenciaConexao.getConexao()).size()>0){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula ja possui registros de frequência para ela, portanto não pode ser excluida");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
                 if (matricula.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Matricula excluído com sucesso!");

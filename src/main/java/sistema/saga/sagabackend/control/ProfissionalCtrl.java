@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.Graduacao;
 import sistema.saga.sagabackend.model.Profissional;
 import sistema.saga.sagabackend.model.Pessoa;
+import sistema.saga.sagabackend.model.Turma;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
@@ -250,8 +251,8 @@ public class ProfissionalCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
                 }
-                if(turma.buscaTurmasDoProfessor(gerenciaConexao.getConexao(),profissional.getProfissional_rn()).size>0){
-                    //verificar se o profissional não possui registros.
+
+                if(new Turma().buscaTurmasDoProfessor(gerenciaConexao.getConexao(),profissional.getProfissional_rn()).size()>0){
                     resposta.put("status", false);
                     resposta.put("mensagem", "Este profissional possui registros e não pode ser excluido");
                     gerenciaConexao.Desconectar();

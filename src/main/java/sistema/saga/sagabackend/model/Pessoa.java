@@ -148,4 +148,39 @@ public class Pessoa {
         PessoaDAO pessoaDAO = new PessoaDAO();
         return pessoaDAO.gravar(this,conexao);
     }
+
+    public boolean validarCPF(String cpf) {
+        if (cpf == null || cpf.length() != 14)
+            return false;
+        String numeros = cpf.replace(".", "").replace("-", "");
+        if (numeros.matches("(\\d)\\1{10}"))
+            return false;
+        try {
+            int soma = 0;
+            for (int i = 0; i < 9; i++) {
+                soma += (numeros.charAt(i) - '0') * (10 - i);
+            }
+            int dig1 = 11 - (soma % 11);
+            if (dig1 >= 10) dig1 = 0;
+            soma = 0;
+            for (int i = 0; i < 10; i++) {
+                soma += (numeros.charAt(i) - '0') * (11 - i);
+            }
+            int dig2 = 11 - (soma % 11);
+            if (dig2 >= 10) dig2 = 0;
+            return (dig1 == (numeros.charAt(9) - '0')) &&
+                    (dig2 == (numeros.charAt(10) - '0'));
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public  boolean validarCEP(String cep) {
+        return cep != null && cep.matches("\\d{5}-\\d{3}");
+    }
+
+    public  boolean validarRG(String rg) {
+        return rg != null && rg.matches("\\d{7,9}");
+    }
 }

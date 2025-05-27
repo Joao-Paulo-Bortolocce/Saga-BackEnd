@@ -86,4 +86,9 @@ public class Turma {
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.gravar(this,conexao);
     }
+
+    public List<Turma> buscaTurmasDoProfessor(Conexao conexao, int profissionalRn) {
+        TurmaDAO turmaDAO = new TurmaDAO();
+        return turmaDAO.buscarTurmasDoProfessor(conexao,profissionalRn);
+    }
 }

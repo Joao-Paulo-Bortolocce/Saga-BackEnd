@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class TurmaDAO {
@@ -108,4 +109,47 @@ public class TurmaDAO {
         return turmas;
     }
 
+    public List<Turma> buscarTurmasDoProfessor(Conexao conexao, int profissionalRn) {
+        String sql= """
+                select * from turma t join serie s on serieturma_id=serie_id
+                join anoletivo a on turmaanoletivo_id= anoletivo_id
+                join profissional on turmaprofissional_rn = profissional_rn
+                join salas on turmasala_id = salas_id
+                where turmaprofissional_rn=#1
+                """;
+        sql=sql.replace("#1",""+profissionalRn);
+        try{
+            List<Turma> turmas= new ArrayList<>();
+            ResultSet rs= conexao.consultar(sql);
+            while (rs.next()){
+                Turma turma = new Turma();
+                turma.setLetra(rs.getString("turma_letra").charAt(0));
+
+                Serie serie = new Serie();
+                serie.setSerieId(rs.getInt("serieturma_id"));
+                serie.buscaSerie(conexao);
+                turma.setSerie(serie);
+
+                AnoLetivo ano = new AnoLetivo();
+                ano.setId(rs.getInt("turmaanoletivo_id"));
+                ano.buscaAnos(conexao);
+                turma.setAnoLetivo(ano);
+
+                Profissional prof = new Profissional();
+                prof.setProfissional_rn(rs.getInt("turmaprofissional_rn"));
+                prof = prof.buscaProfissional(conexao, prof, new HashMap<>(), new HashMap<>());
+                turma.setProfissional(prof);
+
+                Sala sala = new Sala();
+                sala.setId(rs.getInt("turmasala_id"));
+                sala.buscaSerie(conexao);
+                turma.setSala(sala);
+
+                turmas.add(turma);
+            }
+            return turmas;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

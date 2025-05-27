@@ -12,7 +12,7 @@ public class AnoLetivoDAO {
     public boolean gravar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
         INSERT INTO anoletivo (anoletivo_inicio, anoletivo_fim)
-        VALUES (#1, '#2')
+        VALUES ('#1', '#2')
     """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
         sql = sql.replace("#2", "" + anoLetivo.getFim());
@@ -22,7 +22,7 @@ public class AnoLetivoDAO {
     public boolean alterar(AnoLetivo anoLetivo, Conexao conexao) {
         String sql = """
             UPDATE anoletivo SET anoletivo_inicio = '#1', anoletivo_fim = '#2'
-            WHERE anoletivo_id = '#3'
+            WHERE anoletivo_id = #3
         """;
         sql = sql.replace("#1", "" + anoLetivo.getInicio());
         sql = sql.replace("#2", "" + anoLetivo.getFim());

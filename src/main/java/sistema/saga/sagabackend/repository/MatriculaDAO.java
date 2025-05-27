@@ -135,7 +135,7 @@ public class MatriculaDAO {
 
                 ano.put("anoletivo_id", rs.getInt("anoletivo_id"));
                 ano.put("anoletivo_inicio", rs.getDate("anoletivo_inicio"));
-                ano.put("anoletivo_termino", rs.getDate("anoletivo_termino"));
+                ano.put("anoletivo_fim", rs.getDate("anoletivo_fim"));
 
                 serie.put("serie_id", rs.getInt("serie_id"));
                 serie.put("serie_num", rs.getInt("serie_num"));
@@ -143,7 +143,9 @@ public class MatriculaDAO {
 
                 turma.put("serie", serie);
                 turma.put("anoletivo", ano);
-                turma.put("turma_letra", rs.getString("turma_letra").charAt(0));
+                String letra=rs.getString("turma_letra");
+                if(letra!=null)
+                    turma.put("turma_letra","");
 
                 return matricula;
             }
