@@ -275,4 +275,42 @@ public class FrequenciaCtrl {
             return ResponseEntity.badRequest().body(resposta);
         }
     }
+
+    public ResponseEntity<Object> buscarFreqAlunoData(String dataStr) {
+        Map<String, Object> resposta = new HashMap<>();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate data = LocalDate.parse(dataStr, formatter);
+
+        if (Regras.verificaIntegridade(data)) {
+            try {
+                GerenciaConexao gc = new GerenciaConexao();
+
+                Frequencia freq = new Frequencia();
+                freq.setData(data);
+                List<Frequencia> frequencias = new ArrayList<>();
+                frequencias = freq.buscarData(gc.getConexao());
+                gc.Desconectar();
+
+                if (frequencias != null && !frequencias.isEmpty()) {
+                    resposta.put("status", true);
+                    resposta.put("frequencias", frequencias);
+                    return ResponseEntity.ok(resposta);
+                } else {
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Nenhuma frequencia encontrada.");
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+
+            } catch (Exception e) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Erro ao buscar frequencias");
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        }else{
+            resposta.put("status", false);
+            resposta.put("mensagem", "Dados inválidos.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
 }

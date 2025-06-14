@@ -71,4 +71,9 @@ public class Frequencia {
         FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
         return frequenciaDAO.buscarId(this,conexao);
     }
+
+    public List<Frequencia> buscarData(Conexao conexao) {
+        FrequenciaDAO frequenciaDAO = new FrequenciaDAO();
+        return frequenciaDAO.buscarData(this,conexao);
+    }
 }

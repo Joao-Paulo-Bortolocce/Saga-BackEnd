@@ -29,8 +29,8 @@ public class FrequenciaView {
         return frequenciaCtrl.alterarFrequencia(dados);
     }
 
-    /*@GetMapping("/{ano}")
-    public ResponseEntity<Object> busacarPorAno(){
-        return
-    }*/
+    @GetMapping("date/{data}")
+    public ResponseEntity<Object> busacarPorData(@PathVariable String data){
+        return frequenciaCtrl.buscarFreqAlunoData(data);
+    }
 }
