@@ -81,4 +81,9 @@ public class Ficha {
         FichaDAO fichaDAO = new FichaDAO();
         return fichaDAO.apagar(this.getFicha_id(), conexao);
     }
+
+    public Ficha buscaFicha(Conexao conexao){
+        FichaDAO fichaDAO = new FichaDAO();
+        return fichaDAO.getFicha(this,conexao);
+    }
 }

@@ -86,4 +86,9 @@ public class AvaliacaoDaMatricula {
         AvaliacaoDaMatriculaDAO avaliacaoDaMatriculaDAO = new AvaliacaoDaMatriculaDAO();
         return avaliacaoDaMatriculaDAO.recuperaUmaAvaliacao(this, conexao);
     }
+
+    public List<AvaliacaoDaMatricula> buscarTodasAvaliacoesDafichaDaMatricula(Conexao conexao, int matId, int fichaId) {
+        AvaliacaoDaMatriculaDAO avaliacaoDaMatriculaDAO = new AvaliacaoDaMatriculaDAO();
+        return avaliacaoDaMatriculaDAO.buscarTodasAvaliacoesDafichaDaMatricula( conexao,  matId,  fichaId) ;
+    }
 }

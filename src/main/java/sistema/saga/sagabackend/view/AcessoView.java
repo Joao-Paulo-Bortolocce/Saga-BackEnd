@@ -14,7 +14,7 @@ public class AcessoView {
     AcessoCtrl acessoCtrl;
 
     @GetMapping("/{ra}/{senha}")
-    ResponseEntity<Object> autenticar(@PathVariable int ra, @PathVariable String senha){
+    ResponseEntity<Object> autenticar(@PathVariable(name = "ra") int ra, @PathVariable(name = "senha") String senha){
         return  acessoCtrl.autenticar(ra,senha);
     }
 }

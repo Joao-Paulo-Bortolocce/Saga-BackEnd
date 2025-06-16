@@ -104,4 +104,24 @@ public class AvaliacaoDaMatriculaDAO {
         }
         return null;
     }
+
+    public List<AvaliacaoDaMatricula> buscarTodasAvaliacoesDafichaDaMatricula(Conexao conexao, int matId, int fichaId) {
+        String sql = """
+                SELECT * FROM avaliacaodamatricula WHERE avaliacaodamatricula_matricula_matricula_id = '#1' and 
+                avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id in (select habilidadesdaficha_id
+                from habilidadesdaficha where habilidadesdaficha_ficha_id = #2)
+                """;
+        sql = sql.replace("#1", "" + matId);
+        sql = sql.replace("#2", "" + fichaId);
+        List<AvaliacaoDaMatricula> avaliacoes = new ArrayList<>();
+        try{
+            ResultSet resultSet = conexao.consultar(sql);
+            while(resultSet.next()) {
+                avaliacoes.add(new AvaliacaoDaMatricula(resultSet.getInt("avaliacaodamatricula_matricula_matricula_id"),resultSet.getInt("avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id"), resultSet.getString("avaliacaodamatricula_av")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return avaliacoes;
+    }
 }
