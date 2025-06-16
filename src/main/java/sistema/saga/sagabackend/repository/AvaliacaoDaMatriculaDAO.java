@@ -11,16 +11,26 @@ public class AvaliacaoDaMatriculaDAO {
     public AvaliacaoDaMatriculaDAO() {
     }
 
-    public boolean gravar(AvaliacaoDaMatricula avaliacaoDaMatricula, Conexao conexao) {
-        String sql = """
-                    INSERT INTO avaliacaodamatricula (avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id, avaliacaodamatricula_av) VALUES ('#1', '#2')
-                    
-                """;
-        sql = sql.replace("#1", "" + avaliacaoDaMatricula.getAvaHabId());
-        sql = sql.replace("#2", avaliacaoDaMatricula.getAvaAv());
+    public boolean gravar(int idMat, int[] vetorHabilidades, String[] vetorAva, Conexao conexao) {
+        boolean frog = true;
 
-        return conexao.manipular(sql);
+        for (int i = 0; i < vetorHabilidades.length && frog; i++) {
+            String deleteSQL = "DELETE FROM avaliacaodamatricula " +
+                    "WHERE avaliacaodamatricula_matricula_matricula_id = '" + idMat + "' " +
+                    "AND avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id = '" + vetorHabilidades[i] + "'";
+            frog = conexao.manipular(deleteSQL);
+        }
+
+        for (int i = 0; i < vetorHabilidades.length && frog; i++) {
+            String insertSQL = "INSERT INTO avaliacaodamatricula " +
+                    "(avaliacaodamatricula_matricula_matricula_id, avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id, avaliacaodamatricula_av) " +
+                    "VALUES ('" + idMat + "', '" + vetorHabilidades[i] + "', '" + vetorAva[i] + "')";
+            frog = conexao.manipular(insertSQL);
+        }
+
+        return frog;
     }
+
 
     public boolean alterar(AvaliacaoDaMatricula avaliacaoDaMatricula, Conexao conexao) {
         String sql = """

@@ -57,9 +57,9 @@ public class AvaliacaoDaMatricula {
         this.avaAv = avaAv;
     }
 
-    public boolean gravar(Conexao conexao) {
+    public boolean gravar(int arrayInt[], String arrayString[], Conexao conexao) {
         AvaliacaoDaMatriculaDAO avaliacaoDaMatriculaDAO = new AvaliacaoDaMatriculaDAO();
-        return avaliacaoDaMatriculaDAO.gravar(this, conexao);
+        return avaliacaoDaMatriculaDAO.gravar(this.avaMatId, arrayInt, arrayString, conexao);
     }
 
     public boolean alterar(Conexao conexao) {
