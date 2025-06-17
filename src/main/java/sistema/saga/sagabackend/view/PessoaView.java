@@ -3,10 +3,8 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.PessoaCtrl;
+import sistema.saga.sagabackend.control.PessoaCtrl;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @CrossOrigin

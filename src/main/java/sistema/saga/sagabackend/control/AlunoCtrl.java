@@ -1,15 +1,11 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ObjectError;
-import sistema.saga.sagabackend.model.Endereco;
 import sistema.saga.sagabackend.model.Aluno;
 import sistema.saga.sagabackend.model.Pessoa;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service

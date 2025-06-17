@@ -21,7 +21,7 @@ public class JWTTokenProvider {
             .setIssuer("localhost:8080")
             .claim("nivel", nivel)
             .setIssuedAt(new Date())
-            .setExpiration(Date.from(LocalDateTime.now().plusMinutes(5L)
+            .setExpiration(Date.from(LocalDateTime.now().plusMinutes(15L)
                 .atZone(ZoneId.systemDefault()).toInstant()))
             .signWith(CHAVE)
             .compact();

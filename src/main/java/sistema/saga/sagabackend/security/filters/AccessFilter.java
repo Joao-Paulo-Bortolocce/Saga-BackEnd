@@ -20,19 +20,23 @@ public class AccessFilter implements Filter {
 
         boolean isAutenticacaoEndpoint = req.getRequestURI().contains("/autenticacao");
 
-        if ((token != null && JWTTokenProvider.verifyToken(token)) || isAutenticacaoEndpoint) {
-            chain.doFilter(request, response);
-        } else {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-            res.setContentType("application/json");
 
-            Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("mensagem", "Não autorizado. Faça login para prosseguir.");
+        try{
 
-            ObjectMapper mapper = new ObjectMapper();
-            res.getWriter().write(mapper.writeValueAsString(responseBody));
+            if ((token != null && JWTTokenProvider.verifyToken(token)) || isAutenticacaoEndpoint) {
+                chain.doFilter(request, response);
+            } else {
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                res.setContentType("application/json");
+
+                Map<String, String> responseBody = new HashMap<>();
+                responseBody.put("mensagem", "Não autorizado. Faça login para prosseguir.");
+
+                ObjectMapper mapper = new ObjectMapper();
+                res.getWriter().write(mapper.writeValueAsString(responseBody));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
-
-

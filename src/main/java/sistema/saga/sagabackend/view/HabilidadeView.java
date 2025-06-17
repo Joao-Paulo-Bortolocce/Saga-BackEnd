@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.HabilidadeCtrl;
+import sistema.saga.sagabackend.control.HabilidadeCtrl;
 
 import java.util.Map;
 
@@ -15,19 +15,24 @@ public class HabilidadeView {
     @Autowired
     private HabilidadeCtrl habilidadeCtrl;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return habilidadeCtrl.gravarHab(dados);
     }
 
-    @PutMapping("")
+    @PutMapping
     public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
         return habilidadeCtrl.alterar(dados);
     }
 
-    @DeleteMapping("/apagar/{id}/{idHabMat}")
-    public ResponseEntity<Object> apagar(@PathVariable(name = "id") int id, @PathVariable(name = "idHabMat") int idHabMat) {
-        return habilidadeCtrl.apagar(id, idHabMat);
+    @DeleteMapping("apagar/{id}")
+    public ResponseEntity<Object> apagarHab(@PathVariable(name="id") int id) {
+        return habilidadeCtrl.apagarHabilidade(id);
+    }
+
+    @DeleteMapping("/apagar/{idHabMat}/{idHabSer}")
+    public ResponseEntity<Object> apagarHabMatSer(@PathVariable(name = "idHabMat") int idHabMat, @PathVariable(name = "idHabSer") int idHabSer) {
+        return habilidadeCtrl.apagarHabMatSer(idHabMat, idHabSer);
     }
 
     @GetMapping("buscarTodas/{idMat}/{idSerie}")
@@ -35,9 +40,13 @@ public class HabilidadeView {
         return habilidadeCtrl.buscarHabMatSer(idMat, idSerie);
     }
 
-    @GetMapping("buscarTodas/{idMat}")
+    @GetMapping("buscarTodasMat/{idMat}")
     public ResponseEntity<Object> getHabilidadeMat(@PathVariable("idMat") int idMat) {
         return habilidadeCtrl.buscarHabMat(idMat);
     }
 
+    @GetMapping("buscarTodasSer/{idSer}")
+    public ResponseEntity<Object> getHabilidadeSer(@PathVariable("idSer") int idSer) {
+        return habilidadeCtrl.buscarHabSer(idSer);
+    }
 }

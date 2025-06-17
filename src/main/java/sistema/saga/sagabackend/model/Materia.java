@@ -8,28 +8,28 @@ import java.util.List;
 
 @Component
 public class Materia {
-    private Long materia_id;
+    private int materia_id;
     private String materia_nome;
     private int materia_carga;
 
     public Materia() {
     }
 
-    public Materia(Long materia_id, String materia_nome, int materia_carga) {
+    public Materia(int materia_id, String materia_nome, int materia_carga) {
         this.materia_id = materia_id;
         this.materia_nome = materia_nome;
         this.materia_carga = materia_carga;
     }
 
-    public Materia(Long materia_id) {
+    public Materia(int materia_id) {
         this.materia_id = materia_id;
     }
 
-    public Long getId() {
+    public int getId() {
         return materia_id;
     }
 
-    public void setId(Long materia_id) {
+    public void setId(int materia_id) {
         this.materia_id = materia_id;
     }
 

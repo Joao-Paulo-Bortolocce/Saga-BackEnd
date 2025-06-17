@@ -1,4 +1,4 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,18 +12,24 @@ import java.util.Map;
 @Service
 public class MateriaCtrl {
 
+    private final Materia materia;
+
+    public MateriaCtrl(Materia materia) {
+        this.materia = materia;
+    }
+
     public ResponseEntity<Object> gravarMateria(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        Long id = (Long) dados.get("materia_id");
-        String nome = (String) dados.get("materia_nome");
-        int carga = (int) dados.get("materia_carga");
-        if(id >= 0 && nome != null && !nome.trim().isEmpty() && carga > 0) {
+        int materia_id = (int) dados.get("materia_id");
+        String materia_nome = (String) dados.get("materia_nome");
+        int materia_carga = (int) dados.get("materia_carga");
+        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try{
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(id, nome, carga);
+                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
                     if(materia.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Matéria Inserida com sucesso");
@@ -61,17 +67,17 @@ public class MateriaCtrl {
 
     public ResponseEntity<Object> alterarMateria(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        Long id = (Long) dados.get("materia_id");
-        String nome = (String) dados.get("materia_nome");
-        int carga = (int) dados.get("materia_carga");
+        int materia_id = (int) dados.get("materia_id");
+        String materia_nome = (String) dados.get("materia_nome");
+        int materia_carga = (int) dados.get("materia_carga");
 
-        if(id >= 0 && nome != null && !nome.trim().isEmpty() && carga > 0) {
+        if(materia_id >= 0 && materia_nome != null && !materia_nome.trim().isEmpty() && materia_carga > 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Materia materia = new Materia(id, nome, carga);
+                    Materia materia = new Materia(materia_id, materia_nome, materia_carga);
                     if(materia.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Matéria: " + materia.getNome() + "alterada com sucesso!");
@@ -109,7 +115,7 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarMateria(Long id) {
+    public ResponseEntity<Object> buscarMateria(int id) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
@@ -160,11 +166,11 @@ public class MateriaCtrl {
         }
     }
 
-    public ResponseEntity<Object> apagarMateria(Long id) {
+    public ResponseEntity<Object> apagarMateria(int materia_id) {
         Map<String, Object> resposta = new HashMap<>();
-        if(id >= 0) {
+        if(materia_id >= 0) {
             try {
-                Materia materia = new Materia(id);
+                Materia materia = new Materia(materia_id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
                 if(materia.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);

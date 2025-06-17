@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.GraduacaoCtrl;
+import sistema.saga.sagabackend.control.GraduacaoCtrl;
 
 import java.util.Map;
 
@@ -14,19 +14,14 @@ public class GraduacaoView {
     @Autowired
     private GraduacaoCtrl graduacaoCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return graduacaoCtrl.gravarGraduacao(dados);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> alterar(@PathVariable int id, @RequestBody Map<String, Object> dados) {
-        return graduacaoCtrl.alterarGraduacao(id, dados);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> patch(@PathVariable int id, @RequestBody Map<String, Object> dados) {
-        return graduacaoCtrl.alterarGraduacao(id, dados);
+    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
+        return graduacaoCtrl.alterarGraduacao(dados);
     }
 
     @DeleteMapping("/{id}")
@@ -34,7 +29,7 @@ public class GraduacaoView {
         return graduacaoCtrl.excluirGraduacao(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping(value = "/buscarTodos")
     public ResponseEntity<Object> buscarTodos() {
         return graduacaoCtrl.buscarGraduacao("");
     }

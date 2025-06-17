@@ -10,21 +10,21 @@ import java.util.List;
 public class Sala {
     private int id;
     private String descricao;
-    private int ncarterias;
+    private int ncarteiras;
 
     public Sala() {
         this(0,0,"");
     }
 
-    public Sala(int ncarterias, String descricao) {
-        this.ncarterias = ncarterias;
+    public Sala(int ncarteiras, String descricao) {
+        this.ncarteiras = ncarteiras;
         this.descricao = descricao;
     }
 
-    public Sala(int id,int ncarterias,  String descricao) {
+    public Sala(int id,int ncarteiras,  String descricao) {
         this.id = id;
         this.descricao = descricao;
-        this.ncarterias = ncarterias;
+        this.ncarteiras = ncarteiras;
     }
 
     public int getId() {
@@ -43,12 +43,12 @@ public class Sala {
         this.descricao = descricao;
     }
 
-    public int getNcarterias() {
-        return ncarterias;
+    public int getNcarteiras() {
+        return ncarteiras;
     }
 
-    public void setNcarterias(int ncarterias) {
-        this.ncarterias = ncarterias;
+    public void setNcarteiras(int ncarteiras) {
+        this.ncarteiras = ncarteiras;
     }
 
     public boolean apagar(Conexao conexao) {

@@ -1,8 +1,8 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.Serie;
+import sistema.saga.sagabackend.model.Graduacao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.util.HashMap;
@@ -10,30 +10,28 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class SerieCtrl {
-
-    public ResponseEntity<Object> gravarSerie(Map<String, Object> dados) {
+public class GraduacaoCtrl {
+    public ResponseEntity<Object> gravarGraduacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int serieNum = (int) dados.get("serieNum");
-        String serieDescr = (String) dados.get("serieDescr");
+        String gradDescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
+        if (Regras.verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Serie serie = new Serie(serieNum, serieDescr);
-                    if (serie.gravar(gerenciaConexao.getConexao())) {
+                    Graduacao graduacao = new Graduacao(gradDescricao);
+                    if (graduacao.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Série inserida com sucesso!");
+                        resposta.put("mensagem", "Graduação inserida com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao inserir série!");
+                        resposta.put("mensagem", "Erro ao inserir graduação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -59,28 +57,28 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarSerie(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarGraduacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        int serieNum = (int) dados.get("serieNum");
-        String serieDescr = (String) dados.get("serieDescr");
+        int id = (int) dados.get("id");
+        String gradDescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(id) && verificaIntegridade(serieNum) && verificaIntegridade(serieDescr)) {
+        if (Regras.verificaIntegridade(id) && Regras.verificaIntegridade(gradDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Serie serie = new Serie(id, serieNum, serieDescr);
-                    if (serie.alterar(gerenciaConexao.getConexao())) {
+                    Graduacao graduacao = new Graduacao(id, gradDescricao);
+                    if (graduacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Série alterada com sucesso!");
+                        resposta.put("mensagem", "Graduação alterada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao alterar série!");
+                        resposta.put("mensagem", "Erro ao alterar graduação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -106,22 +104,22 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> excluirSerie(int id) {
+    public ResponseEntity<Object> excluirGraduacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             try {
-                Serie serie = new Serie();
-                serie.setSerieId(id);
+                Graduacao graduacao = new Graduacao();
+                graduacao.setId(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (serie.apagar(gerenciaConexao.getConexao())) {
+                if (graduacao.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Série excluída com sucesso!");
+                    resposta.put("mensagem", "Graduação excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao excluir série!");
+                    resposta.put("mensagem", "Erro ao excluir graduação!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
@@ -137,36 +135,28 @@ public class SerieCtrl {
         }
     }
 
-    public ResponseEntity<Object> buscarSeries(String termo) {
+    public ResponseEntity<Object> buscarGraduacao(String termo) {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            Serie serie = new Serie();
-            List<Serie> series = serie.buscarTodos(gerenciaConexao.getConexao());
+            Graduacao graduacao = new Graduacao();
+            List<Graduacao> graduacaos = graduacao.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
 
-            if (series != null && !series.isEmpty()) {
+            if (graduacaos != null && !graduacaos.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("series", series);
+                resposta.put("listaGraduacao", graduacaos);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma série encontrada.");
+                resposta.put("mensagem", "Nenhuma graduação encontrada.");
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar séries");
+            resposta.put("mensagem", "Erro ao buscar graduações");
             return ResponseEntity.badRequest().body(resposta);
         }
-    }
-
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
     }
 }

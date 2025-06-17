@@ -1,10 +1,11 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.Graduacao;
 import sistema.saga.sagabackend.model.Profissional;
 import sistema.saga.sagabackend.model.Pessoa;
+import sistema.saga.sagabackend.model.Turma;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
@@ -58,7 +59,7 @@ public class ProfissionalCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Graduacao graduacaoAux= new Graduacao(idGraduacao,"",null);
+                    Graduacao graduacaoAux= new Graduacao(idGraduacao,"");
 
                     if (graduacaoAux.buscaGraduacao(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
@@ -73,7 +74,7 @@ public class ProfissionalCtrl {
                     Profissional profissional= new Profissional(rn,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
                     if(profissional.buscaProfissional(gerenciaConexao.getConexao(),profissional,pessoa,graduacao)!=null){
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Este Ra já esta cadastrado!");
+                        resposta.put("mensagem", "Este rn já esta cadastrado!");
                         //roolback; end trasaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
@@ -161,7 +162,7 @@ public class ProfissionalCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Graduacao graduacaoAux= new Graduacao(idGraduacao,"",null);
+                    Graduacao graduacaoAux= new Graduacao(idGraduacao,"");
 
                     if (graduacaoAux.buscaGraduacao(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
@@ -176,7 +177,7 @@ public class ProfissionalCtrl {
                     Profissional profissional= new Profissional(rn,tipo,pessoaAux, graduacaoAux,dataAdmissao,user,senha);
                     if(profissional.buscaProfissional(gerenciaConexao.getConexao(),profissional,pessoa,graduacao)==null){
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Este Ra não esta cadastrado!");
+                        resposta.put("mensagem", "Este rn não esta cadastrado!");
                         //roolback; end trasaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
@@ -249,6 +250,13 @@ public class ProfissionalCtrl {
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.badRequest().body(resposta);
                     }
+                }
+
+                if(new Turma().buscaTurmasDoProfessor(gerenciaConexao.getConexao(),profissional.getProfissional_rn()).size()>0){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Este profissional possui registros e não pode ser excluido");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
                 }
                 if (profissional.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
@@ -325,7 +333,7 @@ public class ProfissionalCtrl {
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existe profissional cadastrado com o RA: "+rn);
+                resposta.put("mensagem", "Não existe profissional cadastrado com o rn: "+rn);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
@@ -354,7 +362,7 @@ public class ProfissionalCtrl {
                 if(usuario!=null)
                     resposta.put("mensagem", "Senha incorreta para o usuário informado");
                 else
-                    resposta.put("mensagem", "Este Ra não está cadastrado!");
+                    resposta.put("mensagem", "Este rn não está cadastrado!");
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }

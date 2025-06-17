@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.ProfissionalCtrl;
+import sistema.saga.sagabackend.control.ProfissionalCtrl;
 
 import java.util.Map;
 
@@ -20,26 +20,24 @@ public class ProfissionalView {
         return profissionalCtrl.gravarProfissional(dados);
     }
 
-
     @GetMapping
     ResponseEntity<Object> buscarTodos(){
         return profissionalCtrl.buscarTodos();
     }
 
-    @GetMapping(value = "/{ra}/{senha}")
-    ResponseEntity<Object> buscarUsuario(@PathVariable(name="ra")int ra,@PathVariable(name="senha")String senha){
-        return profissionalCtrl.buscarUsuario(ra,senha);
+    @GetMapping(value = "/{rn}/{senha}")
+    ResponseEntity<Object> buscarUsuario(@PathVariable(name="rn")int rn,@PathVariable(name="senha")String senha){
+        return profissionalCtrl.buscarUsuario(rn,senha);
     }
 
-
-    @GetMapping(value = "/{ra}")
-    ResponseEntity<Object> buscar(@PathVariable(name="ra")int ra){
-        return profissionalCtrl.buscarProfissional(ra);
+    @GetMapping(value = "/{rn}")
+    ResponseEntity<Object> buscar(@PathVariable(name="rn")int rn){
+        return profissionalCtrl.buscarProfissional(rn);
     }
 
-    @DeleteMapping(value = "/{ra}")
-    ResponseEntity<Object> apagar(@PathVariable(name = "ra") int ra){
-        return profissionalCtrl.apagarProfissional(ra);
+    @DeleteMapping(value = "/{rn}")
+    ResponseEntity<Object> apagar(@PathVariable(name = "rn") int rn){
+        return profissionalCtrl.apagarProfissional(rn);
     }
 
     @PutMapping

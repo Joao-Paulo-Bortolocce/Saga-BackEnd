@@ -9,21 +9,18 @@ import java.util.List;
 public class Graduacao {
     private int id;
     private String descricao;
-    private LocalDate data;
 
     public Graduacao() {
-        this(0,"",null);
+        this(0,"");
     }
 
-    public Graduacao(String descricao, LocalDate data) {
+    public Graduacao(String descricao) {
         this.descricao = descricao;
-        this.data = data;
     }
 
-    public Graduacao(int id, String descricao, LocalDate data) {
+    public Graduacao(int id, String descricao) {
         this.id = id;
         this.descricao = descricao;
-        this.data = data;
     }
 
     public int getId() {
@@ -40,14 +37,6 @@ public class Graduacao {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
     }
 
     public boolean apagar(Conexao conexao) {

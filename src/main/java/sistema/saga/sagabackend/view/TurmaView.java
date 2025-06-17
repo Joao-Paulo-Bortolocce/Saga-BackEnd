@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.TurmaCtrl;
+import sistema.saga.sagabackend.control.TurmaCtrl;
 
 import java.util.Map;
 
@@ -15,22 +15,19 @@ public class TurmaView {
     @Autowired
     private TurmaCtrl turmaCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping("/gravar")
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return turmaCtrl.gravarTurma(dados);
     }
 
-    @PutMapping("/{letra}/{serieId}/{anoLetivoId}")
-    public ResponseEntity<Object> alterar(@PathVariable String letra,
+
+    @DeleteMapping("/{letra}/{serieId}/{anoLetivoId}/{profissionalRa}/{salaId}")
+    public ResponseEntity<Object> excluir(@PathVariable String letra,
                                           @PathVariable int serieId,
                                           @PathVariable int anoLetivoId,
-                                          @RequestBody Map<String, Object> dados) {
-        return turmaCtrl.alterarTurma(letra,serieId, anoLetivoId, dados);
-    }
-
-    @DeleteMapping("/{letra}/{serieId}/{anoLetivoId}")
-    public ResponseEntity<Object> excluir(@PathVariable String letra, @PathVariable int serieId, @PathVariable int anoLetivoId) {
-        return turmaCtrl.excluirTurma(letra,serieId,anoLetivoId);
+                                          @PathVariable int profissionalRa,
+                                          @PathVariable int salaId) {
+        return turmaCtrl.excluirTurma(letra, serieId, anoLetivoId, profissionalRa, salaId);
     }
 
     @GetMapping("/buscarTodos")
@@ -38,9 +35,8 @@ public class TurmaView {
         return turmaCtrl.buscarTurmas("");
     }
 
-    @GetMapping("/{termo}")
+    @GetMapping("/buscar/{termo}")
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return turmaCtrl.buscarTurmas(termo);
     }
-
 }

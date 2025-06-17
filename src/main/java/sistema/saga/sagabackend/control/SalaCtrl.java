@@ -1,10 +1,9 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.Sala;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
-import sistema.saga.sagabackend.repository.SalaDAO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,7 @@ public class SalaCtrl {
         int salaNcarteira = (int) dados.get("ncarteiras");
         String salaDescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(salaNcarteira) && verificaIntegridade(salaDescricao)) {
+        if (Regras.verificaIntegridade(salaNcarteira) && Regras.verificaIntegridade(salaDescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -64,7 +63,8 @@ public class SalaCtrl {
         int salancarteiras = (int) dados.get("ncarteiras");
         String saladescricao = (String) dados.get("descricao");
 
-        if (verificaIntegridade(id) && verificaIntegridade(salancarteiras) && verificaIntegridade(saladescricao)) {
+        if (Regras.verificaIntegridade(id) && Regras.verificaIntegridade(salancarteiras) &&
+                Regras.verificaIntegridade(saladescricao)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
@@ -109,7 +109,7 @@ public class SalaCtrl {
     public ResponseEntity<Object> excluirSala(int id) {
         Map<String, Object> resposta = new HashMap<>();
 
-        if (verificaIntegridade(id)) {
+        if (Regras.verificaIntegridade(id)) {
             try {
                 Sala sala = new Sala();
                 sala.setId(id);
@@ -160,13 +160,5 @@ public class SalaCtrl {
             resposta.put("mensagem", "Erro ao buscar salas");
             return ResponseEntity.badRequest().body(resposta);
         }
-    }
-
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
     }
 }

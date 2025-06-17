@@ -11,15 +11,35 @@ public class Turma {
     private AnoLetivo anoLetivo;
     private Serie serie;
     private char letra;
+    private Profissional profissional;
+    private Sala sala;
 
-    public Turma(AnoLetivo anoLetivo, Serie serie, char letra) {
+    public Turma(AnoLetivo anoLetivo, Serie serie, char letra, Profissional profissional, Sala sala) {
         this.anoLetivo = anoLetivo;
         this.serie = serie;
         this.letra = letra;
+        this.profissional = profissional;
+        this.sala = sala;
+    }
+
+    public Profissional getProfissional() {
+        return profissional;
+    }
+
+    public void setProfissional(Profissional profissional) {
+        this.profissional = profissional;
+    }
+
+    public Sala getSala() {
+        return sala;
+    }
+
+    public void setSala(Sala sala) {
+        this.sala = sala;
     }
 
     public Turma() {
-        this(null,null,'z');
+        this(null,null,'z',null,null);
     }
 
     public AnoLetivo getAnoLetivo() {
@@ -51,7 +71,7 @@ public class Turma {
         return turmaDAO.apagar(this,conexao);
     }
 
-    public List<Turma> buscarTodos(Conexao conexao) {
+    public static List<Turma> buscarTodos(Conexao conexao) {
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.get("", conexao);
     }
@@ -61,13 +81,14 @@ public class Turma {
         return turmaDAO.get(termo, conexao);
     }
 
-    public boolean alterar(char novaLetra,Conexao conexao) {
-        TurmaDAO turmaDAO = new TurmaDAO();
-        return turmaDAO.alterar(this,novaLetra,conexao);
-    }
 
     public boolean gravar(Conexao conexao) { //abuu
         TurmaDAO turmaDAO = new TurmaDAO();
         return turmaDAO.gravar(this,conexao);
+    }
+
+    public List<Turma> buscaTurmasDoProfessor(Conexao conexao, int profissionalRn) {
+        TurmaDAO turmaDAO = new TurmaDAO();
+        return turmaDAO.buscarTurmasDoProfessor(conexao,profissionalRn);
     }
 }

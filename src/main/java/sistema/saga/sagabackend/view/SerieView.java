@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.SerieCtrl;
+import sistema.saga.sagabackend.control.SerieCtrl;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class SerieView {
         return serieCtrl.buscarSeries("");
     }
 
-    @GetMapping("/{termo}")
+    @GetMapping("/buscar/{termo}")
     public ResponseEntity<Object> buscarPorTermo(@PathVariable String termo) {
         return serieCtrl.buscarSeries(termo);
     }

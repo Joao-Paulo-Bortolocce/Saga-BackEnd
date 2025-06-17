@@ -1,4 +1,4 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,14 @@ public class HabilidadeCtrl {
         int id = (int) dados.get("habilidades_cod");
         String descricao = (String) dados.get("habilidades_descricao");
         int idHabMat = (int) dados.get("habilidades_mat_id");
-        if(id >= 0 && !descricao.trim().isEmpty() && descricao != null && idHabMat >= 0) {
+        int idHabSer = (int) dados.get("habilidades_serie_id");
+        if(id >= 0 && !descricao.trim().isEmpty() && descricao != null && idHabMat >= 0 && idHabSer >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try{
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Habilidade habilidade = new Habilidade(id, descricao, idHabMat);
+                    Habilidade habilidade = new Habilidade(id, descricao, idHabMat, idHabSer);
                     if(habilidade.gravarHabilidade(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Habilidade Inserida com sucesso");
@@ -64,14 +65,14 @@ public class HabilidadeCtrl {
         int id = (int) dados.get("habilidades_cod");
         String descricao = (String) dados.get("habilidades_descricao");
         int idHabMat = (int) dados.get("habilidades_mat_id");
-
-        if(id >= 0 && !descricao.trim().isEmpty() && descricao != null && idHabMat >= 0) {
+        int idHabSer = (int) dados.get("habilidades_serie_id");
+        if(id >= 0 && !descricao.trim().isEmpty() && descricao != null && idHabMat >= 0 && idHabSer >= 0) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try{
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Habilidade habilidade = new Habilidade(id, descricao, idHabMat);
+                    Habilidade habilidade = new Habilidade(id, descricao, idHabMat, idHabSer);
                     if(habilidade.alterarHabilidade(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
                         resposta.put("mensagem", "Habilidade " + habilidade.getDescricao() + " alterada com sucesso");
@@ -107,11 +108,40 @@ public class HabilidadeCtrl {
         }
     }
 
-    public ResponseEntity<Object> apagar(int id, int codHabMat) {
+    public ResponseEntity<Object> apagarHabMatSer(int codHabMat, int codHabSer) {
         Map<String, Object> resposta = new HashMap<>();
-        if(id >= 0 && codHabMat >= 0) {
+        if(codHabMat >= 0 && codHabSer >= 0) {
             try {
-                Habilidade habilidade = new Habilidade(id, codHabMat);
+                Habilidade habilidade = new Habilidade(0, codHabMat, codHabSer);
+                GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                if(habilidade.deletarHabilidade(gerenciaConexao.getConexao())) {
+                    resposta.put("status", true);
+                    resposta.put("mensagem", "Habilidade excluída com sucesso!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.ok(resposta);
+                } else {
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Exclusão não foi realizada!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+            } catch (Exception e) {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Ocorreu um erro de conexão");
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } else {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Dados inválidos para exclusão!");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+    public ResponseEntity<Object> apagarHabilidade(int id) {
+        Map<String, Object> resposta = new HashMap<>();
+        if(id >= 0) {
+            try {
+                Habilidade habilidade = new Habilidade(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
                 if(habilidade.deletarHabilidade(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
@@ -140,8 +170,8 @@ public class HabilidadeCtrl {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Habilidade habilidade = new Habilidade();
-            List<Habilidade> habilidades = habilidade.buscarHabiliMatSer(idMat, idSer, gerenciaConexao.getConexao());
+            Habilidade habilidade = new Habilidade(0, idMat, idSer);
+            List<Habilidade> habilidades = habilidade.buscarHabiliMatSer(gerenciaConexao.getConexao());
             if (habilidades != null && habilidades.size() > 0) {
                 resposta.put("status", true);
                 resposta.put("listaDeHabilidades", habilidades);
@@ -165,8 +195,33 @@ public class HabilidadeCtrl {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
-            Habilidade habilidade = new Habilidade();
-            List<Habilidade> habilidades = habilidade.buscarHabiliMat(idMat,gerenciaConexao.getConexao());
+            Habilidade habilidade = new Habilidade(0, idMat);
+            List<Habilidade> habilidades = habilidade.buscarHabiliMat(gerenciaConexao.getConexao());
+            if (habilidades != null && habilidades.size() > 0) {
+                resposta.put("status", true);
+                resposta.put("listaDeHabilidades", habilidades);
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não existem habilidades cadastradas com os filtros selecionados");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Ocorreu um erro de conexão");
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+    public ResponseEntity<Object> buscarHabSer(int idSer) {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Habilidade habilidade = new Habilidade(0, 0, idSer);
+            List<Habilidade> habilidades = habilidade.buscarHabiliSer(gerenciaConexao.getConexao());
             if (habilidades != null && habilidades.size() > 0) {
                 resposta.put("status", true);
                 resposta.put("listaDeHabilidades", habilidades);

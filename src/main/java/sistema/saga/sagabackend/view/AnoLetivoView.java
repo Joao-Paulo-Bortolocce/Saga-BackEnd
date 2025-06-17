@@ -3,7 +3,7 @@ package sistema.saga.sagabackend.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sistema.saga.sagabackend.controller.AnoLetivoCtrl;
+import sistema.saga.sagabackend.control.AnoLetivoCtrl;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class AnoLetivoView {
     @Autowired
     private AnoLetivoCtrl anoLetivoCtrl;
 
-    @PostMapping(value = "/gravar")
+    @PostMapping
     public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
         return anoLetivoCtrl.gravarAno(dados);
     }
@@ -34,7 +34,7 @@ public class AnoLetivoView {
         return anoLetivoCtrl.apagarAno(id);
     }
 
-    @GetMapping(value = "buscarTodos")
+    @GetMapping
     public ResponseEntity<Object> buscarTodos() {
         return anoLetivoCtrl.buscarAnos("");
     }

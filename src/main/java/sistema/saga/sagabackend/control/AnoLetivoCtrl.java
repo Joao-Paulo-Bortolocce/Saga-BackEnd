@@ -1,8 +1,8 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.Graduacao;
+import sistema.saga.sagabackend.model.AnoLetivo;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
@@ -12,31 +12,36 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GraduacaoCtrl {
-    public ResponseEntity<Object> gravarGraduacao(Map<String, Object> dados) {
-        Map<String, Object> resposta = new HashMap<>();
-        String gradDescricao = (String) dados.get("descricao");
-        String dataStr = (String) dados.get("data");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate gradData = LocalDate.parse(dataStr, formatter);
+public class AnoLetivoCtrl {
 
-        if (verificaIntegridade(gradDescricao) && verificaIntegridade(String.valueOf(gradData))) {
+    public ResponseEntity<Object> gravarAno(Map<String, Object> dados) {
+        Map<String, Object> resposta = new HashMap<>();
+        String inicioStr = (String) dados.get("inicio");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
+        String fimStr = (String) dados.get("fim");
+        LocalDate fim = LocalDate.parse(fimStr, formatter);
+
+        if (verificaIntegridade(inicio) && verificaIntegridade(fim)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(gradDescricao, gradData);
-                    if (graduacao.gravar(gerenciaConexao.getConexao())) {
+                    //begin transaction
+                    AnoLetivo anoLetivo = new AnoLetivo(inicio,fim);
+                    if (anoLetivo.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Graduação inserida com sucesso!");
+                        resposta.put("mensagem", "Ano letivo inserido com sucesso");
+                        //commit; end transaction;
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao inserir graduação!");
+                        resposta.put("mensagem", "Ano letivo não foi inserido!");
+                        //rollback end transaction;
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -44,7 +49,7 @@ public class GraduacaoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro durante a inserção");
+                    resposta.put("mensagem", "Ocorreu um erro na durante a insercao");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -52,7 +57,7 @@ public class GraduacaoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Erro ao iniciar conexão");
+                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -62,31 +67,31 @@ public class GraduacaoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarGraduacao(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> alterarAno(int id, Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String gradDescricao = (String) dados.get("descricao");
-        String dataStr = (String) dados.get("data");
+        String inicioStr = (String) dados.get("inicio");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate gradData = LocalDate.parse(dataStr, formatter);
+        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
+        String fimStr = (String) dados.get("fim");
+        LocalDate fim = LocalDate.parse(fimStr, formatter);
 
-        if (verificaIntegridade(id) && verificaIntegridade(gradDescricao) &&
-                verificaIntegridade(String.valueOf(gradData))) {
+        if (verificaIntegridade(id) && verificaIntegridade(inicio) && verificaIntegridade(fim)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    Graduacao graduacao = new Graduacao(id, gradDescricao, gradData);
-                    if (graduacao.alterar(gerenciaConexao.getConexao())) {
+                    AnoLetivo anoLetivo = new AnoLetivo(id,inicio,fim);
+                    if (anoLetivo.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Graduação alterada com sucesso!");
+                        resposta.put("mensagem", "Ano letivo alterado com sucesso");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Erro ao alterar graduação!");
+                        resposta.put("mensagem", "Ano letivo não foi alterado!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -94,7 +99,7 @@ public class GraduacaoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro durante a alteração");
+                    resposta.put("mensagem", "Ocorreu um erro de conexão");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -102,7 +107,7 @@ public class GraduacaoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Erro ao iniciar conexão");
+                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -110,69 +115,70 @@ public class GraduacaoCtrl {
             resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
+
     }
 
-    public ResponseEntity<Object> excluirGraduacao(int id) {
+    public ResponseEntity<Object> apagarAno(int id) {
         Map<String, Object> resposta = new HashMap<>();
-
         if (verificaIntegridade(id)) {
             try {
-                Graduacao graduacao = new Graduacao();
-                graduacao.setId(id);
+                AnoLetivo anoLetivo = new AnoLetivo();
+                anoLetivo.setId(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (graduacao.apagar(gerenciaConexao.getConexao())) {
+                if (anoLetivo.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Graduação excluída com sucesso!");
+                    resposta.put("mensagem", "Ano letivo excluido com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Erro ao excluir graduação!");
+                    resposta.put("mensagem", "Exclusão não foi realizada!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Erro de conexão");
+                resposta.put("mensagem", "Ocorreu um erro de conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "ID inválido");
+            resposta.put("mensagem", "Dados inválidos para exclusão!");
             return ResponseEntity.badRequest().body(resposta);
         }
+
     }
 
-    public ResponseEntity<Object> buscarGraduacao(String termo) {
+    public ResponseEntity<Object> buscarAnos(String termo) {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            Graduacao graduacao = new Graduacao();
-            List<Graduacao> graduacaos = graduacao.buscarTodos(gerenciaConexao.getConexao());
+            AnoLetivo anoLetivo = new AnoLetivo();
+            List<AnoLetivo> anoLetivoList = anoLetivo.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
 
-            if (graduacaos != null && !graduacaos.isEmpty()) {
+            if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("graduações", graduacaos);
+                resposta.put("anoletivo", anoLetivoList);
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Nenhuma graduação encontrada.");
+                resposta.put("mensagem", "Nenhum ano letivo encontrado.");
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar graduações");
+            resposta.put("mensagem", "Erro ao buscar anos letivos");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    private boolean verificaIntegridade(String elemento) {
-        return elemento != null && !elemento.trim().isEmpty();
-    }
-
     private boolean verificaIntegridade(int elemento) {
         return elemento > 0;
+    }
+
+    private boolean verificaIntegridade(LocalDate elemento) {
+        return elemento != null;
     }
 }

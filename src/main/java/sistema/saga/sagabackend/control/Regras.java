@@ -1,4 +1,4 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import sistema.saga.sagabackend.model.*;
 
@@ -38,7 +38,7 @@ public class Regras {
         return endereco;
     }
     public static Endereco HashToEnderecoFront(Map<String, Object> end){
-        if(end.isEmpty())
+        if(end == null || end.isEmpty())
             return null;
         Endereco endereco = new Endereco(
                 ((Number) end.get("id")).longValue(),
@@ -73,7 +73,7 @@ public class Regras {
     }
 
     public static Pessoa HashToPessoaFront(Map<String, Object> pessoa){
-        if(pessoa.isEmpty())
+        if(pessoa == null || pessoa.isEmpty())
             return null;
 
         String cpf = (String) pessoa.get("cpf");
@@ -102,13 +102,22 @@ public class Regras {
         return new Aluno(ra,restricaoMedica,pessoa);
     }
     public static Aluno HashToAlunoFront(Map<String, Object> aluno){
-        if(aluno.isEmpty())
+        if(aluno == null || aluno.isEmpty())
             return null;
-        int ra = (int) aluno.get("ra");
-        String restricaoMedica = (String) aluno.get("restricaomedica");
-        Pessoa pessoa= Regras.HashToPessoaFront((Map<String, Object>) aluno.get("pessoa"));
 
-        return new Aluno(ra,restricaoMedica,pessoa);
+        int ra = (int) aluno.get("ra");
+
+        String restricaoMedica = aluno.containsKey("restricaomedica") ? (String) aluno.get("restricaomedica") : "";
+        Pessoa pessoa = null;
+
+        if (aluno.containsKey("pessoa")) {
+            Map<String, Object> pessoaMap = (Map<String, Object>) aluno.get("pessoa");
+            if (pessoaMap != null && !pessoaMap.isEmpty()) {
+                pessoa = Regras.HashToPessoaFront(pessoaMap);
+            }
+        }
+
+        return new Aluno(ra, restricaoMedica, pessoa);
     }
 
     public static AnoLetivo HashToAnoLetivo(Map<String, Object> anoMap) {
@@ -123,7 +132,7 @@ public class Regras {
     }
 
     public static AnoLetivo HashToAnoLetivoFront(Map<String, Object> anoMap) {
-        if (anoMap.isEmpty())
+        if (anoMap == null || anoMap.isEmpty())
             return null;
 
         int id = (int) anoMap.get("id");
@@ -146,7 +155,7 @@ public class Regras {
     }
 
     public static Serie HashToSerieFront(Map<String, Object> serieMap) {
-        if (serieMap.isEmpty())
+        if (serieMap == null || serieMap.isEmpty())
             return null;
 
         int id = (int) serieMap.get("serieId");
@@ -157,48 +166,108 @@ public class Regras {
     }
 
     public static Turma HashToTurma(Map<String, Object> turmaMap) {
-        if (turmaMap.isEmpty())
-            return null;
+        if (turmaMap == null || turmaMap.isEmpty()) return null;
+
         Map<String, Object> serieMap = (Map<String, Object>) turmaMap.get("serie");
         Map<String, Object> anoLetivoMap = (Map<String, Object>) turmaMap.get("anoletivo");
-        Byte letraByte = (Byte) turmaMap.get("turma_letra");
-        if (letraByte == 0)
+        Map<String, Object> profissionalMap = (Map<String, Object>) turmaMap.get("profissional");
+        Map<String, Object> salaMap = (Map<String, Object>) turmaMap.get("sala");
+
+        Object letraObj = turmaMap.get("turma_letra");
+        if (letraObj == null || letraObj.equals(0)) return null;
+
+        char letra;
+        if (letraObj instanceof String str && str.length() == 1) {
+            letra = str.charAt(0);
+        } else if (letraObj instanceof Character c) {
+            letra = c;
+        } else if (letraObj instanceof Byte b) {
+            letra = (char) b.byteValue();
+        } else {
             return null;
-        char letra = (char) letraByte.byteValue();
-        Serie serie = Regras.HashToSerie(serieMap);
-        AnoLetivo anoLetivo = Regras.HashToAnoLetivo(anoLetivoMap);
-        return new Turma(anoLetivo, serie, letra);
+        }
+
+        if(letra==0)
+            return null;
+
+        Serie serie = (serieMap != null) ? Regras.HashToSerie(serieMap) : null;
+        AnoLetivo anoLetivo = (anoLetivoMap != null) ? Regras.HashToAnoLetivo(anoLetivoMap) : null;
+        Profissional profissional = (profissionalMap != null) ? Regras.HashToProfissional(profissionalMap) : null;
+        Sala sala = (salaMap != null) ? Regras.HashToSala(salaMap) : null;
+
+        return new Turma(anoLetivo, serie, letra, profissional, sala);
+    }
+
+
+    public static Profissional HashToProfissional(Map<String, Object> profMap) {
+        if (profMap.isEmpty()) return null;
+        int ra = (int) profMap.get("profissional_rn");
+        return new Profissional(ra);
+    }
+
+    public static Sala HashToSala(Map<String, Object> salaMap) {
+        if (salaMap.isEmpty()) return null;
+        int id = (int) salaMap.get("salas_id");
+        return new Sala(id, 0, "");
     }
 
     public static Turma HashToTurmaFront(Map<String, Object> turmaMap) {
-        if (turmaMap.isEmpty())
+        if (turmaMap == null || turmaMap.isEmpty())
             return null;
+
         Map<String, Object> serieMap = (Map<String, Object>) turmaMap.get("serie");
         Map<String, Object> anoLetivoMap = (Map<String, Object>) turmaMap.get("anoletivo");
-        Byte letraByte = (Byte) turmaMap.get("letra");
-        if (letraByte == 0)
+        Map<String, Object> profissionalMap = (Map<String, Object>) turmaMap.get("profissional");
+        Map<String, Object> salaMap = (Map<String, Object>) turmaMap.get("sala");
+
+        String letraStr = (String) turmaMap.get("letra");
+        if (letraStr == null || letraStr.length() != 1)
             return null;
-        char letra = (char) letraByte.byteValue();
+        char letra = letraStr.charAt(0);
+
         Serie serie = Regras.HashToSerieFront(serieMap);
         AnoLetivo anoLetivo = Regras.HashToAnoLetivoFront(anoLetivoMap);
-        return new Turma(anoLetivo, serie, letra);
+        Profissional profissional = Regras.HashToProfissional(profissionalMap); // ou HashToProfissionalFront
+        Sala sala = Regras.HashToSala(salaMap); // ou HashToSalaFront
+
+        return new Turma(anoLetivo, serie, letra, profissional, sala);
     }
+
 
     public static Matricula HashToMatriculaFront(Map<String, Object> matriculaMap){
         if (matriculaMap.isEmpty())
             return null;
-        int id=(int) matriculaMap.get("id");
+
+        int id = (int) matriculaMap.get("id");
         String dt = (String) matriculaMap.get("data");
         LocalDate data = LocalDate.parse(dt);
-        boolean aprovado= (boolean) matriculaMap.get("aprovado");
-        boolean valido= (boolean) matriculaMap.get("valido");
-        if(!(verificaIntegridade(id)&& verificaIntegridade(data)))
+        boolean aprovado = (boolean) matriculaMap.get("aprovado");
+        boolean valido = (boolean) matriculaMap.get("valido");
+
+        if (!(verificaIntegridade(id) && verificaIntegridade(data)))
             return null;
-        Map<String, Object> serieMap =(Map<String, Object>) matriculaMap.get("serie");
+
+        Map<String, Object> serieMap = (Map<String, Object>) matriculaMap.get("serie");
         Map<String, Object> anoLetivoMap = (Map<String, Object>) matriculaMap.get("anoLetivo");
         Map<String, Object> alunoMap = (Map<String, Object>) matriculaMap.get("aluno");
 
-        return new Matricula(id,HashToAlunoFront(alunoMap),HashToAnoLetivoFront(anoLetivoMap),HashToSerieFront(serieMap),null,aprovado,data,valido);
+        Serie serie = HashToSerieFront(serieMap);
+        AnoLetivo anoLetivo = HashToAnoLetivoFront(anoLetivoMap);
+        Aluno aluno = HashToAlunoFront(alunoMap);
+
+        // Novo trecho: montar a Turma com a letra
+        Turma turma = null;
+        if (matriculaMap.containsKey("turma_letra") && matriculaMap.get("turma_letra") != null) {
+            String letra = matriculaMap.get("turma_letra").toString();
+            if (!letra.isBlank()) {
+                turma = new Turma();
+                turma.setLetra(letra.charAt(0));
+                turma.setSerie(serie);
+                turma.setAnoLetivo(anoLetivo);
+            }
+        }
+
+        return new Matricula(id, aluno, anoLetivo, serie, turma, aprovado, data, valido);
     }
 
     public static Graduacao HashToGraduacao(Map<String, Object> graduacaoMap) {
@@ -208,6 +277,6 @@ public class Regras {
         int id = (int) graduacaoMap.get("graduacao_id");
         String descricao = (String) graduacaoMap.get("graduacao_descricao");
 
-        return new Graduacao(id, descricao,null);
+        return new Graduacao(id, descricao);
     }
 }

@@ -1,11 +1,13 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sistema.saga.sagabackend.model.*;
+import sistema.saga.sagabackend.repository.Conexao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -87,50 +89,143 @@ public class MatriculaCtrl {
                             aux.setSerie(Regras.HashToSerie(serieMap.get(i)));
                             aux.setTurma(Regras.HashToTurma(turmaMap.get(i)));
                         }
-                        int i, maior = -1000, menor = 1000000, pos = 0, posMenor = 0;
-
-                        for (i = 0; i < matriculaList.size() && (matricula.getAluno().getRa() != matriculaList.get(i).getAluno().getRa() || matricula.getAnoLetivo().getId() != matriculaList.get(i).getAnoLetivo().getId()); i++) {
+                        int anoAtual = matricula.getAnoLetivo().getInicio().getYear();
+                        int serieAtual = matricula.getSerie().getSerieNum();
+                        boolean repetiu = false, correto = true;
+                        int anoAux, serieAux, anoRepetiu = 0, serieRepetiu = 0;
+                        int maior = matriculaList.get(0).getSerie().getSerieNum(), menor = matriculaList.get(0).getSerie().getSerieNum(), anoMaior = 0, anoMenor = 0;
+                        String serieErro = "";
+                        for (int i = 0; i < matriculaList.size() && correto; i++) {
+                            anoAux = matriculaList.get(i).getAnoLetivo().getInicio().getYear();
+                            serieAux = matriculaList.get(i).getSerie().getSerieNum();
                             if (matriculaList.get(i).getSerie().getSerieNum() > maior) {
                                 maior = matriculaList.get(i).getSerie().getSerieNum();
-                                pos = i;
-
+                                anoMaior=anoAux;
                             }
                             if (matriculaList.get(i).getSerie().getSerieNum() < menor) {
                                 menor = matriculaList.get(i).getSerie().getSerieNum();
-                                posMenor = i;
-
+                                anoMenor=anoAux;
+                            }
+                            if (serieAtual == serieAux) {
+                                anoRepetiu = anoAux;
+                                serieRepetiu = serieAux;
+                                repetiu = true;
+                                correto = false;
+                            } else {
+                                if (anoAtual > anoAux && serieAtual < serieAux) {
+                                    anoRepetiu = anoAux;
+                                    serieErro = matriculaList.get(i).getSerie().getSerieDescr();
+                                    correto = false;
+                                } else if (anoAtual < anoAux && serieAtual > serieAux) {
+                                    anoRepetiu = anoAux;
+                                    serieErro = matriculaList.get(i).getSerie().getSerieDescr();
+                                    correto = false;
+                                } else {
+                                    if(anoAtual==anoAux){
+                                        anoRepetiu = anoAux;
+                                        correto = false;
+                                    }
+                                }
                             }
                         }
-                        if (i < matriculaList.size()) {
+
+                        if (repetiu) {
+                            if (serieRepetiu == 3 || serieRepetiu == 5) {
+                                if (anoAtual != anoRepetiu - 1 && anoAtual != anoRepetiu + 1) {
+                                    resposta.put("status", false);
+                                    resposta.put("mensagem", "Um aluno só pode repetir anos consecutivos!");
+                                    //roolback; end trasaction;
+                                    gerenciaConexao.getConexao().rollback();
+                                    gerenciaConexao.getConexao().fimTransacao();
+                                    gerenciaConexao.Desconectar();
+                                    return ResponseEntity.badRequest().body(resposta);
+                                }
+                                repetiu = false;
+                                for (int i = 0; i < matriculaList.size() - 1; i++) {
+                                    anoAux = matriculaList.get(i).getAnoLetivo().getInicio().getYear();
+                                    serieAux = matriculaList.get(i).getSerie().getSerieNum();
+                                    for (int j = i + 1; j < matriculaList.size() && !repetiu; j++) {
+                                        if (matriculaList.get(j).getAnoLetivo().getInicio().getYear() == anoAux && matriculaList.get(j).getSerie().getSerieNum() == serieAux)
+                                            repetiu = true;
+                                    }
+                                }
+                                if (repetiu) {
+                                    resposta.put("status", false);
+                                    resposta.put("mensagem", "Este aluno ja reprovou anteriormente e não pode reprovar novamente!");
+                                    //roolback; end trasaction;
+                                    gerenciaConexao.getConexao().rollback();
+                                    gerenciaConexao.getConexao().fimTransacao();
+                                    gerenciaConexao.Desconectar();
+                                    return ResponseEntity.badRequest().body(resposta);
+                                }
+                                correto = true;
+                            } else {
+                                resposta.put("status", false);
+                                resposta.put("mensagem", "Um aluno só pode repetir o 3 ou o 5 ano!");
+                                //roolback; end trasaction;
+                                gerenciaConexao.getConexao().rollback();
+                                gerenciaConexao.getConexao().fimTransacao();
+                                gerenciaConexao.Desconectar();
+                                return ResponseEntity.badRequest().body(resposta);
+                            }
+                        }
+
+                        if (!correto) {
+                            String mensagem = "";
+                            if (anoAtual == anoRepetiu)
+                                mensagem = "Este aluno ja possui matricula no ano " + anoAtual;
+                            else if (anoAtual > anoRepetiu)
+                                mensagem = "A serie que o aluno realizou em " + anoRepetiu + " é superior à " + matricula.getSerie().getSerieDescr() + ", informe uma serie superior a " + serieErro + "!";
+                            else
+                                mensagem = "A serie que o aluno realizou em " + anoRepetiu + " é inferior à " + matricula.getSerie().getSerieDescr() + ", informe uma serie inferior a " + serieErro + "!";
                             resposta.put("status", false);
-                            resposta.put("mensagem", "Esta matricula ja está cadastrada!");
+                            resposta.put("mensagem", mensagem);
                             //roolback; end trasaction;
                             gerenciaConexao.getConexao().rollback();
                             gerenciaConexao.getConexao().fimTransacao();
                             gerenciaConexao.Desconectar();
                             return ResponseEntity.badRequest().body(resposta);
-                        } else {
-                            Matricula aux = matriculaList.get(pos);
-                            if (maior > matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isBefore(matricula.getAnoLetivo().getInicio())) {
-                                resposta.put("status", false);
-                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a " + aux.getSerie().getSerieDescr() + " no ano " + aux.getAnoLetivo().getInicio() + " portanto a serie deve ser igual ou superior a essa!");
-                                //roolback; end trasaction;
-                                gerenciaConexao.getConexao().rollback();
-                                gerenciaConexao.getConexao().fimTransacao();
-                                gerenciaConexao.Desconectar();
-                                return ResponseEntity.badRequest().body(resposta);
-                            }
-                            aux = matriculaList.get(posMenor);
-                            if (menor < matricula.getSerie().getSerieNum() && aux.getAnoLetivo().getInicio().isAfter(matricula.getAnoLetivo().getInicio())) {
-                                resposta.put("status", false);
-                                resposta.put("mensagem", "Esta matricula não pode ser cadastrada neste ano letivo, pois o respectivo aluno ja realizou a " + aux.getSerie().getSerieDescr() + " no ano " + aux.getAnoLetivo().getInicio() + " portanto a serie deve ser igual ou inferior a essa!");
-                                //roolback; end trasaction;
-                                gerenciaConexao.getConexao().rollback();
-                                gerenciaConexao.getConexao().fimTransacao();
-                                gerenciaConexao.Desconectar();
-                                return ResponseEntity.badRequest().body(resposta);
-                            }
                         }
+                        int dist=anoAtual-anoMaior;
+                        if(serieAtual-maior>dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta pulando alguma(s) serie(s)");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+                        if( serieAtual-maior<dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta deixando alguma(s) serie(s) para trás");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+                        dist=anoAtual-anoMenor;
+                        if(serieAtual-menor>dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta pulando alguma(s) serie(s)");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+
+                        if( serieAtual-menor<dist){
+                            resposta.put("status", false);
+                            resposta.put("mensagem", "O aluno esta deixando alguma(s) serie(s) para trás");
+                            //roolback; end trasaction;
+                            gerenciaConexao.getConexao().rollback();
+                            gerenciaConexao.getConexao().fimTransacao();
+                            gerenciaConexao.Desconectar();
+                            return ResponseEntity.badRequest().body(resposta);
+                        }
+
                     }
 
                     aluno.setPessoa(Regras.HashToPessoa(pessoa));
@@ -174,16 +269,16 @@ public class MatriculaCtrl {
     }
 
     public ResponseEntity<Object> alterarMatricula(Map<String, Object> dados) {
-        Map<String, Object> resposta = new HashMap<>();
-        Matricula matricula = Regras.HashToMatriculaFront(dados);
-        if (matricula != null) {
+        Map<String, Object> resposta= new HashMap<>();
+        Matricula matricula= Regras.HashToMatriculaFront(dados);
+        if (matricula!=null) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
                     //begin transaction
-                    if (matricula.getAluno().buscaAluno(gerenciaConexao.getConexao(), matricula.getAluno(), new HashMap<String, Object>()) == null) {
+                    if (matricula.getAluno().buscaAluno(gerenciaConexao.getConexao(),matricula.getAluno(),new HashMap<String,Object>())==null) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "O aluno que deseja alterar a matricula não está cadastrado!");
                         //roolback; end trasaction;
@@ -193,8 +288,8 @@ public class MatriculaCtrl {
                         return ResponseEntity.badRequest().body(resposta);
                     }
 
-                    Serie serie = new Serie(matricula.getSerie().getSerieId(), matricula.getSerie().getSerieNum(), matricula.getSerie().getSerieDescr());
-                    if (serie.buscaSerie(gerenciaConexao.getConexao()) == 0) {
+                    Serie serie= new Serie(matricula.getSerie().getSerieId(),matricula.getSerie().getSerieNum(),matricula.getSerie().getSerieDescr());
+                    if (serie.buscaSerie(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "A serie que deseja matricular não está cadastrada!");
                         //roolback; end trasaction;
@@ -205,7 +300,7 @@ public class MatriculaCtrl {
                     }
 
 
-                    if (matricula.getAnoLetivo().buscaAnos(gerenciaConexao.getConexao()) == 0) {
+                    if (matricula.getAnoLetivo().buscaAnos(gerenciaConexao.getConexao())==0) {
                         resposta.put("status", false);
                         resposta.put("mensagem", "O ano Letivo que deseja alterar a  matricula não está cadastrado!");
                         //roolback; end trasaction;
@@ -252,14 +347,43 @@ public class MatriculaCtrl {
         }
 
     }
-
-    public ResponseEntity<Object> apagarMatricula(int ra) {
+    public ResponseEntity<Object> apagarMatricula(int  ra) {
         Map<String, Object> resposta = new HashMap<>();
 
         if (Regras.verificaIntegridade(ra)) {
             try {
                 Matricula matricula = new Matricula(ra);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
+                 Map<String, Object> aluno= new HashMap();
+                 Map<String, Object> ano= new HashMap();
+                 Map<String, Object> serie= new HashMap();
+                Map<String, Object> turma=  new HashMap();
+                matricula=matricula.buscaMatricula(gerenciaConexao.getConexao(),matricula,aluno,ano,serie,turma);
+                if(matricula==null){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula não foi encontrada!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+                matricula.setAluno(Regras.HashToAluno(aluno));
+                matricula.setAnoLetivo(Regras.HashToAnoLetivo(ano));
+                matricula.setSerie(Regras.HashToSerie(serie));
+                matricula.setTurma(Regras.HashToTurma(turma));
+                if(matricula.getTurma()!=null){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula ja está enturmada e não pode ser excluida!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+                Frequencia frequencia= new Frequencia();
+                frequencia.setMatricula(matricula);
+                frequencia.setData(matricula.getAnoLetivo().getInicio());
+                if(frequencia.buscarId(gerenciaConexao.getConexao()).size()>0){
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Esta matricula ja possui registros de frequência para ela, portanto não pode ser excluida");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
                 if (matricula.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
                     resposta.put("mensagem", "Matricula excluído com sucesso!");
@@ -294,10 +418,10 @@ public class MatriculaCtrl {
             List<Map<String, Object>> anos = new ArrayList<>();
             List<Map<String, Object>> series = new ArrayList<>();
             List<Map<String, Object>> turmas = new ArrayList<>();
-            List<Matricula> matriculaList = matricula.buscarTodas(gerenciaConexao.getConexao(), alunos, anos, series, turmas);
+            List<Matricula> matriculaList = matricula.buscarTodas(gerenciaConexao.getConexao(), alunos,anos,series,turmas);
             if (matriculaList != null) {
                 for (int i = 0; i < alunos.size(); i++) {
-                    Matricula mat = matriculaList.get(i);
+                    Matricula mat= matriculaList.get(i);
                     mat.setAluno(Regras.HashToAluno(alunos.get(i)));
                     mat.setAnoLetivo(Regras.HashToAnoLetivo(anos.get(i)));
                     mat.setSerie(Regras.HashToSerie(series.get(i)));
@@ -327,16 +451,16 @@ public class MatriculaCtrl {
         try {
             Matricula matricula = new Matricula(id);
 
-            List<Map<String, Object>> aluno = new ArrayList<>();
-            List<Map<String, Object>> ano = new ArrayList<>();
-            List<Map<String, Object>> serie = new ArrayList<>();
-            List<Map<String, Object>> turma = new ArrayList<>();
-            List<Matricula> matriculaList = matricula.buscaMatricula(gerenciaConexao.getConexao(), aluno, ano, serie, turma);
+            List< Map<String, Object>> aluno= new ArrayList<>();
+            List< Map<String, Object>> ano= new ArrayList<>();
+            List< Map<String, Object>> serie= new ArrayList<>();
+            List< Map<String, Object>> turma= new ArrayList<>();
+            List<Matricula> matriculaList = matricula.buscaMatricula(gerenciaConexao.getConexao(),aluno,ano,serie,turma);
 
 
             if (matriculaList.isEmpty()) {
                 for (int i = 0; i < matriculaList.size(); i++) {
-                    matricula = matriculaList.get(i);
+                    matricula= matriculaList.get(i);
                     matricula.setAluno(Regras.HashToAluno(aluno.get(i)));
                     matricula.setAnoLetivo(Regras.HashToAnoLetivo(ano.get(i)));
                     matricula.setSerie(Regras.HashToSerie(serie.get(i)));
@@ -348,7 +472,7 @@ public class MatriculaCtrl {
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existe matricula cadastrado com o ID: " + id);
+                resposta.put("mensagem", "Não existe matricula cadastrado com o ID: "+id);
                 gerenciaConexao.Desconectar();
                 return ResponseEntity.badRequest().body(resposta);
             }
@@ -361,19 +485,24 @@ public class MatriculaCtrl {
     }
 
 
-    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId, int valido) {
+    public ResponseEntity<Object> buscarTodasFiltradas(int serieId, int anoLetivoId, int valido, String turmaLetra) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
             Matricula matricula = new Matricula();
             matricula.setSerie(new Serie(serieId, 0, ""));
             matricula.setAnoLetivo(new AnoLetivo(anoLetivoId));
+
             List<Map<String, Object>> alunos = new ArrayList<>();
             List<Map<String, Object>> anos = new ArrayList<>();
             List<Map<String, Object>> series = new ArrayList<>();
             List<Map<String, Object>> turmas = new ArrayList<>();
-            List<Matricula> matriculaList = matricula.buscarTodasFiltradas(gerenciaConexao.getConexao(), matricula, valido, alunos, anos, series, turmas);
-            if (matriculaList != null) {
+
+            List<Matricula> matriculaList = matricula.buscarTodasFiltradas(
+                    gerenciaConexao.getConexao(), matricula, valido, turmaLetra, alunos, anos, series, turmas
+            );
+
+            if (matriculaList != null && !matriculaList.isEmpty()) {
                 for (int i = 0; i < alunos.size(); i++) {
                     Matricula mat = matriculaList.get(i);
                     mat.setAluno(Regras.HashToAluno(alunos.get(i)));
@@ -383,20 +512,101 @@ public class MatriculaCtrl {
                 }
                 resposta.put("status", true);
                 resposta.put("listaDeMatriculas", matriculaList);
-                gerenciaConexao.Desconectar();
                 return ResponseEntity.ok(resposta);
             } else {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Não existem matriculas cadastradas");
-                gerenciaConexao.Desconectar();
+                resposta.put("mensagem", "Nenhuma matrícula encontrada");
                 return ResponseEntity.badRequest().body(resposta);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             resposta.put("status", false);
             resposta.put("mensagem", "Ocorreu um erro de conexão");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+        finally {
+            gerenciaConexao.Desconectar();
+        }
+    }
+
+    public ResponseEntity<Object> buscarMatriculasSemTurma(int serieId, int anoLetivoId) {
+        Map<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            Matricula mat = new Matricula();
+            mat.setSerie(new Serie(serieId, 0, ""));
+            mat.setAnoLetivo(new AnoLetivo(anoLetivoId));
+            List<Map<String, Object>> alunos = new ArrayList<>();
+            List<Map<String, Object>> anos = new ArrayList<>();
+            List<Map<String, Object>> series = new ArrayList<>();
+            List<Map<String, Object>> turmas = new ArrayList<>();
+
+            List<Matricula> lista = mat.buscarMatriculasSemTurma(gerenciaConexao.getConexao(), mat, alunos, anos, series, turmas);
+
+            if (lista != null) {
+                for (int i = 0; i < alunos.size(); i++) {
+                    Matricula m = lista.get(i);
+                    m.setAluno(Regras.HashToAluno(alunos.get(i)));
+                    m.setAnoLetivo(Regras.HashToAnoLetivo(anos.get(i)));
+                    m.setSerie(Regras.HashToSerie(series.get(i)));
+                    m.setTurma(null); // Garantir que vem sem turma
+                }
+                resposta.put("status", true);
+                resposta.put("listaDeMatriculas", lista);
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Não há alunos sem turma.");
+            }
+
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.ok(resposta);
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro ao buscar alunos sem turma.");
             gerenciaConexao.Desconectar();
             return ResponseEntity.badRequest().body(resposta);
         }
     }
-}
 
+    public ResponseEntity<Object> removerTurmaDaMatricula(int idMatricula) {
+        Map<String, Object> resposta = new HashMap<>();
+
+        if (!Regras.verificaIntegridade(idMatricula)) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "ID da matrícula inválido.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+
+        try {
+            GerenciaConexao gerenciaConexao = new GerenciaConexao();
+            gerenciaConexao.getConexao().iniciarTransacao();
+
+            Matricula matricula = new Matricula(idMatricula);
+
+            boolean ok = matricula.removerTurmaDaMatricula(gerenciaConexao.getConexao());
+
+            if (ok) {
+                gerenciaConexao.getConexao().commit();
+                resposta.put("status", true);
+                resposta.put("mensagem", "Turma removida com sucesso da matrícula.");
+                gerenciaConexao.getConexao().fimTransacao();
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.ok(resposta);
+            } else {
+                gerenciaConexao.getConexao().rollback();
+                resposta.put("status", false);
+                resposta.put("mensagem", "Falha ao remover turma da matrícula.");
+                gerenciaConexao.getConexao().fimTransacao();
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro interno ao remover turma da matrícula.");
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
+}

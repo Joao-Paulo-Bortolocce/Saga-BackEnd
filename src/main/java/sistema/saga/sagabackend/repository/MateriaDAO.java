@@ -14,13 +14,15 @@ public class MateriaDAO {
 
     public boolean gravar(Materia materia, Conexao conexao) {
         String sql = """
-                INSERT INTO materia(materia_nome, materia_carga) VALUES ('#1', '#2');
-                """;
-        sql = sql.replace("#1", materia.getNome());
-        sql = sql.replace("#2","" + materia.getCarga());
+            INSERT INTO materia(materia_id, materia_nome, materia_carga) VALUES (#1, '#2', #3);
+            """;
+        sql = sql.replace("#1", "" + materia.getId());
+        sql = sql.replace("#2", materia.getNome());
+        sql = sql.replace("#3", "" + materia.getCarga());
 
         return conexao.manipular(sql);
     }
+
 
     public boolean alterar(Materia materia, Conexao conexao) {
         String sql = """
@@ -42,7 +44,7 @@ public class MateriaDAO {
         return conexao.manipular(sql);
     }
 
-    public Materia getId(Long id, Conexao conexao) {
+    public Materia getId(int id, Conexao conexao) {
         String sql = """
                     SELECT * WHERE materia_id = '#1' ORDER BY materia_nome
                 """;
@@ -50,7 +52,7 @@ public class MateriaDAO {
         try{
             ResultSet resultSet = conexao.consultar(sql);
             if(resultSet.next()) {
-                return new Materia(resultSet.getLong("materia_id"), resultSet.getString("materia_nome"), resultSet.getInt("materia_carga"));
+                return new Materia(resultSet.getInt("materia_id"), resultSet.getString("materia_nome"), resultSet.getInt("materia_carga"));
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -75,7 +77,7 @@ public class MateriaDAO {
         try{
             ResultSet resultSet = conexao.consultar(sql);
             while(resultSet.next()) {
-                materias.add(new Materia(resultSet.getLong("materia_id"), resultSet.getString("materia_nome"), resultSet.getInt("materia_carga")));
+                materias.add(new Materia(resultSet.getInt("materia_id"), resultSet.getString("materia_nome"), resultSet.getInt("materia_carga")));
             }
         } catch(Exception e) {
             e.printStackTrace();

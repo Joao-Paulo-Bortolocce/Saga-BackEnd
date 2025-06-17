@@ -1,47 +1,43 @@
-package sistema.saga.sagabackend.controller;
+package sistema.saga.sagabackend.control;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import sistema.saga.sagabackend.model.AnoLetivo;
+import sistema.saga.sagabackend.model.Notificacao;
 import sistema.saga.sagabackend.repository.GerenciaConexao;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class AnoLetivoCtrl {
-    public ResponseEntity<Object> gravarAno(Map<String, Object> dados) {
+public class NotificacaoCtrl {
+    public ResponseEntity<Object> gravarNotificacao(Map<String, Object> dados) {
         Map<String, Object> resposta = new HashMap<>();
-        String inicioStr = (String) dados.get("inicio");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
-        String fimStr = (String) dados.get("fim");
-        LocalDate fim = LocalDate.parse(fimStr, formatter);
 
-        if (verificaIntegridade(inicio) && verificaIntegridade(fim)) {
+        String mensagem = (String) dados.get("mensagem");
+        String dataStr = (String) dados.get("data");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate data = LocalDate.parse(dataStr, formatter);
+
+        if (Regras.verificaIntegridade(mensagem) && Regras.verificaIntegridade(data)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    //begin transaction
-                    AnoLetivo anoLetivo = new AnoLetivo(inicio,fim);
-                    if (anoLetivo.gravar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao(mensagem, data);
+                    if (notificacao.gravar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Ano letivo inserido com sucesso");
-                        //commit; end transaction;
+                        resposta.put("mensagem", "Notificação inserida com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Ano letivo não foi inserido!");
-                        //rollback end transaction;
+                        resposta.put("mensagem", "Erro ao inserir notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -49,7 +45,7 @@ public class AnoLetivoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro na durante a insercao");
+                    resposta.put("mensagem", "Erro durante a inserção");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -57,7 +53,7 @@ public class AnoLetivoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
+                resposta.put("mensagem", "Erro ao iniciar conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -67,31 +63,27 @@ public class AnoLetivoCtrl {
         }
     }
 
-    public ResponseEntity<Object> alterarAno(int id, Map<String, Object> dados) {
+    public ResponseEntity<Object> visualizarNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
-        String inicioStr = (String) dados.get("inicio");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate inicio = LocalDate.parse(inicioStr, formatter);
-        String fimStr = (String) dados.get("fim");
-        LocalDate fim = LocalDate.parse(fimStr, formatter);
 
-        if (verificaIntegridade(id) && verificaIntegridade(inicio) && verificaIntegridade(fim)) {
+        if (Regras.verificaIntegridade(id)) {
             GerenciaConexao gerenciaConexao;
             try {
                 gerenciaConexao = new GerenciaConexao();
                 try {
                     gerenciaConexao.getConexao().iniciarTransacao();
-                    AnoLetivo anoLetivo = new AnoLetivo(id,inicio,fim);
-                    if (anoLetivo.alterar(gerenciaConexao.getConexao())) {
+                    Notificacao notificacao = new Notificacao();
+                    notificacao.setNot_id(id);
+                    if (notificacao.alterar(gerenciaConexao.getConexao())) {
                         resposta.put("status", true);
-                        resposta.put("mensagem", "Ano letivo alterado com sucesso");
+                        resposta.put("mensagem", "Notificação visualizada com sucesso!");
                         gerenciaConexao.getConexao().commit();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
                         return ResponseEntity.ok(resposta);
                     } else {
                         resposta.put("status", false);
-                        resposta.put("mensagem", "Ano letivo não foi alterado!");
+                        resposta.put("mensagem", "Erro ao visualizar notificação!");
                         gerenciaConexao.getConexao().rollback();
                         gerenciaConexao.getConexao().fimTransacao();
                         gerenciaConexao.Desconectar();
@@ -99,7 +91,7 @@ public class AnoLetivoCtrl {
                     }
                 } catch (Exception e) {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Ocorreu um erro de conexão");
+                    resposta.put("mensagem", "Erro durante a visualização");
                     gerenciaConexao.getConexao().rollback();
                     gerenciaConexao.getConexao().fimTransacao();
                     gerenciaConexao.Desconectar();
@@ -107,7 +99,7 @@ public class AnoLetivoCtrl {
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro ao iniciar conexao");
+                resposta.put("mensagem", "Erro ao iniciar conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
@@ -115,69 +107,63 @@ public class AnoLetivoCtrl {
             resposta.put("mensagem", "Dados inválidos");
             return ResponseEntity.badRequest().body(resposta);
         }
-
     }
 
-    public ResponseEntity<Object> apagarAno(int id) {
+    public ResponseEntity<Object> excluirNotificacao(int id) {
         Map<String, Object> resposta = new HashMap<>();
-        if (verificaIntegridade(id)) {
+
+        if (Regras.verificaIntegridade(id)) {
             try {
-                AnoLetivo anoLetivo = new AnoLetivo();
-                anoLetivo.setId(id);
+                Notificacao notificacao = new Notificacao();
+                notificacao.setNot_id(id);
                 GerenciaConexao gerenciaConexao = new GerenciaConexao();
-                if (anoLetivo.apagar(gerenciaConexao.getConexao())) {
+                if (notificacao.apagar(gerenciaConexao.getConexao())) {
                     resposta.put("status", true);
-                    resposta.put("mensagem", "Ano letivo excluido com sucesso!");
+                    resposta.put("mensagem", "Notificação excluída com sucesso!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.ok(resposta);
                 } else {
                     resposta.put("status", false);
-                    resposta.put("mensagem", "Exclusão não foi realizada!");
+                    resposta.put("mensagem", "Erro ao excluir notificação!");
                     gerenciaConexao.Desconectar();
                     return ResponseEntity.badRequest().body(resposta);
                 }
             } catch (Exception e) {
                 resposta.put("status", false);
-                resposta.put("mensagem", "Ocorreu um erro de conexão");
+                resposta.put("mensagem", "Erro de conexão");
                 return ResponseEntity.badRequest().body(resposta);
             }
         } else {
             resposta.put("status", false);
-            resposta.put("mensagem", "Dados inválidos para exclusão!");
+            resposta.put("mensagem", "ID inválido");
             return ResponseEntity.badRequest().body(resposta);
         }
-
     }
 
-    public ResponseEntity<Object> buscarAnos(String termo) {
+    public ResponseEntity<Object> buscarNotificacao() {
         Map<String, Object> resposta = new HashMap<>();
         try {
             GerenciaConexao gerenciaConexao = new GerenciaConexao();
-            AnoLetivo anoLetivo = new AnoLetivo();
-            List<AnoLetivo> anoLetivoList = anoLetivo.buscarTodos(gerenciaConexao.getConexao());
+            Notificacao notificacao = new Notificacao();
+            List<Notificacao> notificacaoList = notificacao.buscarTodos(gerenciaConexao.getConexao());
             gerenciaConexao.Desconectar();
-            if (anoLetivoList != null && !anoLetivoList.isEmpty()) {
+
+            if (notificacaoList != null && !notificacaoList.isEmpty()) {
                 resposta.put("status", true);
-                resposta.put("anos", anoLetivoList);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.ok(resposta);
             } else {
-                resposta.put("status", false);
-                resposta.put("mensagem", "Nenhum ano letivo encontrado.");
+                resposta.put("status", true);
+                resposta.put("ListaNotificacao", notificacaoList);
                 return ResponseEntity.badRequest().body(resposta);
             }
 
         } catch (Exception e) {
+
             resposta.put("status", false);
-            resposta.put("mensagem", "Erro ao buscar anos letivos");
+            resposta.put("mensagem", "Erro ao buscar as notificações");
             return ResponseEntity.badRequest().body(resposta);
         }
     }
 
-    private boolean verificaIntegridade(int elemento) {
-        return elemento > 0;
-    }
-
-    private boolean verificaIntegridade(LocalDate elemento) {
-        return elemento != null;
-    }
 }
