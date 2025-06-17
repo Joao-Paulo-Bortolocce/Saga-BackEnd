@@ -27,19 +27,23 @@ public class FichaDaMatriculaDAO {
         return conexao.manipular(sql);
     }
 
-    public boolean alterar(FichaDaMatricula ficha,Conexao conexao){
+    public boolean alterar(FichaDaMatricula ficha, Conexao conexao) {
         String sql = """
-                        UPDATE public.fichadamatricula
-                        	SET fichadamatricula_observacao='#3',' fichadamatricula_status='#4'
-                        	WHERE fichadamatricula_matricula_matricula_id='#1' AND fichadamatricula_ficha_ficha_id='#2';
-                """;
-        sql = sql.replace("#1", "" + ficha.getMatricula().getId());
-        sql = sql.replace("#2", "" + ficha.getFicha().getFicha_id());
-        sql = sql.replace("#3", "" + ficha.getObservacao());
-        sql = sql.replace("#3", "" + ficha.getStatus());
+        UPDATE public.fichadamatricula
+        SET fichadamatricula_observacao = '#3',
+            fichadamatricula_status = '#4'
+        WHERE fichadamatricula_matricula_matricula_id = #1 
+          AND fichadamatricula_ficha_ficha_id = #2;
+        """;
+
+        sql = sql.replace("#1", String.valueOf(ficha.getMatricula().getId()));
+        sql = sql.replace("#2", String.valueOf(ficha.getFicha().getFicha_id()));
+        sql = sql.replace("#3", ficha.getObservacao().replace("'", "''")); // protege aspas simples
+        sql = sql.replace("#4", String.valueOf(ficha.getStatus()));
 
         return conexao.manipular(sql);
     }
+
 
     public boolean apagar(FichaDaMatricula ficha,Conexao conexao){
         String sql = """
@@ -62,7 +66,7 @@ public class FichaDaMatriculaDAO {
         else{
              sql = """
                 SELECT * FROM fichadamatricula
-                    where fichadamatricula_status= 1;
+                    where fichadamatricula_status= 2;
                 """;
         }
 

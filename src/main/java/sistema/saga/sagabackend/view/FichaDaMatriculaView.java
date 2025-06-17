@@ -20,10 +20,10 @@ public class FichaDaMatriculaView {
 //        return fichaDaMatriculaCtrl.gravar(dados);
 //    }
 //
-//    @PutMapping
-//    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
-//        return fichaDaMatriculaCtrl.alterar(dados);
-//    }
+    @PutMapping
+    public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
+        return fichaDaMatriculaCtrl.alterar(dados);
+    }
 //
 //    @DeleteMapping("/apagar/{id}")
 //    public ResponseEntity<Object> apagar(@PathVariable(name = "id") int id) {
