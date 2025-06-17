@@ -29,8 +29,8 @@ public class FichaDaMatriculaCtrl {
 
             if (Regras.verificaIntegridade(ra) &&
                     Regras.verificaIntegridade(id) &&
-                    Regras.verificaIntegridade(status) &&
-                    Regras.verificaIntegridade(observacao)) {
+                    Regras.verificaIntegridade(status)
+                    ) {
 
                 FichaDaMatricula fichaDaMatricula = new FichaDaMatricula(
                         new Matricula(ra),
@@ -147,8 +147,8 @@ public class FichaDaMatriculaCtrl {
 
             if (Regras.verificaIntegridade(ra) &&
                     Regras.verificaIntegridade(id) &&
-                    Regras.verificaIntegridade(status) &&
-                    Regras.verificaIntegridade(observacao)) {
+                    Regras.verificaIntegridade(status)
+                   ) {
 
                 FichaDaMatricula fichaDaMatricula = new FichaDaMatricula(
                         new Matricula(ra),
