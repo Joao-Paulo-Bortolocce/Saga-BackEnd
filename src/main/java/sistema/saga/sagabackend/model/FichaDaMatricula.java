@@ -65,7 +65,7 @@ public class FichaDaMatricula {
         return fichaDAO.alterar(this, conexao);
     }
 
-    public List<FichaDaMatricula> buscarTodas(boolean validada,Conexao conexao) {
+    public List<FichaDaMatricula> buscarTodas(int validada,Conexao conexao) {
         FichaDaMatriculaDAO fichaDAO = new FichaDaMatriculaDAO();
         return fichaDAO.getAll(validada,conexao);
     }

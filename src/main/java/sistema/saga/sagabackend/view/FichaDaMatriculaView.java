@@ -31,7 +31,7 @@ public class FichaDaMatriculaView {
 //    }
 
     @GetMapping
-    public ResponseEntity<Object> buscarTodas(@RequestParam(name = "validadas", required = false) boolean valid) {
+    public ResponseEntity<Object> buscarTodas(@RequestParam(name = "validadas", required = false) int valid) {
         return fichaDaMatriculaCtrl.buscarTodas(valid);
     }
 

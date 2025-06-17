@@ -56,18 +56,27 @@ public class FichaDaMatriculaDAO {
         return conexao.manipular(sql);
     }
 
-    public List<FichaDaMatricula> getAll(boolean validadas,Conexao conexao) {
+    public List<FichaDaMatricula> getAll(int validadas,Conexao conexao) {
         String sql="";
-        if(validadas){
+        if(validadas==2){
              sql = """
                 SELECT * FROM fichadamatricula;
                 """;
         }
         else{
-             sql = """
+            if(validadas==1){
+                sql = """
+                SELECT * FROM fichadamatricula
+                    where fichadamatricula_status= 3;
+                """;
+            }
+            else{
+
+                sql = """
                 SELECT * FROM fichadamatricula
                     where fichadamatricula_status= 2;
                 """;
+            }
         }
 
         List<FichaDaMatricula> fichas = new ArrayList<>();
