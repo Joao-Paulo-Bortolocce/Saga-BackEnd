@@ -14,31 +14,52 @@ public class FichaDaMatriculaDAO {
     }
 
     public boolean gravar(FichaDaMatricula ficha,Conexao conexao){
-        String sql = """
+        String sql;
+        if(ficha.getObservacao()!=null){
+            sql = """
                         INSERT INTO fichadamatricula(
                         	fichadamatricula_matricula_matricula_id, fichadamatricula_ficha_ficha_id, fichadamatricula_observacao, fichadamatricula_status)
                         	VALUES ('#1','#2','#3','#4');
                 """;
+            sql = sql.replace("#3", ficha.getObservacao());
+        }
+
+        else{
+            sql = """
+                        INSERT INTO fichadamatricula(
+                        	fichadamatricula_matricula_matricula_id, fichadamatricula_ficha_ficha_id, fichadamatricula_status)
+                        	VALUES ('#1','#2','#4');
+                """;
+        }
         sql = sql.replace("#1", "" + ficha.getMatricula().getId());
         sql = sql.replace("#2", "" + ficha.getFicha().getFicha_id());
-        sql = sql.replace("#3", ficha.getObservacao());
         sql = sql.replace("#4", "" + ficha.getStatus());
 
         return conexao.manipular(sql);
     }
 
     public boolean alterar(FichaDaMatricula ficha, Conexao conexao) {
-        String sql = """
+        String sql;
+        if(ficha.getObservacao()!=null){
+                sql = """
         UPDATE public.fichadamatricula
         SET fichadamatricula_observacao = '#3',
             fichadamatricula_status = '#4'
         WHERE fichadamatricula_matricula_matricula_id = #1 
           AND fichadamatricula_ficha_ficha_id = #2;
         """;
-
+            sql = sql.replace("#3", ficha.getObservacao().replace("'", "''")); // protege aspas simples
+        }
+        else{
+            sql = """
+        UPDATE public.fichadamatricula
+        SET fichadamatricula_status = '#4'
+        WHERE fichadamatricula_matricula_matricula_id = #1 
+          AND fichadamatricula_ficha_ficha_id = #2;
+        """;
+        }
         sql = sql.replace("#1", String.valueOf(ficha.getMatricula().getId()));
         sql = sql.replace("#2", String.valueOf(ficha.getFicha().getFicha_id()));
-        sql = sql.replace("#3", ficha.getObservacao().replace("'", "''")); // protege aspas simples
         sql = sql.replace("#4", String.valueOf(ficha.getStatus()));
 
         return conexao.manipular(sql);
