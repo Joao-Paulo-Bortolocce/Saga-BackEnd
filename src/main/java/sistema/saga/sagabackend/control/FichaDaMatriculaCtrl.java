@@ -16,7 +16,8 @@ import java.util.Map;
 @Service
 public class FichaDaMatriculaCtrl {
 
-    public ResponseEntity<Object> buscarTodas(boolean valid) {
+
+    public ResponseEntity<Object> buscarTodas(int valid) {
         Map<String, Object> resposta = new HashMap<>();
         GerenciaConexao gerenciaConexao = new GerenciaConexao();
         try {
