@@ -21,6 +21,8 @@ public class AvaliacaoDaMatriculaDAO {
             frog = conexao.manipular(deleteSQL);
         }
 
+        frog = true;
+
         for (int i = 0; i < vetorHabilidades.length && frog; i++) {
             String insertSQL = "INSERT INTO avaliacaodamatricula " +
                     "(avaliacaodamatricula_matricula_matricula_id, avaliacaodamatricula_habilidadesdaficha_habilidadesdaficha_id, avaliacaodamatricula_av) " +

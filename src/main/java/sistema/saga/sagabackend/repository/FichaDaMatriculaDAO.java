@@ -21,8 +21,8 @@ public class FichaDaMatriculaDAO {
                 """;
         sql = sql.replace("#1", "" + ficha.getMatricula().getId());
         sql = sql.replace("#2", "" + ficha.getFicha().getFicha_id());
-        sql = sql.replace("#3", "" + ficha.getObservacao());
-        sql = sql.replace("#3", "" + ficha.getStatus());
+        sql = sql.replace("#3", ficha.getObservacao());
+        sql = sql.replace("#4", "" + ficha.getStatus());
 
         return conexao.manipular(sql);
     }

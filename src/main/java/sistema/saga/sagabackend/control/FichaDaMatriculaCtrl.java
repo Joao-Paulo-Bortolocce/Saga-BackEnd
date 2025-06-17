@@ -16,6 +16,56 @@ import java.util.Map;
 @Service
 public class FichaDaMatriculaCtrl {
 
+    public ResponseEntity<Object> gravar(Map<String, Object> dados) {
+        HashMap<String, Object> resposta = new HashMap<>();
+        GerenciaConexao gerenciaConexao = new GerenciaConexao();
+        try {
+            HashMap<String, Object> mat = (HashMap<String, Object>) dados.get("matricula");
+            HashMap<String, Object> ficha = (HashMap<String, Object>) dados.get("ficha");
+            String observacao = (String) dados.get("observacao");
+            int status = Integer.parseInt(""+ dados.get("status"));
+            int ra = Integer.parseInt(""+ mat.get("id"));
+            int id = Integer.parseInt(""+ ficha.get("ficha_id"));
+
+            if (Regras.verificaIntegridade(ra) &&
+                    Regras.verificaIntegridade(id) &&
+                    Regras.verificaIntegridade(status) &&
+                    Regras.verificaIntegridade(observacao)) {
+
+                FichaDaMatricula fichaDaMatricula = new FichaDaMatricula(
+                        new Matricula(ra),
+                        new Ficha(id),
+                        observacao,
+                        status
+                );
+
+                if (fichaDaMatricula.gravar(gerenciaConexao.getConexao())) {
+                    resposta.put("status", true);
+                    resposta.put("mensagem", "Ficha da matrícula gravada com sucesso!");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.ok(resposta);
+                } else {
+                    resposta.put("status", false);
+                    resposta.put("mensagem", "Erro ao gravar a ficha da matrícula");
+                    gerenciaConexao.Desconectar();
+                    return ResponseEntity.badRequest().body(resposta);
+                }
+
+            } else {
+                resposta.put("status", false);
+                resposta.put("mensagem", "Dados inválidos");
+                gerenciaConexao.Desconectar();
+                return ResponseEntity.badRequest().body(resposta);
+            }
+
+        } catch (Exception e) {
+            resposta.put("status", false);
+            resposta.put("mensagem", "Erro ao processar os dados: " + e.getMessage());
+            gerenciaConexao.Desconectar();
+            return ResponseEntity.badRequest().body(resposta);
+        }
+    }
+
 
     public ResponseEntity<Object> buscarTodas(int valid) {
         Map<String, Object> resposta = new HashMap<>();

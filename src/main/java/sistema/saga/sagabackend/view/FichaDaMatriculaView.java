@@ -15,11 +15,11 @@ public class FichaDaMatriculaView {
     @Autowired
     FichaDaMatriculaCtrl fichaDaMatriculaCtrl;
 
-//    @PostMapping
-//    public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
-//        return fichaDaMatriculaCtrl.gravar(dados);
-//    }
-//
+    @PostMapping
+    public ResponseEntity<Object> gravar(@RequestBody Map<String, Object> dados) {
+        return fichaDaMatriculaCtrl.gravar(dados);
+    }
+
     @PutMapping
     public ResponseEntity<Object> alterar(@RequestBody Map<String, Object> dados) {
         return fichaDaMatriculaCtrl.alterar(dados);
