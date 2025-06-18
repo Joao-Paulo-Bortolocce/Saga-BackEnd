@@ -14,10 +14,11 @@ public class HabilidadeDAO {
     public boolean gravar(Habilidade habilidade ,Conexao conexao) {
         String sql = """
                     INSERT INTO habilidades(habilidades_descricao, habilidades_materia_id, habilidades_serie_id) VALUES
-                    ('#1', '#2');
+                    ('#1', '#2', '#3');
                 """;
         sql = sql.replace("#1", habilidade.getDescricao());
         sql = sql.replace("#2", "" + habilidade.getMateria_id());
+        sql = sql.replace("#3", "" + habilidade.getHabilidades_serie_id());
 
         return conexao.manipular(sql);
     }
