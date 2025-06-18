@@ -14,9 +14,8 @@ public class MateriaDAO {
 
     public boolean gravar(Materia materia, Conexao conexao) {
         String sql = """
-            INSERT INTO materia(materia_id, materia_nome, materia_carga) VALUES (#1, '#2', #3);
+            INSERT INTO materia(materia_nome, materia_carga) VALUES ('#2', #3);
             """;
-        sql = sql.replace("#1", "" + materia.getId());
         sql = sql.replace("#2", materia.getNome());
         sql = sql.replace("#3", "" + materia.getCarga());
 
